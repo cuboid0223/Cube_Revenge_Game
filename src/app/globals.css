@@ -3,25 +3,62 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --game-viewport-width: 180px;
+  --game-viewport-height: 180px;
+  --game-cell-size: 16px;
+  --pixel-size: 1;
 }
 
-@media (prefers-color-scheme: dark) {
+html,
+body {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  margin: 0;
+}
+
+/* 當 viewport 變大或縮小，不影響 pixel 的模糊 */
+canvas {
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Scale up game art if we can fit it. 2x */
+@media (min-width: 360px) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --pixel-size: 2;
   }
 }
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+/* 3x */
+@media (min-width: 540px) {
+  :root {
+    --pixel-size: 3;
+  }
+}
+/* 4x */
+@media (min-width: 720px) {
+  :root {
+    --pixel-size: 4;
+  }
+}
+/* 5x */
+@media (min-width: 900px) {
+  :root {
+    --pixel-size: 5;
+  }
+}
+/* 6x */
+@media (min-width: 1080px) {
+  :root {
+    --pixel-size: 6;
+  }
+}
+/* 7x */
+@media (min-width: 1260px) {
+  :root {
+    --pixel-size: 7;
+  }
 }

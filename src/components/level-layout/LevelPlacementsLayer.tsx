@@ -10,6 +10,7 @@ export default function LevelPlacementsLayer({ level }: Props) {
     const style: CSSProperties = {
       position: "absolute",
       transform: `translate3d(${x}px, ${y}px, 0)`,
+      zIndex: placement.zIndex(),
     };
 
     return (

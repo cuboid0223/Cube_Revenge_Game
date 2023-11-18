@@ -1,5 +1,22 @@
+import { LevelSchema, PlacementSchema } from "@/helpers/types";
+
+type PositionType = {
+  x: number;
+  y: number;
+} | null;
+
 export class Collision {
-  constructor(forBody, level, position = null) {
+  forBody: PlacementSchema;
+  level: LevelSchema;
+  placementsAtPosition: PlacementSchema[];
+  x: number;
+  y: number;
+
+  constructor(
+    forBody: PlacementSchema,
+    level: LevelSchema,
+    position: PositionType
+  ) {
     this.forBody = forBody;
     this.level = level;
     this.placementsAtPosition = [];
@@ -11,14 +28,19 @@ export class Collision {
   }
 
   scanPlacementsAtPosition() {
-    // check 所有的 placements 中
+    // check 撞到哪個 placements 並加入到 placementsAtPosition
     this.placementsAtPosition = this.level.placements.filter((p) => {
       const isSelf = p.id === this.forBody.id;
       return !isSelf && p.x === this.x && p.y === this.y;
     });
+    console.log(this.placementsAtPosition);
   }
 
   withSolidPlacement() {
+    console.log(
+      "withSolidPlacement",
+      this.placementsAtPosition.find((p) => p.isSolidForBody(this.forBody))
+    );
     return this.placementsAtPosition.find((p) =>
       p.isSolidForBody(this.forBody)
     );

@@ -35,7 +35,7 @@ export class Placement {
 
   tick() {}
 
-  isSolidForBody(_body) {
+  isSolidForBody(_body: PlacementSchema): boolean {
     return false;
   }
 
@@ -67,6 +67,10 @@ export class Placement {
       default:
         return [x, y + progressPixels];
     }
+  }
+
+  zIndex() {
+    return 1;
   }
 
   renderComponent(): JSX.Element | null {

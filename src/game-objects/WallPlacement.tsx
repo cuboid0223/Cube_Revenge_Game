@@ -4,6 +4,7 @@ import { THEME_TILES_MAP } from "../helpers/consts";
 
 export class WallPlacement extends Placement {
   isSolidForBody(_body) {
+    // _body 下底線的意思表示這個參數不會被用到
     return true;
   }
 

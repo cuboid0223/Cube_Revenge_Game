@@ -37,12 +37,15 @@ export class Collision {
   }
 
   withSolidPlacement() {
-    console.log(
-      "withSolidPlacement",
-      this.placementsAtPosition.find((p) => p.isSolidForBody(this.forBody))
-    );
     return this.placementsAtPosition.find((p) =>
       p.isSolidForBody(this.forBody)
     );
+  }
+
+  withPlacementAddsToInventory() {
+    // 撿到 placements 加入到 inventory
+    return this.placementsAtPosition.find((p) => {
+      return p.addsItemToInventoryOnCollide(this.forBody);
+    });
   }
 }

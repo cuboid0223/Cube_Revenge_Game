@@ -144,6 +144,8 @@ export class HeroPlacement extends Placement {
     // handle collisions!
     const collision = new Collision(this, this.level);
     const collideThatAddsToInventory = collision.withPlacementAddsToInventory();
+
+    // 當角色遇到可拾取物件
     if (collideThatAddsToInventory) {
       // console.log("HANDLE COLLISION!", collideThatAddsToInventory);
       collideThatAddsToInventory.collect();
@@ -152,6 +154,13 @@ export class HeroPlacement extends Placement {
         x: this.x,
         y: this.y,
       });
+    }
+
+    // 當角色踩上傳送門，呼叫 level 的 completeLevel
+    const completesLevel = collision.withCompletesLevel();
+    if (completesLevel) {
+      console.log("Hero is on the goal!");
+      this.level.completeLevel();
     }
   }
 

@@ -42,8 +42,12 @@ export class Placement {
   }
 
   addsItemToInventoryOnCollide() {
-    console.log("adding item to inventory on collide");
+    // console.log("adding item to inventory on collide");
     return null;
+  }
+
+  completesLevelOnCollide() {
+    return false;
   }
 
   displayXY() {
@@ -62,7 +66,7 @@ export class Placement {
     // movingPixelsRemaining 介於 1 - 16
     // 會隨時間每個 frame 遞減 1.5 pixel
     // 16 -> 14.5 -> 13 -> ... 1.5
-    console.log(this.movingPixelsRemaining);
+    // console.log(this.movingPixelsRemaining);
     const progressPixels = CELL_SIZE - this.movingPixelsRemaining;
     switch (this.movingPixelDirection) {
       case DIRECTION_LEFT:

@@ -33,13 +33,20 @@ export class Collision {
       const isSelf = p.id === this.forBody.id;
       return !isSelf && p.x === this.x && p.y === this.y;
     });
-    console.log(this.placementsAtPosition);
+    console.log("遇到了 -> ", this.placementsAtPosition);
   }
 
   withSolidPlacement() {
     return this.placementsAtPosition.find((p) =>
       p.isSolidForBody(this.forBody)
     );
+  }
+
+  withCompletesLevel() {
+    // 尋找 傳送門 placement 並呼叫 completesLevelOnCollide
+    return this.placementsAtPosition.find((p) => {
+      return p.completesLevelOnCollide();
+    });
   }
 
   withPlacementAddsToInventory() {

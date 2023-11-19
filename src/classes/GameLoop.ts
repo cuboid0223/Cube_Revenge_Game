@@ -6,6 +6,7 @@ export class GameLoop {
     // onStep -> a callback fire on every single frame
     this.onStep = onStep;
     this.rafCallback = null;
+    this.hasStopped = false;
     this.start();
   }
 
@@ -13,6 +14,10 @@ export class GameLoop {
     let previousMs: number | undefined;
     const step = 1 / 60;
     const tick = (timestampMs: number) => {
+      if (this.hasStopped) {
+        return;
+      }
+
       if (previousMs === undefined) {
         previousMs = timestampMs;
       }
@@ -31,6 +36,7 @@ export class GameLoop {
   }
 
   stop() {
+    this.hasStopped = true;
     if (this.rafCallback !== null) {
       cancelAnimationFrame(this.rafCallback);
     }

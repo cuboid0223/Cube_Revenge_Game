@@ -27,6 +27,7 @@ export class LevelState {
     this.id = levelId;
     this.onEmit = onEmit;
     this.directionControls = new DirectionControls();
+    this.isCompleted = false;
     this.theme = LEVEL_THEMES.BLUE;
     this.tilesWidth = 8;
     this.tilesHeight = 8;
@@ -105,7 +106,14 @@ export class LevelState {
       tilesWidth: this.tilesWidth,
       tilesHeight: this.tilesHeight,
       placements: this.placements,
+      isCompleted: this.isCompleted,
     };
+  }
+
+  completeLevel() {
+    this.isCompleted = true;
+    // 當角色完成該 level 後，所有動作均停止(包含角色移動)
+    this.gameLoop.stop();
   }
 
   destroy() {

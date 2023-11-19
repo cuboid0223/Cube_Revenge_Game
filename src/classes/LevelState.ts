@@ -30,14 +30,7 @@ export class LevelState {
     this.theme = LEVEL_THEMES.BLUE;
     this.tilesWidth = 8;
     this.tilesHeight = 8;
-    this.placements = [
-      { id: 0, x: 2, y: 2, frameCoord: TILES.ICE_PICKUP },
-      { id: 1, x: 2, y: 4, frameCoord: TILES.WATER_PICKUP },
-      { id: 2, x: 2, y: 6, frameCoord: TILES.FIRE_PICKUP },
-      { id: 3, x: 7, y: 2, frameCoord: TILES.GREEN_KEY },
-      { id: 4, x: 7, y: 4, frameCoord: TILES.BLUE_LOCK },
-      { id: 5, x: 7, y: 6, frameCoord: TILES.BULLET },
-    ];
+    this.placements = [];
     //Start the level!
     this.start();
   }
@@ -49,7 +42,9 @@ export class LevelState {
       { id: 2, x: 4, y: 4, type: PLACEMENT_TYPE_WALL },
       { id: 3, x: 5, y: 2, type: PLACEMENT_TYPE_WALL },
       { id: 4, x: 6, y: 6, type: PLACEMENT_TYPE_WALL },
-      { id: 5, x: 4, y: 3, type: PLACEMENT_TYPE_FLOUR },
+      { id: 5, x: 3, y: 3, type: PLACEMENT_TYPE_FLOUR },
+      { id: 6, x: 4, y: 3, type: PLACEMENT_TYPE_FLOUR },
+      { id: 7, x: 5, y: 3, type: PLACEMENT_TYPE_FLOUR },
     ].map((config) => {
       return placementFactory.createPlacement(config, this);
     });

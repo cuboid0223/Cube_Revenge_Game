@@ -31,6 +31,8 @@ export class Placement {
 
     this.spriteFacingDirection = DIRECTION_RIGHT;
     this.spriteWalkFrame = 0;
+
+    this.hasBeenCollected = false;
   }
 
   tick() {}
@@ -40,6 +42,7 @@ export class Placement {
   }
 
   addsItemToInventoryOnCollide() {
+    console.log("adding item to inventory on collide");
     return null;
   }
 
@@ -75,6 +78,10 @@ export class Placement {
 
   zIndex() {
     return 1;
+  }
+
+  collect() {
+    this.hasBeenCollected = true;
   }
 
   renderComponent(): JSX.Element | null {

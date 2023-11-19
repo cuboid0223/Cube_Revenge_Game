@@ -144,7 +144,8 @@ export class HeroPlacement extends Placement {
     const collision = new Collision(this, this.level);
     const collideThatAddsToInventory = collision.withPlacementAddsToInventory();
     if (collideThatAddsToInventory) {
-      console.log("HANDLE COLLISION!", collideThatAddsToInventory);
+      // console.log("HANDLE COLLISION!", collideThatAddsToInventory);
+      collideThatAddsToInventory.collect();
     }
   }
 

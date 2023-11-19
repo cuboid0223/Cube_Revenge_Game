@@ -5,6 +5,7 @@ import LevelBackgroundTilesLayer from "./LevelBackgroundTilesLayer";
 import LevelPlacementsLayer from "./LevelPlacementsLayer";
 import { LevelState } from "../../classes/LevelState";
 import { LevelSchema } from "@/helpers/types";
+import FlourCount from "../hud/FlourCount";
 
 export default function RenderLevel() {
   const [level, setLevel] = useState<LevelSchema | null>(null);
@@ -86,6 +87,7 @@ export default function RenderLevel() {
         {/* 遊戲物體層 */}
         <LevelPlacementsLayer level={level} />
       </div>
+      <FlourCount level={level} />
     </div>
   );
 }

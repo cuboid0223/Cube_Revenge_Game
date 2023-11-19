@@ -45,7 +45,9 @@ export class Collision {
   withPlacementAddsToInventory() {
     // 撿到 placements 加入到 inventory
     return this.placementsAtPosition.find((p) => {
-      return p.addsItemToInventoryOnCollide(this.forBody);
+      return (
+        !p.hasBeenCollected && p.addsItemToInventoryOnCollide(this.forBody)
+      );
     });
   }
 }

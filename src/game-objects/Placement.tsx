@@ -84,6 +84,10 @@ export class Placement {
     }
   }
 
+  canBeUnlocked() {
+    return false;
+  }
+
   zIndex() {
     return 1;
   }

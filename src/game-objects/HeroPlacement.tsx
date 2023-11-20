@@ -22,15 +22,23 @@ const heroSkinMap = {
 
 export class HeroPlacement extends Placement {
   controllerMoveRequested(direction) {
-    //Attempt to start moving
+    // Attempt to start moving
     // 因為 controllerMoveRequested 是在每一 frame 呼叫的，所以避免重複呼叫需要下面的 return，
+    // return; 的意思是指 不讓角色移動
     if (this.movingPixelsRemaining > 0) {
       return;
     }
 
+    // check for lock at next position
+    const possibleLock = this.getLockAtNextPosition(direction);
+    if (possibleLock) {
+      console.log("解鎖 : ", possibleLock);
+      possibleLock.unlock();
+      return;
+    }
+
     //Make sure the next space is available
-    const canMove = this.canMoveToNextDestination(direction);
-    if (!canMove) {
+    if (this.isSolidAtNextPosition(direction)) {
       return;
     }
 
@@ -42,27 +50,32 @@ export class HeroPlacement extends Placement {
     this.updateWalkFrame();
   }
 
-  canMoveToNextDestination(direction) {
-    // Is the next space in bounds?
+  getCollisionAtNextPosition(direction) {
+    // 取得移動到下一個位置遇到的 placements
+    // e.g. lock placement
     const { x, y } = directionUpdateMap[direction];
     const nextX = this.x + x;
     const nextY = this.y + y;
-    const isOutOfBounds = this.level.isPositionOutOfBounds(nextX, nextY);
+    return new Collision(this, this.level, { x: nextX, y: nextY });
+  }
+
+  getLockAtNextPosition(direction) {
+    const collision = this.getCollisionAtNextPosition(direction);
+    return collision.withLock();
+  }
+
+  isSolidAtNextPosition(direction) {
+    const collision = this.getCollisionAtNextPosition(direction);
+
+    const isOutOfBounds = this.level.isPositionOutOfBounds(
+      collision.x,
+      collision.y
+    );
     if (isOutOfBounds) {
-      return false;
+      return true;
     }
 
-    // Is there a solid thing here?
-    const collision = new Collision(this, this.level, {
-      x: nextX,
-      y: nextY,
-    });
-    if (collision.withSolidPlacement()) {
-      return false;
-    }
-
-    // Default to allowing move
-    return true;
+    return Boolean(collision.withSolidPlacement());
   }
 
   updateFacingDirection() {
@@ -158,6 +171,7 @@ export class HeroPlacement extends Placement {
 
     // 當角色踩上傳送門，呼叫 level 的 completeLevel
     const completesLevel = collision.withCompletesLevel();
+
     if (completesLevel) {
       console.log("Hero is on the goal!");
       this.level.completeLevel();

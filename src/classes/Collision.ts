@@ -49,6 +49,13 @@ export class Collision {
     });
   }
 
+  withLock() {
+    // 當遇到是 lock placement 且有正確的 key，回傳 true
+    return this.placementsAtPosition.find((p) => {
+      return p.canBeUnlocked();
+    });
+  }
+
   withPlacementAddsToInventory() {
     // 撿到 placements 加入到 inventory
     return this.placementsAtPosition.find((p) => {

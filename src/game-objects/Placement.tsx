@@ -35,18 +35,22 @@ export class Placement {
     this.hasBeenCollected = false;
   }
 
-  tick() {}
+  tick() {
+    // base class init tick()
+  }
 
   isSolidForBody(_body: PlacementSchema): boolean {
+    // base class init isSolidForBody()
     return false;
   }
 
   addsItemToInventoryOnCollide() {
-    // console.log("adding item to inventory on collide");
+    // base class init addsItemToInventoryOnCollide()
     return null;
   }
 
   completesLevelOnCollide() {
+    // base class init completesLevelOnCollide()
     return false;
   }
 
@@ -86,9 +90,11 @@ export class Placement {
 
   collect() {
     this.hasBeenCollected = true;
+    this.level.inventory.add(this.addsItemToInventoryOnCollide());
   }
 
   renderComponent(): JSX.Element | null {
+    // base class init renderComponent()
     return this.renderFn();
   }
 }

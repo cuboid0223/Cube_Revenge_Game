@@ -4,6 +4,8 @@ import { placementFactory } from "./PlacementFactory";
 import { GameLoop } from "./GameLoop";
 import { DirectionControls } from "./DirectionControls";
 import LevelsMap from "../levels/levelsMap";
+import { Inventory } from "./Inventory";
+
 type OnEmitType = (level: LevelSchema) => void;
 
 export class LevelState {
@@ -31,6 +33,8 @@ export class LevelState {
     this.placements = levelData.placements.map((config) => {
       return placementFactory.createPlacement(config, this);
     });
+
+    this.inventory = new Inventory();
 
     // Cache a reference to the hero
     this.heroRef = this.placements.find((p) => p.type === PLACEMENT_TYPE_HERO);

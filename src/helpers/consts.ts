@@ -11,7 +11,7 @@ export const PLACEMENT_TYPE_CELEBRATION = "CELEBRATION";
 export const PLACEMENT_TYPE_LOCK = "LOCK";
 export const PLACEMENT_TYPE_KEY = "KEY";
 export const PLACEMENT_TYPE_WATER = "WATER";
-
+ export const PLACEMENT_TYPE_WATER_PICKUP = "WATER_PICKUP";
 
 export const DIRECTION_LEFT = "LEFT";
 export const DIRECTION_RIGHT = "RIGHT";
@@ -36,7 +36,7 @@ export const BODY_SKINS = {
   CONVEYOR: "CONVEYOR",
   FIRE: "FIRE",
   TELEPORT: "TELEPORT",
-  SCARED: "SCARED",
+  DEATH: "DEATH",
 };
 
 export const HERO_RUN_1 = "HERO_RUN_1";

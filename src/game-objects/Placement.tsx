@@ -4,6 +4,7 @@ import {
   CELL_SIZE,
   DIRECTION_LEFT,
   DIRECTION_UP,
+  BODY_SKINS,
 } from "../helpers/consts";
 
 export class Placement {
@@ -23,6 +24,7 @@ export class Placement {
     this.x = properties.x;
     this.y = properties.y;
     this.level = level;
+    this.skin = BODY_SKINS.NORMAL;
     this.renderFn = () => null;
 
     this.travelPixelsPerFrame = 1.5; // how quickly the character is going to move( 1 frame 1.5 pixel)
@@ -95,6 +97,10 @@ export class Placement {
   collect() {
     this.hasBeenCollected = true;
     this.level.inventory.add(this.addsItemToInventoryOnCollide());
+  }
+
+  changesHeroSkinOnCollide() {
+    return null;
   }
 
   damagesBodyOnCollide(_body) {

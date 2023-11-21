@@ -16,6 +16,7 @@ import { TILES } from "../helpers/tiles";
 
 const heroSkinMap = {
   [BODY_SKINS.NORMAL]: [TILES.HERO_LEFT, TILES.HERO_RIGHT],
+  [BODY_SKINS.WATER]: [TILES.HERO_WATER_LEFT, TILES.HERO_WATER_RIGHT],
   [HERO_RUN_1]: [TILES.HERO_RUN_1_LEFT, TILES.HERO_RUN_1_RIGHT],
   [HERO_RUN_2]: [TILES.HERO_RUN_2_LEFT, TILES.HERO_RUN_2_RIGHT],
   [BODY_SKINS.DEATH]: [TILES.HERO_DEATH_LEFT, TILES.HERO_DEATH_RIGHT],
@@ -41,6 +42,12 @@ export class HeroPlacement extends Placement {
     //Make sure the next space is available
     if (this.isSolidAtNextPosition(direction)) {
       return;
+    }
+
+    // Maybe hop out of non-normal skin
+    const collision = this.getCollisionAtNextPosition(direction);
+    if (!collision.withChangesHeroSkin()) {
+      this.skin = BODY_SKINS.NORMAL;
     }
 
     //Start the move
@@ -110,17 +117,17 @@ export class HeroPlacement extends Placement {
     }
 
     //If is moving, use correct walking frame per direction
-    if (this.movingPixelsRemaining > 0) {
+    if (this.movingPixelsRemaining > 0 && this.skin === BODY_SKINS.NORMAL) {
       const walkKey = this.spriteWalkFrame === 0 ? HERO_RUN_1 : HERO_RUN_2;
       return heroSkinMap[walkKey][index];
     }
 
-    return heroSkinMap[BODY_SKINS.NORMAL][index];
+    return heroSkinMap[this.skin][index];
   }
 
   getYTranslate() {
     // Stand on ground when not moving
-    if (this.movingPixelsRemaining === 0) {
+    if (this.movingPixelsRemaining === 0 || this.skin !== BODY_SKINS.NORMAL) {
       return 0;
     }
 
@@ -164,11 +171,16 @@ export class HeroPlacement extends Placement {
     // handle collisions!
     const collision = new Collision(this, this.level);
     const collideThatAddsToInventory = collision.withPlacementAddsToInventory();
-
+    this.skin = BODY_SKINS.NORMAL;
+    const changesHeroSkin = collision.withChangesHeroSkin();
+    if (changesHeroSkin) {
+      this.skin = changesHeroSkin.changesHeroSkinOnCollide();
+    }
     // 當角色遇到可拾取物件
     if (collideThatAddsToInventory) {
       // console.log("HANDLE COLLISION!", collideThatAddsToInventory);
       collideThatAddsToInventory.collect();
+      // 撿到物品後的 bling bling特效
       this.level.addPlacement({
         type: PLACEMENT_TYPE_CELEBRATION,
         x: this.x,
@@ -196,8 +208,13 @@ export class HeroPlacement extends Placement {
   }
 
   renderComponent() {
+    const showShadow = this.skin !== BODY_SKINS.WATER;
     return (
-      <Hero frameCoord={this.getFrame()} yTranslate={this.getYTranslate()} />
+      <Hero
+        frameCoord={this.getFrame()}
+        yTranslate={this.getYTranslate()}
+        showShadow={showShadow}
+      />
     );
   }
 }

@@ -70,4 +70,11 @@ export class Collision {
       );
     });
   }
+
+  withChangesHeroSkin() {
+    // 遇到水變更 skin
+    return this.placementsAtPosition.find((p) => {
+      return p.changesHeroSkinOnCollide();
+    });
+  }
 }

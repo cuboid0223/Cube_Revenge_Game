@@ -1,11 +1,25 @@
 import { Placement } from "./Placement";
 import Sprite from "../components/object-graphics/Sprite";
 import { TILES } from "../helpers/tiles";
-import { PLACEMENT_TYPE_HERO } from "../helpers/consts";
+import {
+  BODY_SKINS,
+  PLACEMENT_TYPE_HERO,
+  PLACEMENT_TYPE_WATER_PICKUP,
+} from "../helpers/consts";
 
 export class WaterPlacement extends Placement {
+  changesHeroSkinOnCollide() {
+    // 當碰到水變更為潛水 skin
+    return BODY_SKINS.WATER;
+  }
+
   damagesBodyOnCollide(body) {
-    return body.type === PLACEMENT_TYPE_HERO;
+    const { inventory } = this.level;
+    return (
+      body.type === PLACEMENT_TYPE_HERO &&
+      // 沒有潛水面具則死
+      !inventory.has(PLACEMENT_TYPE_WATER_PICKUP)
+    );
   }
 
   renderComponent() {

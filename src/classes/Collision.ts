@@ -56,6 +56,12 @@ export class Collision {
     });
   }
 
+  withSelfGetsDamaged() {
+    return this.placementsAtPosition.find((p) => {
+      return p.damagesBodyOnCollide(this.forBody);
+    });
+  }
+
   withPlacementAddsToInventory() {
     // 撿到 placements 加入到 inventory
     return this.placementsAtPosition.find((p) => {

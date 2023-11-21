@@ -10,6 +10,8 @@ export const PLACEMENT_TYPE_FLOUR = "FLOUR";
 export const PLACEMENT_TYPE_CELEBRATION = "CELEBRATION";
 export const PLACEMENT_TYPE_LOCK = "LOCK";
 export const PLACEMENT_TYPE_KEY = "KEY";
+export const PLACEMENT_TYPE_WATER = "WATER";
+
 
 export const DIRECTION_LEFT = "LEFT";
 export const DIRECTION_RIGHT = "RIGHT";

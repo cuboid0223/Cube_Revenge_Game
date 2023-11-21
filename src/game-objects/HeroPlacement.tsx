@@ -18,6 +18,7 @@ const heroSkinMap = {
   [BODY_SKINS.NORMAL]: [TILES.HERO_LEFT, TILES.HERO_RIGHT],
   [HERO_RUN_1]: [TILES.HERO_RUN_1_LEFT, TILES.HERO_RUN_1_RIGHT],
   [HERO_RUN_2]: [TILES.HERO_RUN_2_LEFT, TILES.HERO_RUN_2_RIGHT],
+  [BODY_SKINS.DEATH]: [TILES.HERO_DEATH_LEFT, TILES.HERO_DEATH_RIGHT],
 };
 
 export class HeroPlacement extends Placement {
@@ -98,9 +99,15 @@ export class HeroPlacement extends Placement {
     this.tickMovingPixelProgress();
   }
 
+  // 處理 skin 渲染
   getFrame() {
     //Which frame to show? left or right?
     const index = this.spriteFacingDirection === DIRECTION_LEFT ? 0 : 1;
+
+    // If dead, show the dead skin
+    if (this.level.deathOutcome) {
+      return heroSkinMap[BODY_SKINS.DEATH][index];
+    }
 
     //If is moving, use correct walking frame per direction
     if (this.movingPixelsRemaining > 0) {
@@ -167,6 +174,12 @@ export class HeroPlacement extends Placement {
         x: this.x,
         y: this.y,
       });
+    }
+    // 當角色碰到某些物體死亡
+    const takesDamages = collision.withSelfGetsDamaged();
+    if (takesDamages) {
+      console.log("掛了，因為 ", takesDamages.type);
+      this.level.setDeathOutcome(takesDamages.type);
     }
 
     // 當角色踩上傳送門，呼叫 level 的 completeLevel

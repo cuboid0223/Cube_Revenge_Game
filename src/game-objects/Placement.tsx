@@ -97,6 +97,10 @@ export class Placement {
     this.level.inventory.add(this.addsItemToInventoryOnCollide());
   }
 
+  damagesBodyOnCollide(_body) {
+    return null;
+  }
+
   renderComponent(): JSX.Element | null {
     // base class init renderComponent()
     return this.renderFn();

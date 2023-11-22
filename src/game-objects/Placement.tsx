@@ -41,6 +41,10 @@ export class Placement {
     // base class init tick()
   }
 
+  tickAttemptAiMove() {
+    return null;
+  }
+
   isSolidForBody(_body: PlacementSchema): boolean {
     // base class init isSolidForBody()
     return false;

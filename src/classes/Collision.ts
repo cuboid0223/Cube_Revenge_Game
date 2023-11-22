@@ -33,7 +33,9 @@ export class Collision {
       const isSelf = p.id === this.forBody.id;
       return !isSelf && p.x === this.x && p.y === this.y;
     });
-    console.log("遇到了 -> ", this.placementsAtPosition);
+    if (this.placementsAtPosition) {
+      console.log(this.forBody.type, "遇到了 -> ", this.placementsAtPosition);
+    }
   }
 
   withSolidPlacement() {

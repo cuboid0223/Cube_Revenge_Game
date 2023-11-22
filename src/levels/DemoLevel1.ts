@@ -33,6 +33,7 @@ const DemoLevel1 = {
     { x: 1, y: 3, type: PLACEMENT_TYPE_KEY, color: "GREEN" },
     { x: 5, y: 2, type: PLACEMENT_TYPE_GROUND_ENEMY },
     { x: 6, y: 7, type: PLACEMENT_TYPE_FLYING_ENEMY },
+    { x: 8, y: 7, type: PLACEMENT_TYPE_FLYING_ENEMY, initialDirection: "UP" },
   ],
 };
 

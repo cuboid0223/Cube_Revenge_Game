@@ -1,7 +1,7 @@
 import Body from "@/components/object-graphics/Body";
 import { Placement } from "./Placement";
 import { TILES } from "@/helpers/tiles";
-import { DIRECTION_LEFT, DIRECTION_RIGHT } from "@/helpers/consts";
+import { DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP } from "@/helpers/consts";
 import { BodyPlacement } from "./BodyPlacement";
 
 export class GroundEnemyPlacement extends BodyPlacement {
@@ -9,11 +9,13 @@ export class GroundEnemyPlacement extends BodyPlacement {
     super(properties, level);
     this.tickBetweenMovesInterval = 28; // hop! wait 28 frames and hop! wait 28 frames
     this.ticksUntilNextMove = this.tickBetweenMovesInterval;
+    this.turnsAroundAtWater = true;
+    this.movingPixelDirection = properties.initialDirection ?? DIRECTION_RIGHT; // 上下移動
   }
 
   tickAttemptAiMove() {
     this.checkForOverlapWithHero();
-    
+
     if (this.ticksUntilNextMove > 0) {
       this.ticksUntilNextMove -= 1;
       return;
@@ -51,10 +53,16 @@ export class GroundEnemyPlacement extends BodyPlacement {
   }
 
   switchDirection() {
-    this.movingPixelDirection =
-      this.movingPixelDirection === DIRECTION_LEFT
-        ? DIRECTION_RIGHT
-        : DIRECTION_LEFT;
+    const currentDir = this.movingPixelDirection;
+
+    // Horizontal change
+    if (currentDir === DIRECTION_LEFT || currentDir === DIRECTION_RIGHT) {
+      this.movingPixelDirection =
+        currentDir === DIRECTION_LEFT ? DIRECTION_RIGHT : DIRECTION_LEFT;
+      return;
+    }
+    // Vertical change
+    currentDir === DIRECTION_UP ? DIRECTION_DOWN : DIRECTION_UP;
   }
 
   renderComponent() {

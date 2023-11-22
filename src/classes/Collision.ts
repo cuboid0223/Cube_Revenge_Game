@@ -33,7 +33,7 @@ export class Collision {
       const isSelf = p.id === this.forBody.id;
       return !isSelf && p.x === this.x && p.y === this.y;
     });
-    if (this.placementsAtPosition) {
+    if (this.placementsAtPosition.length != 0) {
       console.log(this.forBody.type, "遇到了 -> ", this.placementsAtPosition);
     }
   }
@@ -66,11 +66,14 @@ export class Collision {
 
   withPlacementAddsToInventory() {
     // 撿到 placements 加入到 inventory
-    return this.placementsAtPosition.find((p) => {
-      return (
-        !p.hasBeenCollected && p.addsItemToInventoryOnCollide(this.forBody)
-      );
-    });
+    if (this.forBody.canCollectItems) {
+      return this.placementsAtPosition.find((p) => {
+        return (
+          !p.hasBeenCollected && p.addsItemToInventoryOnCollide(this.forBody)
+        );
+      });
+    }
+    return null;
   }
 
   withChangesHeroSkin() {

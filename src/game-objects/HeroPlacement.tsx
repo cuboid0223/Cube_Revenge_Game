@@ -1,4 +1,3 @@
-
 import {
   DIRECTION_LEFT,
   BODY_SKINS,
@@ -19,6 +18,11 @@ const heroSkinMap = {
 };
 
 export class HeroPlacement extends BodyPlacement {
+  constructor(properties, level) {
+    super(properties, level);
+    this.canCollectItems = true;
+  }
+
   controllerMoveRequested(direction) {
     // Attempt to start moving
     // 因為 controllerMoveRequested 是在每一 frame 呼叫的，所以避免重複呼叫需要下面的 return，

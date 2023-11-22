@@ -46,9 +46,12 @@ export class Collision {
 
   withCompletesLevel() {
     // 尋找 傳送門 placement 並呼叫 completesLevelOnCollide
-    return this.placementsAtPosition.find((p) => {
-      return p.completesLevelOnCollide();
-    });
+    if (this.forBody.canCompleteLevel) {
+      return this.placementsAtPosition.find((p) => {
+        return p.completesLevelOnCollide();
+      });
+    }
+    return null;
   }
 
   withLock() {

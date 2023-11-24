@@ -33,8 +33,13 @@ export class Collision {
       const isSelf = p.id === this.forBody.id;
       return !isSelf && p.x === this.x && p.y === this.y;
     });
+
     if (this.placementsAtPosition.length != 0) {
-      console.log(this.forBody.type, "遇到了 -> ", this.placementsAtPosition);
+      console.log(
+        this.forBody.type,
+        "下一步會遇到了 -> ",
+        this.placementsAtPosition
+      );
     }
   }
 
@@ -84,5 +89,14 @@ export class Collision {
     return this.placementsAtPosition.find((p) => {
       return p.changesHeroSkinOnCollide();
     });
+  }
+
+  withPlacementMovesBody() {
+    if (this.forBody.allowsAutoMovement) {
+      return this.placementsAtPosition.find((p) => {
+        return p.autoMovesBodyOnCollide();
+      });
+    }
+    return null;
   }
 }

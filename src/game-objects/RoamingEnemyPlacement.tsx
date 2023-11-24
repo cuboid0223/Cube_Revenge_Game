@@ -14,6 +14,23 @@ export class RoamingEnemyPlacement extends GroundEnemyPlacement {
     this.tickBetweenMovesInterval = 48;
     this.ticksUntilNextMove = this.tickBetweenMovesInterval;
     this.turnsAroundAtWater = true;
+    this.allowsAutoMovement = true;
+  }
+
+  onPostMove() {
+    // Randomly choose a new direction
+    const directions = [
+      DIRECTION_UP,
+      DIRECTION_DOWN,
+      DIRECTION_LEFT,
+      DIRECTION_RIGHT,
+    ].filter((direction) => {
+      return !this.isSolidAtNextPosition(direction);
+    });
+    if (directions.length) {
+      this.movingPixelDirection =
+        directions[Math.floor(Math.random() * directions.length)];
+    }
   }
 
   renderComponent() {

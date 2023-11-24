@@ -11,6 +11,7 @@ import {
   PLACEMENT_TYPE_GROUND_ENEMY,
   PLACEMENT_TYPE_FLYING_ENEMY,
   PLACEMENT_TYPE_ROAMING_ENEMY,
+  PLACEMENT_TYPE_CONVEYOR,
 } from "../helpers/consts";
 
 import { HeroPlacement } from "../game-objects/HeroPlacement";
@@ -24,7 +25,7 @@ import { WaterPlacement } from "../game-objects/WaterPlacement";
 import { GroundEnemyPlacement } from "../game-objects/GroundEnemyPlacement";
 import { FlyingEnemyPlacement } from "../game-objects/FlyingEnemyPlacement";
 import { RoamingEnemyPlacement } from "../game-objects/RoamingEnemyPlacement";
-
+import { ConveyorPlacement } from "../game-objects/ConveyorPlacement";
 // types
 import { LevelSchema, PlacementSchema } from "@/helpers/types";
 import { WaterPickupPlacement } from "@/game-objects/WaterPickupPlacement";
@@ -42,6 +43,7 @@ const placementTypeClassMap = {
   [PLACEMENT_TYPE_GROUND_ENEMY]: GroundEnemyPlacement,
   [PLACEMENT_TYPE_FLYING_ENEMY]: FlyingEnemyPlacement,
   [PLACEMENT_TYPE_ROAMING_ENEMY]: RoamingEnemyPlacement,
+  [PLACEMENT_TYPE_CONVEYOR]: ConveyorPlacement,
 };
 
 class PlacementFactory {

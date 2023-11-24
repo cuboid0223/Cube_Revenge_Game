@@ -53,6 +53,7 @@ export class BodyPlacement extends Placement {
   }
 
   updateWalkFrame() {
+    // 走路時左手右手輪流變換的動畫
     this.spriteWalkFrame = this.spriteWalkFrame === 1 ? 0 : 1;
   }
 
@@ -105,19 +106,11 @@ export class BodyPlacement extends Placement {
   }
 
   onPostMove() {
-    // Randomly choose a new direction
-    const directions = [
-      DIRECTION_UP,
-      DIRECTION_DOWN,
-      DIRECTION_LEFT,
-      DIRECTION_RIGHT,
-    ].filter((direction) => {
-      return !this.isSolidAtNextPosition(direction);
-    });
-    if (directions.length) {
-      this.movingPixelDirection =
-        directions[Math.floor(Math.random() * directions.length)];
-    }
+    return null;
+  }
+
+  onAutoMovement(_direction) {
+    return null;
   }
 
   handleCollisions() {
@@ -145,6 +138,13 @@ export class BodyPlacement extends Placement {
     if (takesDamages) {
       console.log("掛了，因為 ", takesDamages.type);
       this.level.setDeathOutcome(takesDamages.type);
+    }
+
+    // 當角色走上傳送帶
+    const autoMovePlacement = collision.withPlacementMovesBody();
+    if (autoMovePlacement) {
+      console.log("走上傳送帶，往", autoMovePlacement.direction);
+      this.onAutoMovement(autoMovePlacement.direction);
     }
 
     // 當角色踩上傳送門，呼叫 level 的 completeLevel

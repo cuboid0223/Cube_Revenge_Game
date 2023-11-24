@@ -103,6 +103,10 @@ export class Placement {
     this.level.inventory.add(this.addsItemToInventoryOnCollide());
   }
 
+  autoMovesBodyOnCollide() {
+    return false;
+  }
+
   changesHeroSkinOnCollide() {
     return null;
   }

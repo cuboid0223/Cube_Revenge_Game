@@ -1,7 +1,12 @@
 import Body from "@/components/object-graphics/Body";
 import { Placement } from "./Placement";
 import { TILES } from "@/helpers/tiles";
-import { DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP } from "@/helpers/consts";
+import {
+  DIRECTION_DOWN,
+  DIRECTION_LEFT,
+  DIRECTION_RIGHT,
+  DIRECTION_UP,
+} from "@/helpers/consts";
 import { BodyPlacement } from "./BodyPlacement";
 
 export class GroundEnemyPlacement extends BodyPlacement {
@@ -11,6 +16,7 @@ export class GroundEnemyPlacement extends BodyPlacement {
     this.ticksUntilNextMove = this.tickBetweenMovesInterval;
     this.turnsAroundAtWater = true;
     this.movingPixelDirection = properties.initialDirection ?? DIRECTION_RIGHT; // 上下移動
+    this.allowsAutoMovement = true;
   }
 
   tickAttemptAiMove() {
@@ -50,6 +56,10 @@ export class GroundEnemyPlacement extends BodyPlacement {
     this.movingPixelDirection = direction;
     this.updateFacingDirection();
     this.updateWalkFrame();
+  }
+
+  onAutoMovement(direction) {
+    this.internalMoveRequested(direction);
   }
 
   switchDirection() {

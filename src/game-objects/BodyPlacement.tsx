@@ -140,11 +140,15 @@ export class BodyPlacement extends Placement {
       this.level.setDeathOutcome(takesDamages.type);
     }
 
-    // 當角色走上傳送帶
+    // 當角色走上傳送帶 或是 冰
     const autoMovePlacement = collision.withPlacementMovesBody();
     if (autoMovePlacement) {
-      console.log("走上傳送帶，往", autoMovePlacement.direction);
-      this.onAutoMovement(autoMovePlacement.direction);
+      console.log(
+        `走上 ${
+          autoMovePlacement.type
+        } 後向, ${autoMovePlacement.autoMovesBodyOnCollide(this)}走 `
+      );
+      this.onAutoMovement(autoMovePlacement.autoMovesBodyOnCollide(this));
     }
 
     // 當角色踩上傳送門，呼叫 level 的 completeLevel

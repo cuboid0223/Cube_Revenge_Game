@@ -49,14 +49,10 @@ export class HeroPlacement extends BodyPlacement {
     }
 
     // Maybe hop out of non-normal skin
-    const collision = this.getCollisionAtNextPosition(direction);
-    if (!collision.withChangesHeroSkin()) {
-      this.skin = BODY_SKINS.NORMAL;
-      if (this.skin === BODY_SKINS.WATER) {
-        const collision = this.getCollisionAtNextPosition(direction);
-        if (!collision.withChangesHeroSkin()) {
-          this.skin = BODY_SKINS.NORMAL;
-        }
+    if (this.skin === BODY_SKINS.WATER) {
+      const collision = this.getCollisionAtNextPosition(direction);
+      if (!collision.withChangesHeroSkin()) {
+        this.skin = BODY_SKINS.NORMAL;
       }
     }
 

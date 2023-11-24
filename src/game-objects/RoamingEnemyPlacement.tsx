@@ -18,6 +18,12 @@ export class RoamingEnemyPlacement extends GroundEnemyPlacement {
   }
 
   onPostMove() {
+    // Do not choose next move if we are on an automoving tile
+    const collision = new Collision(this, this.level);
+    if (collision.withPlacementMovesBody()) {
+      return;
+    }
+
     // Randomly choose a new direction
     const directions = [
       DIRECTION_UP,

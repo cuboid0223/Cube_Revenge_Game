@@ -14,6 +14,8 @@ import {
   PLACEMENT_TYPE_CONVEYOR,
   PLACEMENT_TYPE_ICE,
   PLACEMENT_TYPE_ICE_PICKUP,
+  PLACEMENT_TYPE_FIRE,
+  PLACEMENT_TYPE_FIRE_PICKUP,
 } from "../helpers/consts";
 
 const DemoLevel1 = {
@@ -26,6 +28,10 @@ const DemoLevel1 = {
 
     { x: 1, y: 4, type: PLACEMENT_TYPE_CONVEYOR, direction: "DOWN" },
     { x: 1, y: 5, type: PLACEMENT_TYPE_CONVEYOR, direction: "DOWN" },
+    { x: 2, y: 3, type: PLACEMENT_TYPE_FIRE_PICKUP },
+    { x: 3, y: 3, type: PLACEMENT_TYPE_FIRE },
+    { x: 4, y: 3, type: PLACEMENT_TYPE_FIRE },
+    { x: 5, y: 3, type: PLACEMENT_TYPE_FIRE },
 
     { x: 3, y: 4, type: PLACEMENT_TYPE_ICE, corner: "TOP_LEFT" },
     { x: 3, y: 5, type: PLACEMENT_TYPE_ICE },

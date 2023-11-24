@@ -13,6 +13,7 @@ import {
   PLACEMENT_TYPE_ROAMING_ENEMY,
   PLACEMENT_TYPE_CONVEYOR,
   PLACEMENT_TYPE_ICE,
+  PLACEMENT_TYPE_ICE_PICKUP,
 } from "../helpers/consts";
 
 const DemoLevel1 = {
@@ -25,7 +26,7 @@ const DemoLevel1 = {
 
     { x: 1, y: 4, type: PLACEMENT_TYPE_CONVEYOR, direction: "DOWN" },
     { x: 1, y: 5, type: PLACEMENT_TYPE_CONVEYOR, direction: "DOWN" },
-  
+
     { x: 3, y: 4, type: PLACEMENT_TYPE_ICE, corner: "TOP_LEFT" },
     { x: 3, y: 5, type: PLACEMENT_TYPE_ICE },
     { x: 4, y: 5, type: PLACEMENT_TYPE_ICE },
@@ -38,14 +39,12 @@ const DemoLevel1 = {
     { x: 4, y: 4, type: PLACEMENT_TYPE_ICE },
     { x: 4, y: 6, type: PLACEMENT_TYPE_ICE },
 
-    // { x: 5, y: 2, type: PLACEMENT_TYPE_ICE_PICKUP },
+    { x: 5, y: 2, type: PLACEMENT_TYPE_ICE_PICKUP },
 
     { x: 7, y: 6, type: PLACEMENT_TYPE_WALL },
     { x: 8, y: 2, type: PLACEMENT_TYPE_FLOUR },
     { x: 6, y: 2, type: PLACEMENT_TYPE_WATER_PICKUP },
     { x: 7, y: 2, type: PLACEMENT_TYPE_WATER },
-
-    { x: 5, y: 4, type: PLACEMENT_TYPE_GROUND_ENEMY },
   ],
 };
 

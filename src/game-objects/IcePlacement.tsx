@@ -37,6 +37,26 @@ const iceTileCornerRedirection = {
     [DIRECTION_DOWN]: DIRECTION_LEFT,
   },
 };
+// 處理坐上雪橇遇到防護欄能穿越問題
+// 針對不同的 corner 制定那些邊要關起來
+const iceTileCornerBlockedMoves = {
+  TOP_LEFT: {
+    [DIRECTION_UP]: true,
+    [DIRECTION_LEFT]: true,
+  },
+  TOP_RIGHT: {
+    [DIRECTION_UP]: true,
+    [DIRECTION_RIGHT]: true,
+  },
+  BOTTOM_LEFT: {
+    [DIRECTION_DOWN]: true,
+    [DIRECTION_LEFT]: true,
+  },
+  BOTTOM_RIGHT: {
+    [DIRECTION_DOWN]: true,
+    [DIRECTION_RIGHT]: true,
+  },
+};
 
 export class IcePlacement extends Placement {
   constructor(properties, level) {
@@ -44,7 +64,23 @@ export class IcePlacement extends Placement {
     this.corner = properties.corner ?? null;
   }
 
+  blocksMovementDirection(direction): boolean {
+    // 根據角色行進方向禁止對應的邊，並回傳 boolean
+    if (this.corner) {
+      return iceTileCornerBlockedMoves[this.corner][direction];
+    }
+    return false;
+  }
+
   autoMovesBodyOnCollide(body) {
+    // 角色得到 "防滑寶石"
+    if (
+      body.type === PLACEMENT_TYPE_HERO &&
+      this.level.inventory.has(PLACEMENT_TYPE_ICE_PICKUP)
+    ) {
+      return null;
+    }
+
     // ice placement with corner
     const possibleRedirects = iceTileCornerRedirection[this.corner];
     if (possibleRedirects) {
@@ -74,9 +110,9 @@ export class IcePlacement extends Placement {
   }
 
   changesHeroSkinOnCollide() {
-    // if (this.level.inventory.has(PLACEMENT_TYPE_ICE_PICKUP)) {
-    return BODY_SKINS.SCARED;
-    // }
+    if (this.level.inventory.has(PLACEMENT_TYPE_ICE_PICKUP)) {
+      return BODY_SKINS.ICE;
+    }
   }
 
   renderComponent() {

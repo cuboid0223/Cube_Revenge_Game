@@ -1,3 +1,4 @@
+import { PLACEMENT_TYPE_ICE } from "@/helpers/consts";
 import { LevelSchema, PlacementSchema } from "@/helpers/types";
 
 type PositionType = {
@@ -98,5 +99,12 @@ export class Collision {
       });
     }
     return null;
+  }
+
+  withIceCorner() {
+    // 檢查角色是否在有 corner 的冰上，並回傳該 ice corner tile
+    return this.placementsAtPosition.find((p) => {
+      return p.type === PLACEMENT_TYPE_ICE && p.corner;
+    });
   }
 }

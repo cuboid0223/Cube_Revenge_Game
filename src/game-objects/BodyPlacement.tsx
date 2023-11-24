@@ -27,6 +27,14 @@ export class BodyPlacement extends Placement {
   }
 
   isSolidAtNextPosition(direction) {
+    // Check for ice corner...
+    // 檢查角色是否在有 corner 的冰上，並回傳該 ice corner tile
+    const onIceCorner = new Collision(this, this.level).withIceCorner();
+    // 根據回傳的 ice corner tile 禁止角色行進方向的對應邊
+    if (onIceCorner?.blocksMovementDirection(direction)) {
+      return true;
+    }
+
     const collision = this.getCollisionAtNextPosition(direction);
 
     const isOutOfBounds = this.level.isPositionOutOfBounds(

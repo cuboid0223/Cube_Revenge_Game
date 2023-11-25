@@ -52,10 +52,11 @@ export default function RenderLevel() {
           {/* 遊戲物體層 */}
           <LevelPlacementsLayer level={level} />
         </div>
+
+        {level.isCompleted && <LevelCompleteMessage />}
+        {level.deathOutcome && <DeathMessage level={level} />}
       </div>
       <TopHud level={level} />
-      {level.isCompleted && <LevelCompleteMessage />}
-      {level.deathOutcome && <DeathMessage level={level} />}
     </div>
   );
 }

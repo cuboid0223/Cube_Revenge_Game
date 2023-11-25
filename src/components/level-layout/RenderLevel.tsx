@@ -33,6 +33,7 @@ export default function RenderLevel() {
   if (!level) {
     return null;
   }
+  const cameraTranslate = `translate3d(${level.cameraTransformX}, ${level.cameraTransformY}, 0)`;
 
   return (
     <div
@@ -42,10 +43,16 @@ export default function RenderLevel() {
       }}
     >
       <div className={styles.gameScreen}>
-        {/* 遊戲場景層 */}
-        <LevelBackgroundTilesLayer level={level} />
-        {/* 遊戲物體層 */}
-        <LevelPlacementsLayer level={level} />
+        <div
+          style={{
+            transform: cameraTranslate,
+          }}
+        >
+          {/* 遊戲場景層 */}
+          <LevelBackgroundTilesLayer level={level} />
+          {/* 遊戲物體層 */}
+          <LevelPlacementsLayer level={level} />
+        </div>
       </div>
       <FlourCount level={level} />
       {level.isCompleted && <LevelCompleteMessage />}

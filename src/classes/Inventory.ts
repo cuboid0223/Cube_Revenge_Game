@@ -15,4 +15,8 @@ export class Inventory {
     this.inventoryMap.set(key, true);
     console.log(`將 ${key} 放進 Inventory `, this.inventoryMap);
   }
+
+  clear() {
+    this.inventoryMap = new Map();
+  }
 }

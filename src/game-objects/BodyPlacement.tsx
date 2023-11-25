@@ -164,6 +164,11 @@ export class BodyPlacement extends Placement {
       this.level.switchAllDoors();
     }
 
+    // 踩到 thief (Resets inventory)
+    if (collision.withStealsInventory()) {
+      this.level.stealInventory();
+    }
+
     // 踩到傳送門
     const teleport = collision.withTeleport();
     if (teleport) {

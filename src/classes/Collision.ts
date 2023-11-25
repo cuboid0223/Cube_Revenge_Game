@@ -108,7 +108,6 @@ export class Collision {
     });
   }
 
-
   withDoorSwitch() {
     // 紫色變換門
     return this.placementsAtPosition.find((p) => {
@@ -121,6 +120,13 @@ export class Collision {
     return this.placementsAtPosition.find((p) => {
       const teleportPos = p.teleportsToPositionOnCollide(this.forBody);
       return Boolean(teleportPos);
+    });
+  }
+
+  withStealsInventory() {
+    // Thief placement 重製 inventory
+    return this.placementsAtPosition.find((p) => {
+      return p.stealsInventoryOnCollide(this.forBody);
     });
   }
 }

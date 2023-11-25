@@ -35,6 +35,7 @@ export class Placement {
     this.spriteWalkFrame = 0;
 
     this.hasBeenCollected = false;
+    this.canBeStolen = true;
   }
 
   tick() {
@@ -119,8 +120,18 @@ export class Placement {
     return null;
   }
 
+  stealsInventoryOnCollide() {
+    return null;
+  }
+
   damagesBodyOnCollide(_body) {
     return null;
+  }
+
+  resetHasBeenCollected() {
+    if (this.canBeStolen && this.hasBeenCollected) {
+      this.hasBeenCollected = false;
+    }
   }
 
   renderComponent(): JSX.Element | null {

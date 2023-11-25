@@ -10,6 +10,7 @@ import LevelCompleteMessage from "../hud/LevelCompleteMessage";
 import { useRecoilValue } from "recoil";
 import { currentLevelIdAtom } from "../../atoms/currentLevelIdAtom";
 import DeathMessage from "../hud/DeathMessage";
+import ClockCount from "../hud/ClockCount";
 
 export default function RenderLevel() {
   const [level, setLevel] = useState<LevelSchema | null>(null);
@@ -55,6 +56,7 @@ export default function RenderLevel() {
         </div>
       </div>
       <FlourCount level={level} />
+      <ClockCount level={level} />
       {level.isCompleted && <LevelCompleteMessage />}
       {level.deathOutcome && <DeathMessage level={level} />}
     </div>

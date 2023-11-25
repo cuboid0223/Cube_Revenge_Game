@@ -35,6 +35,8 @@ export const DIRECTION_RIGHT = "RIGHT";
 export const DIRECTION_UP = "UP";
 export const DIRECTION_DOWN = "DOWN";
 
+export const DEATH_TYPE_CLOCK = "CLOCK";
+
 type DirectionUpdateMapType = {
   [key: string]: { x: number; y: number };
 };

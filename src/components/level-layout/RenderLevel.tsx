@@ -5,13 +5,11 @@ import LevelBackgroundTilesLayer from "./LevelBackgroundTilesLayer";
 import LevelPlacementsLayer from "./LevelPlacementsLayer";
 import { LevelState } from "../../classes/LevelState";
 import { LevelSchema } from "@/helpers/types";
-import FlourCount from "../hud/FlourCount";
 import LevelCompleteMessage from "../hud/LevelCompleteMessage";
 import { useRecoilValue } from "recoil";
 import { currentLevelIdAtom } from "../../atoms/currentLevelIdAtom";
 import DeathMessage from "../hud/DeathMessage";
-import ClockCount from "../hud/ClockCount";
-
+import TopHud from "../hud/TopHud";
 export default function RenderLevel() {
   const [level, setLevel] = useState<LevelSchema | null>(null);
   const currentLevelId = useRecoilValue(currentLevelIdAtom);
@@ -55,8 +53,7 @@ export default function RenderLevel() {
           <LevelPlacementsLayer level={level} />
         </div>
       </div>
-      <FlourCount level={level} />
-      <ClockCount level={level} />
+      <TopHud level={level} />
       {level.isCompleted && <LevelCompleteMessage />}
       {level.deathOutcome && <DeathMessage level={level} />}
     </div>

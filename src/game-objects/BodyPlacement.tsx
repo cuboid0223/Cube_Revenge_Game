@@ -159,6 +159,11 @@ export class BodyPlacement extends Placement {
       this.onAutoMovement(autoMovePlacement.autoMovesBodyOnCollide(this));
     }
 
+    // 踩到開關門的按鈕(紫)    
+    if (collision.withDoorSwitch()) {
+      this.level.switchAllDoors();
+    }
+
     // 當角色踩上傳送門，呼叫 level 的 completeLevel
     const completesLevel = collision.withCompletesLevel();
 

@@ -93,7 +93,7 @@ export class Collision {
   }
 
   withPlacementMovesBody() {
-    if (this.forBody.allowsAutoMovement) {
+    if (this.forBody.interactsWithGround) {
       return this.placementsAtPosition.find((p) => {
         return p.autoMovesBodyOnCollide(this.forBody);
       });
@@ -105,6 +105,12 @@ export class Collision {
     // 檢查角色是否在有 corner 的冰上，並回傳該 ice corner tile
     return this.placementsAtPosition.find((p) => {
       return p.type === PLACEMENT_TYPE_ICE && p.corner;
+    });
+  }
+
+  withDoorSwitch() {
+    return this.placementsAtPosition.find((p) => {
+      return p.switchesDoorsOnCollide(this.forBody);
     });
   }
 }

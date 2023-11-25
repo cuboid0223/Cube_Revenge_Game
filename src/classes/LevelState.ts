@@ -115,6 +115,13 @@ export class LevelState {
     this.gameLoop.stop();
   }
 
+  switchAllDoors() {
+    this.placements.forEach((placement) => {
+      if (placement.toggleIsRaised) {
+        placement.toggleIsRaised();
+      }
+    });
+  }
   destroy() {
     // Tear down the level.
     this.gameLoop.stop();

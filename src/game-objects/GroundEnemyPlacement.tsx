@@ -16,7 +16,7 @@ export class GroundEnemyPlacement extends BodyPlacement {
     this.ticksUntilNextMove = this.tickBetweenMovesInterval;
     this.turnsAroundAtWater = true;
     this.movingPixelDirection = properties.initialDirection ?? DIRECTION_RIGHT; // 上下移動
-    this.allowsAutoMovement = true;
+    this.interactsWithGround = true;
   }
 
   tickAttemptAiMove() {

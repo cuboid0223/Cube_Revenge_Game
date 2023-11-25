@@ -159,9 +159,17 @@ export class BodyPlacement extends Placement {
       this.onAutoMovement(autoMovePlacement.autoMovesBodyOnCollide(this));
     }
 
-    // 踩到開關門的按鈕(紫)    
+    // 踩到開關門的按鈕(紫)
     if (collision.withDoorSwitch()) {
       this.level.switchAllDoors();
+    }
+
+    // 踩到傳送門
+    const teleport = collision.withTeleport();
+    if (teleport) {
+      const pos = teleport.teleportsToPositionOnCollide(this);
+      this.x = pos.x;
+      this.y = pos.y;
     }
 
     // 當角色踩上傳送門，呼叫 level 的 completeLevel

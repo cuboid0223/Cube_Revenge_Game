@@ -112,7 +112,11 @@ export class Placement {
   }
 
   switchesDoorsOnCollide() {
-    return null
+    return null;
+  }
+
+  teleportsToPositionOnCollide() {
+    return null;
   }
 
   damagesBodyOnCollide(_body) {

@@ -108,9 +108,19 @@ export class Collision {
     });
   }
 
+
   withDoorSwitch() {
+    // 紫色變換門
     return this.placementsAtPosition.find((p) => {
       return p.switchesDoorsOnCollide(this.forBody);
+    });
+  }
+
+  withTeleport() {
+    // 傳送門
+    return this.placementsAtPosition.find((p) => {
+      const teleportPos = p.teleportsToPositionOnCollide(this.forBody);
+      return Boolean(teleportPos);
     });
   }
 }

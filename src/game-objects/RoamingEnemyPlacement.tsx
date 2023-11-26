@@ -7,6 +7,7 @@ import {
   DIRECTION_UP,
   DIRECTION_DOWN,
 } from "../helpers/consts";
+import { Collision } from "@/classes/Collision";
 
 export class RoamingEnemyPlacement extends GroundEnemyPlacement {
   constructor(properties, level) {

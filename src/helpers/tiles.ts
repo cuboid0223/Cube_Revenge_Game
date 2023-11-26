@@ -125,9 +125,12 @@ export const TILES = {
   HERO_RUN_2_RIGHT: "6x17",
 
   // Ciabatta
+  // 以 3 為單位
   CIABATTA1: "5x4",
   CIABATTA2: "8x4",
   CIABATTA_PAIN: "11x4",
   CIABATTA_DEAD: "14x4",
   CIABATTA_BLAST: "6x3",
+  CIABATTA_RIGHT: "17x4",
+  CIABATTA_TELEPORT: "20x4",
 };

@@ -20,6 +20,7 @@ import {
   PLACEMENT_TYPE_SWITCH,
   PLACEMENT_TYPE_TELEPORT,
   PLACEMENT_TYPE_THIEF,
+  PLACEMENT_TYPE_CIABATTA,
 } from "../helpers/consts";
 
 const DemoLevel1 = {
@@ -34,8 +35,8 @@ const DemoLevel1 = {
     { x: 7, y: 1, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: false },
     { x: 4, y: 3, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: true },
     { x: 4, y: 1, type: PLACEMENT_TYPE_SWITCH },
-    
-    { x: 3, y: 1, type: PLACEMENT_TYPE_THIEF },
+
+    { x: 3, y: 1, type: PLACEMENT_TYPE_CIABATTA },
 
     { x: 3, y: 2, type: PLACEMENT_TYPE_TELEPORT },
     { x: 7, y: 6, type: PLACEMENT_TYPE_TELEPORT },

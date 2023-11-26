@@ -45,7 +45,7 @@ export class LevelState {
     this.camera = new Camera(this);
 
     // Create a clock
-    this.clock = new Clock(20, this);
+    this.clock = new Clock(60, this);
 
     // Create a frame animation manager
     this.animatedFrames = new LevelAnimatedFrames();

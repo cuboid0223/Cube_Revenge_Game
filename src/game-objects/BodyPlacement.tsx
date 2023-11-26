@@ -10,7 +10,7 @@ import {
   Z_INDEX_LAYER_SIZE,
 } from "../helpers/consts";
 import { Collision } from "../classes/Collision";
-
+import soundsManager, { SFX } from "../classes/Sounds";
 export class BodyPlacement extends Placement {
   getCollisionAtNextPosition(direction) {
     // 取得移動到下一個位置遇到的 placements
@@ -140,6 +140,8 @@ export class BodyPlacement extends Placement {
         x: this.x,
         y: this.y,
       });
+
+      soundsManager.playSfx(SFX.COLLECT);
     }
     // 當角色碰到某些物體死亡
     const takesDamages = collision.withSelfGetsDamaged();
@@ -175,14 +177,15 @@ export class BodyPlacement extends Placement {
       const pos = teleport.teleportsToPositionOnCollide(this);
       this.x = pos.x;
       this.y = pos.y;
+      soundsManager.playSfx(SFX.TELEPORT);
     }
 
-    // 當角色踩上傳送門，呼叫 level 的 completeLevel
+    // 當角色踩上 下一關傳送門，呼叫 level 的 completeLevel
     const completesLevel = collision.withCompletesLevel();
-
     if (completesLevel) {
       console.log("Hero is on the goal!");
       this.level.completeLevel();
+      soundsManager.playSfx(SFX.WIN);
     }
   }
 

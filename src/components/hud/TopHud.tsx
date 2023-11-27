@@ -2,6 +2,7 @@ import styles from "./TopHud.module.css";
 import FlourCount from "./FlourCount";
 import ClockCount from "./ClockCount";
 import InventoryList from "./InventoryList";
+import EditorDropdown from "./EditorDropdown";
 
 export default function TopHud({ level }) {
   return (
@@ -13,6 +14,7 @@ export default function TopHud({ level }) {
       </div>
       <div className={styles.topHudRight}>
         {/*<span>Come back to me</span>*/}
+        <EditorDropdown level={level} />
       </div>
     </div>
   );

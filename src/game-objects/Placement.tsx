@@ -134,6 +134,10 @@ export class Placement {
     }
   }
 
+  canBeDeleted() {
+    return true;
+  }
+
   renderComponent(): JSX.Element | null {
     // base class init renderComponent()
     return this.renderFn();

@@ -1,5 +1,5 @@
 import { LevelSchema, PlacementSchema } from "@/helpers/types";
-import { PLACEMENT_TYPE_HERO } from "../helpers/consts";
+import { PLACEMENT_TYPE_HERO, PLACEMENT_TYPE_WALL } from "../helpers/consts";
 import { placementFactory } from "./PlacementFactory";
 import { GameLoop } from "./GameLoop";
 import { DirectionControls } from "./DirectionControls";
@@ -21,6 +21,7 @@ export class LevelState {
     this.onEmit = onEmit;
     this.directionControls = new DirectionControls();
     this.isCompleted = false;
+    this.editModePlacementType = PLACEMENT_TYPE_WALL;
 
     //Start the level!
     this.start();
@@ -90,7 +91,7 @@ export class LevelState {
     this.camera.tick();
 
     // Update the clock
-    this.clock.tick();
+    // this.clock.tick();
 
     //Emit any changes to React
     this.onEmit(this.getState());
@@ -106,7 +107,38 @@ export class LevelState {
     );
   }
 
+  copyPlacementsToClipboard() {
+    // Convert the Placements to type,x,y JSON
+    // 先將 PlacementsData 轉成 json
+    const placementsData = this.placements.map((p) => {
+      return {
+        type: p.type,
+        x: p.x,
+        y: p.y,
+      };
+    });
+
+    // Copy the data to the clipboard for moving into map files after editing
+    // 複製到剪貼簿
+    navigator.clipboard.writeText(JSON.stringify(placementsData)).then(
+      () => {
+        console.log("Content copied to clipboard");
+
+        // Also console log the output
+        console.log(placementsData);
+      },
+      () => {
+        console.error("Failed to copy");
+      }
+    );
+  }
+
+  setEditModePlacementType(newType) {
+    this.editModePlacementType = newType;
+  }
+
   getState() {
+    // 讓外部使用 levelState
     return {
       theme: this.theme,
       tilesWidth: this.tilesWidth,
@@ -122,6 +154,14 @@ export class LevelState {
       restart: () => {
         this.start();
       },
+      // Edit Mode API
+      // 將 method 傳出去供外部使用
+      enableEditing: true,
+      editModePlacementType: this.editModePlacementType,
+      addPlacement: this.addPlacement.bind(this),
+      deletePlacement: this.deletePlacement.bind(this),
+      setEditModePlacementType: this.setEditModePlacementType.bind(this),
+      copyPlacementsToClipboard: this.copyPlacementsToClipboard.bind(this),
     };
   }
 

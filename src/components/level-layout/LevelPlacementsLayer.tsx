@@ -18,7 +18,16 @@ export default function LevelPlacementsLayer({ level }: Props) {
       };
 
       return (
-        <div key={placement.id} style={style}>
+        <div
+          key={placement.id}
+          style={style}
+          onClick={() => {
+            if (!level.enableEditing || !placement.canBeDeleted()) {
+              return;
+            }
+            level.deletePlacement(placement);
+          }}
+        >
           {/* <Sprite frameCoord={placement.frameCoord} /> */}
           {placement.renderComponent()}
         </div>

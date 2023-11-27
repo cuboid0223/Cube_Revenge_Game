@@ -36,7 +36,7 @@ const DemoLevel1 = {
     { x: 4, y: 3, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: true },
     { x: 4, y: 1, type: PLACEMENT_TYPE_SWITCH },
 
-    { x: 3, y: 1, type: PLACEMENT_TYPE_CIABATTA },
+    // { x: 3, y: 1, type: PLACEMENT_TYPE_CIABATTA },
     { x: 5, y: 1, type: PLACEMENT_TYPE_FIRE },
 
     { x: 3, y: 2, type: PLACEMENT_TYPE_TELEPORT },

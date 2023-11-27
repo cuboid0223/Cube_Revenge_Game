@@ -45,6 +45,7 @@ export default function LevelBackgroundTilesLayer({ level }: Props) {
       // add a cell to the map
       canvases.push(
         <MapCell
+          level={level}
           key={`${x}_${y}`}
           x={x}
           y={y}

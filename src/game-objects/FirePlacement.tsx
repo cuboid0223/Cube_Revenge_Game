@@ -5,6 +5,7 @@ import {
   PLACEMENT_TYPE_FIRE_PICKUP,
   PLACEMENT_TYPE_HERO,
   BODY_SKINS,
+  PLACEMENT_TYPE_CIABATTA,
 } from "@/helpers/consts";
 
 export class FirePlacement extends Placement {
@@ -14,6 +15,10 @@ export class FirePlacement extends Placement {
       body.type === PLACEMENT_TYPE_HERO &&
       !inventory.has(PLACEMENT_TYPE_FIRE_PICKUP)
     ) {
+      return this.type;
+    }
+    //  CIABATTA 踩到火焰
+    if (body.type === PLACEMENT_TYPE_CIABATTA) {
       return this.type;
     }
     return null;

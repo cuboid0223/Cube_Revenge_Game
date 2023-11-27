@@ -75,6 +75,8 @@ export class GroundEnemyPlacement extends BodyPlacement {
     currentDir === DIRECTION_UP ? DIRECTION_DOWN : DIRECTION_UP;
   }
 
+
+
   renderComponent() {
     const frameCoord =
       this.spriteFacingDirection === DIRECTION_LEFT

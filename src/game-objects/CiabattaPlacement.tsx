@@ -7,7 +7,8 @@ const ATTACKS = {
   TACKLE: "TACKLE",
   SPAWN: "SPAWN",
 };
-
+const PAIN_FRAMES_LENGTH = 20;
+const DEATH_FRAMES_LENGTH = 140;
 export class CiabattaPlacement extends GroundEnemyPlacement {
   constructor(properties, level) {
     super(properties, level);
@@ -30,6 +31,20 @@ export class CiabattaPlacement extends GroundEnemyPlacement {
     this.checkForOverlapWithHero();
 
     // Phase 2: counters
+    // death frames counter
+    if (this.deathFramesUntilDisappear > 0) {
+      this.deathFramesUntilDisappear -= 1;
+      if (this.deathFramesUntilDisappear === 0) {
+        this.level.deletePlacement(this);
+      }
+      return;
+    }
+    // pain counter
+    if (this.painFramesRemaining > 0) {
+      this.painFramesRemaining -= 1;
+      return;
+    }
+    // move counter
     if (this.ticksUntilNextMove > 0) {
       this.ticksUntilNextMove -= 1;
       return;
@@ -184,7 +199,28 @@ export class CiabattaPlacement extends GroundEnemyPlacement {
     }
   }
 
+  takesDamage() {
+    // Apply pain frames
+    this.painFramesRemaining = PAIN_FRAMES_LENGTH;
+    this.hp -= 1;
+
+    if (this.hp <= 0) {
+      // Start counting death frames
+      this.deathFramesUntilDisappear = DEATH_FRAMES_LENGTH;
+    }
+  }
+
   getFrame() {
+    // Dead skin
+    if (this.hp <= 0) {
+      return TILES.CIABATTA_DEAD;
+    }
+
+    //  CIABATTA 被火燒動畫 Flash in pain
+    if (this.painFramesRemaining > 0) {
+      return TILES.CIABATTA_PAIN;
+    }
+
     // 若是 捕捉攻擊則更改 skin(CIABATTA_TELEPORT)
     if (this.currentAttack?.type === ATTACKS.TACKLE) {
       return TILES.CIABATTA_TELEPORT;

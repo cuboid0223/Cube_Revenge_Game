@@ -113,7 +113,7 @@ export class BodyPlacement extends Placement {
     this.onPostMove();
   }
 
-  onPostMove() {
+  onPostMove(): void | null {
     return null;
   }
 
@@ -147,7 +147,8 @@ export class BodyPlacement extends Placement {
     const takesDamages = collision.withSelfGetsDamaged();
     if (takesDamages) {
       console.log("掛了，因為 ", takesDamages.type);
-      this.level.setDeathOutcome(takesDamages.type);
+
+      this.takesDamage(takesDamages.type);
     }
 
     // 當角色走上傳送帶 或是 冰
@@ -187,6 +188,10 @@ export class BodyPlacement extends Placement {
       this.level.completeLevel();
       soundsManager.playSfx(SFX.WIN);
     }
+  }
+
+  takesDamage() {
+    return null;
   }
 
   zIndex() {

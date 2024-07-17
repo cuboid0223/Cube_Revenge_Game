@@ -29,7 +29,7 @@ const DemoLevel1 = {
   tilesHeight: 8,
   placements: [
     { x: 2, y: 2, type: PLACEMENT_TYPE_HERO },
-    // { x: 2, y: 1, type: PLACEMENT_TYPE_FLYING_ENEMY },
+    { x: 2, y: 1, type: PLACEMENT_TYPE_FLYING_ENEMY },
     { x: 7, y: 4, type: PLACEMENT_TYPE_GOAL },
 
     { x: 7, y: 1, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: false },

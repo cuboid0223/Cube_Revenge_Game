@@ -20,6 +20,9 @@ export default function Home() {
     };
   }, [setSpriteSheetImage]);
 
+
+
+
   if (!spriteSheetImage) {
     return null;
   }

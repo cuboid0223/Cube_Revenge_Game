@@ -1,5 +1,6 @@
 import { PLACEMENT_TYPE_ICE } from "@/helpers/consts";
 import { LevelSchema, PlacementSchema } from "@/helpers/types";
+import { Direction } from "@/types/global";
 
 type PositionType = {
   x: number;
@@ -12,11 +13,12 @@ export class Collision {
   placementsAtPosition: PlacementSchema[];
   x: number;
   y: number;
+  
 
   constructor(
     forBody: PlacementSchema,
     level: LevelSchema,
-    position: PositionType
+    position?: PositionType
   ) {
     this.forBody = forBody;
     this.level = level;
@@ -35,13 +37,13 @@ export class Collision {
       return !isSelf && p.x === this.x && p.y === this.y;
     });
 
-    if (this.placementsAtPosition.length != 0) {
-      console.log(
-        this.forBody.type,
-        "下一步會遇到了 -> ",
-        this.placementsAtPosition
-      );
-    }
+    // if (this.placementsAtPosition.length != 0) {
+    //   console.log(
+    //     this.forBody.type,
+    //     "下一步會遇到了 -> ",
+    //     this.placementsAtPosition
+    //   );
+    // }
   }
 
   withSolidPlacement() {

@@ -1,4 +1,3 @@
-import React, { ReactElement } from "react";
 import { z } from "zod";
 
 const placementSchema = z.object({
@@ -18,6 +17,7 @@ const levelSchema = z.object({
   tilesWidth: z.number(),
   tilesHeight: z.number(),
   placements: z.array(placementSchema),
+  isPositionOutOfBounds:  z.function().args(z.number(), z.number()).returns(z.boolean())
 });
 
 export type PlacementSchema = z.infer<typeof placementSchema>;

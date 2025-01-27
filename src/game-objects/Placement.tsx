@@ -13,9 +13,15 @@ export class Placement {
   x: number;
   y: number;
   level: LevelSchema;
+  skin: string;
   travelPixelsPerFrame: number;
   movingPixelsRemaining: number;
   movingPixelDirection: string;
+  spriteFacingDirection: string
+  spriteWalkFrame: number;
+  hasBeenCollected: boolean;
+  canBeStolen: boolean;
+
   renderFn: () => React.JSX.Element | null;
 
   constructor(properties: PlacementSchema, level: LevelSchema) {
@@ -124,7 +130,7 @@ export class Placement {
     return null;
   }
 
-  damagesBodyOnCollide(_body) {
+  damagesBodyOnCollide(_body: PlacementSchema) {
     return null;
   }
 

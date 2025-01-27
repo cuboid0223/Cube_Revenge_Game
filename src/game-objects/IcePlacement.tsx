@@ -11,6 +11,7 @@ import {
   PLACEMENT_TYPE_HERO,
   PLACEMENT_TYPE_ICE_PICKUP,
 } from "../helpers/consts";
+import { PlacementSchema } from "@/helpers/types";
 
 const iceTileCornerFramesMap = {
   [ICE_CORNERS.TOP_LEFT]: TILES.ICE_TOP_LEFT,
@@ -19,7 +20,7 @@ const iceTileCornerFramesMap = {
   [ICE_CORNERS.BOTTOM_RIGHT]: TILES.ICE_BOTTOM_RIGHT,
 };
 
-const iceTileCornerRedirection = {
+export const iceTileCornerRedirection = {
   TOP_LEFT: {
     [DIRECTION_UP]: DIRECTION_RIGHT,
     [DIRECTION_LEFT]: DIRECTION_DOWN,
@@ -39,7 +40,7 @@ const iceTileCornerRedirection = {
 };
 // 處理坐上雪橇遇到防護欄能穿越問題
 // 針對不同的 corner 制定那些邊要關起來
-const iceTileCornerBlockedMoves = {
+export const iceTileCornerBlockedMoves = {
   TOP_LEFT: {
     [DIRECTION_UP]: true,
     [DIRECTION_LEFT]: true,
@@ -59,12 +60,14 @@ const iceTileCornerBlockedMoves = {
 };
 
 export class IcePlacement extends Placement {
-  constructor(properties, level) {
+  corner: string | null;
+  
+  constructor(properties: PlacementSchema, level: LevelSchema) {
     super(properties, level);
     this.corner = properties.corner ?? null;
   }
 
-  blocksMovementDirection(direction): boolean {
+  blocksMovementDirection(direction: Direction): boolean {
     // 根據角色行進方向禁止對應的邊，並回傳 boolean
     if (this.corner) {
       return iceTileCornerBlockedMoves[this.corner][direction];

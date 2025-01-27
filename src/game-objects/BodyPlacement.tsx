@@ -11,8 +11,11 @@ import {
 } from "../helpers/consts";
 import { Collision } from "../classes/Collision";
 import soundsManager, { SFX } from "../classes/Sounds";
+import { Direction } from "@/types/global";
+import { IcePlacement } from "./IcePlacement";
+
 export class BodyPlacement extends Placement {
-  getCollisionAtNextPosition(direction) {
+  getCollisionAtNextPosition(direction: Direction) {
     // 取得移動到下一個位置遇到的 placements
     // e.g. lock placement
     const { x, y } = directionUpdateMap[direction];
@@ -21,12 +24,12 @@ export class BodyPlacement extends Placement {
     return new Collision(this, this.level, { x: nextX, y: nextY });
   }
 
-  getLockAtNextPosition(direction) {
+  getLockAtNextPosition(direction: Direction) {
     const collision = this.getCollisionAtNextPosition(direction);
     return collision.withLock();
   }
 
-  isSolidAtNextPosition(direction) {
+  isSolidAtNextPosition(direction: Direction) {
     // Check for ice corner...
     // 檢查角色是否在有 corner 的冰上，並回傳該 ice corner tile
     const onIceCorner = new Collision(this, this.level).withIceCorner();
@@ -123,7 +126,7 @@ export class BodyPlacement extends Placement {
 
   handleCollisions() {
     // handle collisions!
-    const collision = new Collision(this, this.level);
+    const collision = new Collision(this, this.level, { x: this.x, y: this.y });
     const collideThatAddsToInventory = collision.withPlacementAddsToInventory();
     this.skin = BODY_SKINS.NORMAL;
     const changesHeroSkin = collision.withChangesHeroSkin();

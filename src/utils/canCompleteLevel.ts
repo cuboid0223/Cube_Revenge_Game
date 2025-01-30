@@ -2,6 +2,7 @@ import { DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, PLACEMEN
 import { LevelSchema, PlacementSchema } from "@/helpers/types";
 import PriorityQueue from "./PriorityQueue";
 import { iceTileCornerBlockedMoves, iceTileCornerRedirection } from "@/game-objects/IcePlacement";
+import { getDirectionKey, handleIceLogic } from "./handleIceLogic";
 
 // 簡化地圖為二維矩陣，並記錄所有物件位置
 export function createMap(level: LevelSchema) {
@@ -173,84 +174,145 @@ export function aStarWithMechanics(start, gameMap, width, height, placements) {
           }
         }
 
+
         // Handle Ice
-        if (gameMap[ny - 1][nx - 1] === PLACEMENT_TYPE_ICE) {
-          const ice = placements.find(p => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE);
-        
-          // 如果玩家有 ICE_PICKUP，檢查 corner 阻擋邏輯
-          if (hasIcePickup) {
-            if (ice && ice.corner) {
-              const blockedDirections = iceTileCornerBlockedMoves[ice.corner];
-              const currentDirection = getDirectionKey([dx, dy]);
-               console.log("currentDirection: ",currentDirection);
-              // 如果方向被 corner 阻擋，禁止移動
-              if (blockedDirections[currentDirection]) {
-                console.log(`Blocked by corner at (${nx}, ${ny}). Cannot move ${currentDirection}.`);
-                nx -= dx; // 回退到合法位置
-                ny -= dy;
-              } else {
-                console.log(`Walking freely on ice at (${nx}, ${ny}) due to ICE_PICKUP.`);
-              }
+        // 檢查 corner-block (外部阻擋: 在 非ice 要往 ice corner 走) 
+        const cornerIce = placements.find(
+          (p) => p.x === nx && p.y === ny && p.type===PLACEMENT_TYPE_ICE && p.corner
+        );
+        if (cornerIce) {
+          // 代表 (nx, ny) 是 corner
+          const cornerType = cornerIce.corner; // e.g. 'BOTTOM_LEFT'
+          const blockedDirections =  iceTileCornerBlockedMoves[cornerType];
+          // 若 corner 定義了
+          if (blockedDirections) {
+            const currentDirKey = getDirectionKey([dx, dy]);
+           console.log(`User at [${x},${y}]  to [${dx}, ${dy}](${currentDirKey}), Corner(${cornerType}) at [${nx}, ${ny}]`);
+            if(isCornerSolidForBody(x,y, dx,dy, cornerIce)){ // 非 ice tile 到 ice corner
+              console.log(`skip! isCornerSolidForBody`);
+              continue;
             }
-          } else {
-            // 滑動邏輯
-            let direction = [dx, dy];
-            let sliding = true;
-        
-            while (sliding) {
-              if (!ice) break; // 停止滑動，已離開 ICE 範圍
-        
-              // 檢查 corner 是否阻擋當前滑動方向
-              if (ice.corner) {
-                const blockedDirections = iceTileCornerBlockedMoves[ice.corner];
-                const currentDirection = getDirectionKey(direction);
-        
-                if (blockedDirections[currentDirection]) {
-                  console.log(direction);
-                  console.log(`Sliding blocked by corner at (${nx}, ${ny}). when user go ${currentDirection}`);
-                  break; // 停止滑動
-                }
-        
-                // 檢查 corner 並改變滑動方向
-                const possibleRedirects = iceTileCornerRedirection[ice.corner];
-                if (possibleRedirects && possibleRedirects[`${direction[0]},${direction[1]}`]) {
-                  direction = possibleRedirects[`${direction[0]},${direction[1]}`];
-                } else {
-                  break; // 沒有合法轉向，停止滑動
-                }
-              }
-        
-              // 滑動到下一個位置
-              nx += direction[0];
-              ny += direction[1];
-        
-              // 停止滑動的條件
-              if (
-                nx < 1 || nx > width || ny < 1 || ny > height || // 出界
-                gameMap[ny - 1][nx - 1] === PLACEMENT_TYPE_WALL || // 遇到牆
-                (gameMap[ny - 1][nx - 1] !== PLACEMENT_TYPE_ICE ) // 非 ICE 範圍 
-              ) {
-                nx -= direction[0]; // 回退到合法位置
-                ny -= direction[1];
-                sliding = false
-              }
-            }
-        
-            console.log(`Slid on ice to (${nx}, ${ny})`);
+            // if (blockedDirections[currentDirKey]) { // ice tile 到 ice corner 但轉不出去(可能輸出方向有牆)
+            //   console.log(`skip!`);
+            //   continue;
+            // }
           }
         }
+
+        function isCornerSolidForBody(x,y, dx,dy, icePlacement) {
+          const nextX = x + dx
+          const nextY = y + dy
+          const bodyIsBelow = nextY < y;
+          if (bodyIsBelow && icePlacement.corner?.includes("BOTTOM")) {
+            return true;
+          }
+          const bodyIsAbove = nextY > y;
+          if (bodyIsAbove && icePlacement.corner?.includes("TOP")) {
+            return true;
+          }
+          const bodyIsToLeft = nextX > x;
+          if (bodyIsToLeft && icePlacement.corner?.includes("LEFT")) {
+            return true;
+          }
+          const bodyIsToRight = nextX < x;
+          if (bodyIsToRight && icePlacement.corner?.includes("RIGHT")) {
+            return true;
+          }
+        }
+
+        const [finalX, finalY] = handleIceLogic(
+          nx, ny, // 初始想移到 (nx, ny)
+          dx, dy, // 嘗試的方向
+          gameMap,
+          placements,
+          newHasIcePickup,
+          width,
+          height
+        );
+  
+        // 如果 handleIceLogic 回傳跟原位置一樣 => 被 corner 阻擋 /無法前進
+        if (finalX === x && finalY === y) {
+          continue; // skip
+        }
+        
+        
+        // if (gameMap[ny - 1][nx - 1] === PLACEMENT_TYPE_ICE) {
+        //   let direction: [number, number] = [dx, dy];
+        //   let sliding = !hasIcePickup;
+
+        //   while (true) {
+        //     const ice = placements.find(
+        //       (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE
+        //     );
+
+        //     if (!ice) break; // 停止滑動，已離開 ICE 範圍
+
+        //     if (ice.corner) {
+        //       const blockedDirections = iceTileCornerBlockedMoves[ice.corner as keyof typeof iceTileCornerBlockedMoves];
+        //       const currentDirection = getDirectionKey(direction);
+
+        //       // 檢查 corner 是否阻擋當前方向
+        //       if (blockedDirections[currentDirection as keyof typeof blockedDirections]) {
+        //         console.log(
+        //           `Sliding blocked by corner at (${nx}, ${ny}). Cannot move ${currentDirection}.`
+        //         );
+        //         // nx -= direction[0]
+        //         // ny -= direction[1]
+        //         break
+        //         // return [nx - direction[0], ny - direction[1]]; // 回退到合法位置
+        //       }
+
+        //       // 如果有合法轉向，更新滑動方向
+        //       const possibleRedirects = iceTileCornerRedirection[ice.corner as keyof typeof iceTileCornerRedirection];
+        //       const directionKey = `${direction[0]},${direction[1]}` as keyof typeof possibleRedirects;
+        //       if (possibleRedirects && possibleRedirects[directionKey]) {
+        //         direction = possibleRedirects[directionKey];
+        //       }
+        //     }
+
+        //     // 如果玩家有 ICE_PICKUP，不進行滑動檢查，允許自由行走
+        //     if (hasIcePickup) {
+        //       console.log(`Walking freely on ice at (${nx}, ${ny}) due to ICE_PICKUP.`);
+        //       break;
+        //     }
+
+        //     // 滑動到下一個位置
+        //     nx += direction[0];
+        //     ny += direction[1];
+
+        //     // 停止滑動的條件
+        //     if (
+        //       nx < 1 ||
+        //       nx > width ||
+        //       ny < 1 ||
+        //       ny > height || // 出界
+        //       gameMap[ny - 1][nx - 1] === PLACEMENT_TYPE_WALL || // 遇到牆
+        //       (gameMap[ny - 1][nx - 1] !== PLACEMENT_TYPE_ICE &&
+        //         !placements.find((p) => p.x === nx && p.y === ny)) // 非 ICE 範圍
+        //     ) {
+        //       console.log(`Stopped sliding at (${nx}, ${ny}) due to invalid condition.`);
+        //       nx -= direction[0]
+        //       ny -= direction[1]
+        //       break
+        //       // return [nx - direction[0], ny - direction[1]]; // 回退到合法位置
+        //     }
+          
+            
+        //   }
+        // }
+
         
 
         // State management
-        const stateKey = `${nx},${ny}-${[...newCollected].sort().join(",")}-${newHasFirePickup}-${newHasWaterPickup}-${newIsSwitchDoorOpen}-${newHasKey}`;
+        const stateKey = `${finalX},${finalY}-${[...newCollected].sort().join(",")}-${newHasFirePickup}-${newHasWaterPickup}-${newHasIcePickup}-${newIsSwitchDoorOpen}-${newHasKey}`;
         if (visited.has(stateKey)) continue;
   
         visited.add(stateKey);
   
         // Calculate costs with heuristic
         const newG = g + 1;
-        const newH = heuristicOptimized([nx, ny], flourPositions, goalPosition, newCollected);
-        queue.push([newG + newH, newG, nx, ny, newCollected, newHasFirePickup, newHasWaterPickup, newHasIcePickup, newIsSwitchDoorOpen,newHasKey, newPath]);
+        const newH = heuristicOptimized([finalX, finalY], flourPositions, goalPosition, newCollected);
+        queue.push([newG + newH, newG, finalX, finalY, newCollected, newHasFirePickup, newHasWaterPickup, newHasIcePickup, newIsSwitchDoorOpen,newHasKey, newPath]);
       }
     }
   
@@ -271,10 +333,3 @@ export function aStarWithMechanics(start, gameMap, width, height, placements) {
   }
 
 
-  function getDirectionKey([dx, dy]) {
-    if (dx === -1 && dy === 0) return DIRECTION_LEFT;
-    if (dx === 1 && dy === 0) return DIRECTION_RIGHT;
-    if (dx === 0 && dy === -1) return DIRECTION_UP;
-    if (dx === 0 && dy === 1) return DIRECTION_DOWN;
-    return null; // 無效方向
-  }

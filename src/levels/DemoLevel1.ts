@@ -66,203 +66,307 @@ import {
 //   ],
 // };
 
+// bug level
+// const DemoLevel1 = {
+//   theme: LEVEL_THEMES.YELLOW,
+//   tilesWidth: 10,
+//   tilesHeight: 7,
+//   placements: [
+//       {
+//           "type": PLACEMENT_TYPE_HERO,
+//           "x": 5,
+//           "y": 2
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         "x": 5,
+//         "y": 4
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_ICE,
+//         "x": 4,
+//         "y": 4
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         // "corner": "BOTTOM_RIGHT",
+//         "x": 3,
+//         "y": 4
+//       },
+
+//       {
+//         "type": PLACEMENT_TYPE_ICE,
+//         "x": 4,
+//         "y": 5
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_ICE,
+//         "corner": "BOTTOM_RIGHT",
+//         "x": 4,
+//         "y": 6
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_ICE_PICKUP,
+//         "x": 6,
+//         "y": 3
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         "x": 3,
+//         "y": 6
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         "x": 2,
+//         "y": 4
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         "x": 2,
+//         "y": 3
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         "x": 2,
+//         "y": 2
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         "x": 6,
+//         "y": 4
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         "x": 7,
+//         "y": 4
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         "x": 8,
+//         "y": 4
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         "x": 8,
+//         "y": 3
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         "x": 8,
+//         "y": 2
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         "x": 2,
+//         "y": 1
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         "x": 10,
+//         "y": 5
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_WALL,
+//         "x": 9,
+//         "y": 6
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_GOAL,
+//         "x": 5,
+//         "y": 5
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_FLOUR,
+//         "x": 3,
+//         "y": 5
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_FLOUR,
+//         "x": 6,
+//         "y": 5
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_CONVEYOR,
+//         "direction": "DOWN",
+//         "x": 1,
+//         "y": 2
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_CONVEYOR,
+//         "direction": "DOWN",
+//         "x": 1,
+//         "y": 3
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_CONVEYOR,
+//         "direction": "DOWN",
+//         "x": 1,
+//         "y": 4
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_CONVEYOR,
+//         "direction": "RIGHT",
+//         "x": 1,
+//         "y": 5
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_ICE,
+//         "x": 6,
+//         "y": 1
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_ICE,
+//         "x": 7,
+//         "y": 1
+//       },      
+//       {
+//         "type": PLACEMENT_TYPE_ICE,
+//         "x": 8,
+//         "y": 1
+//       },      
+//       {
+//         "type": PLACEMENT_TYPE_ICE,
+//         "corner": "TOP_RIGHT",
+//         "x": 9,
+//         "y": 1
+//       },      
+//       {
+//         "type": PLACEMENT_TYPE_ICE,
+//         "x": 9,
+//         "y": 2
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_ICE,
+//         "x": 9,
+//         "y": 3
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_ICE,
+//         "x": 9,
+//         "y": 4
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_ICE,
+//         "x": 9,
+//         "y": 5
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_ICE,
+//         "x": 8,
+//         "y": 5
+//       },
+//       {
+//         "type": PLACEMENT_TYPE_ICE,
+//         "x": 7,
+//         "y": 5
+//       },
+
+//   ],
+// };
+
 
 const DemoLevel1 = {
   theme: LEVEL_THEMES.YELLOW,
-  tilesWidth: 10,
-  tilesHeight: 6,
+  tilesWidth: 8,
+  tilesHeight: 5,
   placements: [
-      {
-          "type": PLACEMENT_TYPE_HERO,
-          "x": 5,
-          "y": 2
+          {
+              "type": PLACEMENT_TYPE_HERO,
+              "x": 1,
+              "y": 1
+          },
+          {
+              "type": PLACEMENT_TYPE_GOAL,
+              "x": 7,
+              "y": 5
+          },
+          {
+              "type": PLACEMENT_TYPE_WALL,
+              "x": 4,
+              "y": 3
+          },
+          {
+            "type": PLACEMENT_TYPE_WALL,
+            "x": 3,
+            "y": 3
+        },
+        {
+          "type": PLACEMENT_TYPE_WALL,
+          "x": 2,
+          "y": 3
       },
       {
         "type": PLACEMENT_TYPE_WALL,
-        "x": 5,
-        "y": 4
-      },
-      {
-        "type": PLACEMENT_TYPE_ICE,
         "x": 4,
-        "y": 4
-      },
-      {
-        "type": PLACEMENT_TYPE_WALL,
-        // "corner": "BOTTOM_RIGHT",
-        "x": 3,
-        "y": 4
-      },
-
-      {
-        "type": PLACEMENT_TYPE_ICE,
-        "x": 4,
-        "y": 5
-      },
-      {
-        "type": PLACEMENT_TYPE_ICE,
-        "corner": "BOTTOM_RIGHT",
-        "x": 4,
-        "y": 6
-      },
-      {
-        "type": PLACEMENT_TYPE_ICE_PICKUP,
-        "x": 6,
-        "y": 3
-      },
-      {
-        "type": PLACEMENT_TYPE_WALL,
-        "x": 3,
-        "y": 6
-      },
-      {
-        "type": PLACEMENT_TYPE_WALL,
-        "x": 2,
-        "y": 4
-      },
-      {
-        "type": PLACEMENT_TYPE_WALL,
-        "x": 2,
-        "y": 3
-      },
-      {
-        "type": PLACEMENT_TYPE_WALL,
-        "x": 2,
         "y": 2
+    },
+    {
+      "type": PLACEMENT_TYPE_WALL,
+      "x": 4,
+      "y": 1
+  },
+      
+          {
+              "type": PLACEMENT_TYPE_FLOUR,
+              "x": 3,
+              "y": 2
+          },
+          {
+            "type": PLACEMENT_TYPE_ICE,
+            "x": 1,
+            "y": 2
+          },
+          {
+            "type": PLACEMENT_TYPE_ICE,
+            "x": 1,
+            "y": 3
+          },
+          {
+            "type": PLACEMENT_TYPE_ICE,
+            "x": 1,
+            "y": 4
+          },
+          {
+            "type": PLACEMENT_TYPE_ICE,
+            "x": 1,
+            "y": 5
+          },
+          {
+            "type": PLACEMENT_TYPE_ICE,
+            "x": 2,
+            "y": 5
+          },
+          {
+            "type": PLACEMENT_TYPE_ICE,
+            
+            "x": 3,
+            "y": 5
+          },
+          // {
+          //   "type": PLACEMENT_TYPE_ICE,
+          //   "x": 4,
+          //   "y": 5
+          // },
+          {
+              "type": PLACEMENT_TYPE_ICE,
+              "corner": "BOTTOM_RIGHT",
+              "x": 4,
+              "y": 5
+          },
+          {
+            "type": PLACEMENT_TYPE_ICE,
+            "corner": "BOTTOM_LEFT",
+            "x": 6,
+            "y": 4
+        },
+        {
+          "type": PLACEMENT_TYPE_ICE,
+          "corner": "BOTTOM_LEFT",
+          "x": 6,
+          "y": 5
       },
-      {
-        "type": PLACEMENT_TYPE_WALL,
-        "x": 6,
-        "y": 4
-      },
-      {
-        "type": PLACEMENT_TYPE_WALL,
-        "x": 7,
-        "y": 4
-      },
-      {
-        "type": PLACEMENT_TYPE_WALL,
-        "x": 8,
-        "y": 4
-      },
-      {
-        "type": PLACEMENT_TYPE_WALL,
-        "x": 8,
-        "y": 3
-      },
-      {
-        "type": PLACEMENT_TYPE_WALL,
-        "x": 8,
-        "y": 2
-      },
-      {
-        "type": PLACEMENT_TYPE_WALL,
-        "x": 2,
-        "y": 1
-      },
-      {
-        "type": PLACEMENT_TYPE_WALL,
-        "x": 10,
-        "y": 5
-      },
-      {
-        "type": PLACEMENT_TYPE_WALL,
-        "x": 9,
-        "y": 6
-      },
-      {
-        "type": PLACEMENT_TYPE_GOAL,
-        "x": 5,
-        "y": 5
-      },
-      {
-        "type": PLACEMENT_TYPE_FLOUR,
-        "x": 3,
-        "y": 5
-      },
-      {
-        "type": PLACEMENT_TYPE_FLOUR,
-        "x": 6,
-        "y": 5
-      },
-      {
-        "type": PLACEMENT_TYPE_CONVEYOR,
-        "direction": "DOWN",
-        "x": 1,
-        "y": 2
-      },
-      {
-        "type": PLACEMENT_TYPE_CONVEYOR,
-        "direction": "DOWN",
-        "x": 1,
-        "y": 3
-      },
-      {
-        "type": PLACEMENT_TYPE_CONVEYOR,
-        "direction": "DOWN",
-        "x": 1,
-        "y": 4
-      },
-      {
-        "type": PLACEMENT_TYPE_CONVEYOR,
-        "direction": "RIGHT",
-        "x": 1,
-        "y": 5
-      },
-      {
-        "type": PLACEMENT_TYPE_ICE,
-        "x": 6,
-        "y": 1
-      },
-      {
-        "type": PLACEMENT_TYPE_ICE,
-        "x": 7,
-        "y": 1
-      },      
-      {
-        "type": PLACEMENT_TYPE_ICE,
-        "x": 8,
-        "y": 1
-      },      
-      {
-        "type": PLACEMENT_TYPE_ICE,
-        "corner": "TOP_RIGHT",
-        "x": 9,
-        "y": 1
-      },      
-      {
-        "type": PLACEMENT_TYPE_ICE,
-        "x": 9,
-        "y": 2
-      },
-      {
-        "type": PLACEMENT_TYPE_ICE,
-        "x": 9,
-        "y": 3
-      },
-      {
-        "type": PLACEMENT_TYPE_ICE,
-        "x": 9,
-        "y": 4
-      },
-      {
-        "type": PLACEMENT_TYPE_ICE,
-        "x": 9,
-        "y": 5
-      },
-      {
-        "type": PLACEMENT_TYPE_ICE,
-        "x": 8,
-        "y": 5
-      },
-      {
-        "type": PLACEMENT_TYPE_ICE,
-        "x": 7,
-        "y": 5
-      },
-
-  ],
-};
+  ]
+}
 
 
 export default DemoLevel1;

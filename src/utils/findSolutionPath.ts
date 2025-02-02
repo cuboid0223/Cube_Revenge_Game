@@ -35,12 +35,16 @@ export function findPositions(placements: PlacementSchema[], type: string) {
 }
 
 // A* Algo 檢查路徑並返回通關路徑
-export function aStarWithMechanics(start, gameMap, width, height, placements) {
+export default function findSolutionPath(start, gameMap, width, height, placements) {
  
     const flourPositions = placements
       .filter(p => p.type === PLACEMENT_TYPE_FLOUR)
       .map(p => [p.x, p.y]);
     const goalPosition = placements.find(p => p.type === PLACEMENT_TYPE_GOAL);
+    if (!goalPosition) {
+      console.error("No goal position found in placements.");
+      return null;
+    }
     const firePickupPosition = placements.find(p => p.type === PLACEMENT_TYPE_FIRE_PICKUP);
     const waterPickupPosition = placements.find(p => p.type === PLACEMENT_TYPE_WATER_PICKUP);
     const icePickupPosition = placements.find(p => p.type === PLACEMENT_TYPE_ICE_PICKUP);

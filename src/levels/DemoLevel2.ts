@@ -115,7 +115,14 @@ const DemoLevel2 = {
   {
     "type": PLACEMENT_TYPE_SWITCH_DOOR,
     "x": 8,
-    "y": 4
+    "y": 4,
+    "isRaised": false
+  },
+  {
+    "type": PLACEMENT_TYPE_SWITCH_DOOR,
+    "x": 3,
+    "y": 1,
+    "isRaised": true
   }
   
   ],

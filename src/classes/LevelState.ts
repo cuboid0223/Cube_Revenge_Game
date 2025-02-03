@@ -38,7 +38,7 @@ export class LevelState {
       return placementFactory.createPlacement(config, this);
     });
     this.gameMap = createMap(levelData).gameMap
-    this.solutionPath = findSolutionPath(this.gameMap,  this.tilesWidth,this.tilesHeight,levelData.placements)
+    this.solutionPath = findSolutionPath(this.gameMap, this.tilesWidth,this.tilesHeight, levelData.placements)
 
     this.inventory = new Inventory();
 
@@ -73,6 +73,12 @@ export class LevelState {
     this.gameLoop = new GameLoop(() => {
       this.tick();
     });
+  }
+
+  updateSolutionPath(){
+    this.gameMap = createMap(this.getState()).gameMap
+    this.solutionPath = findSolutionPath(this.gameMap, this.tilesWidth,this.tilesHeight,this.placements)
+    // this.onEmit(this.getState());
   }
 
   tick() {
@@ -140,6 +146,7 @@ export class LevelState {
     this.editModePlacementType = newType;
   }
 
+
   getState() {
     // 讓外部使用 levelState
     return {
@@ -158,6 +165,7 @@ export class LevelState {
       restart: () => {
         this.start();
       },
+     
       // Edit Mode API
       // 將 method 傳出去供外部使用
       enableEditing: true,
@@ -166,6 +174,7 @@ export class LevelState {
       deletePlacement: this.deletePlacement.bind(this),
       setEditModePlacementType: this.setEditModePlacementType.bind(this),
       copyPlacementsToClipboard: this.copyPlacementsToClipboard.bind(this),
+      updateSolutionPath: this.updateSolutionPath.bind(this)
     };
   }
 

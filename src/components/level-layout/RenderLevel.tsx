@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect, useState } from "react";
+import React, {useEffect, useState } from "react";
 import styles from "./RenderLevel.module.css";
 import { PLACEMENT_TYPE_FIRE_PICKUP, PLACEMENT_TYPE_FLOUR, PLACEMENT_TYPE_GOAL, PLACEMENT_TYPE_HERO, PLACEMENT_TYPE_TELEPORT, THEME_BACKGROUNDS } from "../../helpers/consts";
 import LevelBackgroundTilesLayer from "./LevelBackgroundTilesLayer";
@@ -10,13 +10,12 @@ import { useRecoilValue } from "recoil";
 import { currentLevelIdAtom } from "../../atoms/currentLevelIdAtom";
 import DeathMessage from "../hud/DeathMessage";
 import TopHud from "../hud/TopHud";
-import findSolutionPath, {  createMap , findPositions} from "@/utils/findSolutionPath";
-import DemoLevel1 from "@/levels/DemoLevel1";
-import DemoLevel2 from "@/levels/DemoLevel2";
-import generateRoomsWalks from "@/utils/generateRooms";
-import { buildTileMap } from "@/helpers/buildTileMap";
-import { templateMap } from "@/helpers/roomTemplatesMap";
-import tileMapToLevel from "@/utils/tileMapToLevel";
+// import DemoLevel1 from "@/levels/DemoLevel1";
+// import DemoLevel2 from "@/levels/DemoLevel2";
+// import generateRoomsWalks from "@/utils/generateRooms";
+// import { buildTileMap } from "@/helpers/buildTileMap";
+// import { templateMap } from "@/helpers/roomTemplatesMap";
+// import tileMapToLevel from "@/utils/tileMapToLevel";
 
 export default function RenderLevel() {
   const [level, setLevel] = useState<LevelSchema | null>(null);

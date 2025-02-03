@@ -61,6 +61,14 @@ export const directionUpdateMap: DirectionUpdateMapType = {
   [DIRECTION_DOWN]: { x: 0, y: 1 },
 } as const;
 
+export const directions = [
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1]
+]
+
+
 export const BODY_SKINS = {
   NORMAL: "NORMAL",
   WATER: "WATER",

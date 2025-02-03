@@ -1,7 +1,7 @@
 import React, { CSSProperties } from "react";
 import { LevelSchema } from "@/helpers/types";
 import { CELL_SIZE, PLACEMENT_TYPE_CONVEYOR, PLACEMENT_TYPE_FIRE, PLACEMENT_TYPE_ICE, PLACEMENT_TYPE_SWITCH, PLACEMENT_TYPE_SWITCH_DOOR, PLACEMENT_TYPE_TELEPORT, PLACEMENT_TYPE_THIEF, PLACEMENT_TYPE_WATER } from "@/helpers/consts";
-import { isColoredTile } from "@/utils/isColoredTile";
+import { handleColoredTile } from "@/utils/handleColoredTile";
 import { Placement } from "@/game-objects/Placement";
 type Props = {
   level: LevelSchema;
@@ -15,7 +15,7 @@ export default function LevelPlacementsLayer({ level }: Props) {
     .map((placement) => {
       // Wrap each Sprite in a positioned div
       const [x, y] = placement.displayXY();
-      const {isColored, hslColor} = isColoredTile(placement.type, x, y, level.solutionPath)
+      const {isColored, hslColor} = handleColoredTile(placement.type, x, y, level.solutionPath)
       const style: CSSProperties = {
         position: "absolute",
         transform: `translate3d(${x}px, ${y}px, 0)`,

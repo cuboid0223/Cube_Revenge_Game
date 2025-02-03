@@ -1,10 +1,10 @@
 import Sprite from "../object-graphics/Sprite";
 import { CELL_SIZE } from "../../helpers/consts";
-import { isColoredTile } from "@/utils/isColoredTile";
+import { handleColoredTile } from "@/utils/handleColoredTile";
 
 export default function MapCell({ level, x, y, frameCoord }) {
 
-  const {isColored, hslColor,frequency} = isColoredTile(undefined, x, y, level.solutionPath)
+  const {isColored, hslColor,frequency} = handleColoredTile(undefined, x, y, level.solutionPath)
 
   return (
     <div
@@ -21,10 +21,11 @@ export default function MapCell({ level, x, y, frameCoord }) {
             y: y,
             type: level.editModePlacementType,
           });
+          level.updateSolutionPath()
         }
       }}
     >
-      { isColored && (
+      {isColored && (
         <div 
         style={{
           width: CELL_SIZE,
@@ -33,7 +34,6 @@ export default function MapCell({ level, x, y, frameCoord }) {
         }}  
         className={` overflow-hidden`}>
           <pre className="absolute text-xs z-100"> {frequency}</pre>
-          
         </div>
       )}
 

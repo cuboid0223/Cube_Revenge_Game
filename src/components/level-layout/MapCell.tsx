@@ -21,7 +21,6 @@ export default function MapCell({ level, x, y, frameCoord }) {
             y: y,
             type: level.editModePlacementType,
           });
-          level.updateSolutionPath()
         }
       }}
     >
@@ -31,8 +30,10 @@ export default function MapCell({ level, x, y, frameCoord }) {
           width: CELL_SIZE,
           height: CELL_SIZE,
           // backgroundColor: hslColor
+          border: '1px solid white',
+ 
         }}  
-        className={` overflow-hidden`}>
+        className={`overflow-hidden`}>
           <pre className="absolute text-xs z-100"> {frequency}</pre>
         </div>
       )}

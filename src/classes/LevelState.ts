@@ -59,12 +59,15 @@ export class LevelState {
 
   addPlacement(config) {
     this.placements.push(placementFactory.createPlacement(config, this));
+    this.updateSolutionPath()
   }
 
   deletePlacement(placementToRemove) {
     this.placements = this.placements.filter((p) => {
       return p.id !== placementToRemove.id;
     });
+    this.updateSolutionPath()
+
   }
 
   startGameLoop() {

@@ -44,6 +44,7 @@ export default function generateMap({
       const goalPos = findPositions(placements, PLACEMENT_TYPE_GOAL)[0];
       if (!heroPos ||!goalPos) {
         // 若連英雄都沒有 => 代表地圖沒放 "H"? 或衝突
+        console.log(gameMap);
         console.log("no goalPos or hero");
         continue; // 重新來一次
       }

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const placementSchema = z.object({
-  id: z.number(),
+  id: z.number().optional(),
   x: z.number(),
   y: z.number(),
   type: z.string().optional(),

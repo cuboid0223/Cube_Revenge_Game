@@ -77,7 +77,6 @@ export function handleIceLogic(
             //     continue;
             // }
             if (blockedDirections[currentDirKey]) {
-                console.log(`轉向遇到牆壁`);
                 continue;
             }
         }

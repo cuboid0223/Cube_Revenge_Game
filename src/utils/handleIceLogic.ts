@@ -50,13 +50,18 @@ export function handleIceLogic(
         if (possibleRedirects[dirKey]) {
             const point = directionUpdateMap[possibleRedirects[dirKey]] 
             direction = [point.x,point.y];
-            if(nx===3 && ny===5) console.log("這裡");
-        
+
             console.log(
                 `Corner(${ice.corner}) at [${nx}, ${ny}] => redirect => [${direction}].`
             );
+            
             nx += direction[0]
             ny += direction[1]
+            const solidPlacement = placements.find(p => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_WALL)
+            if(solidPlacement){
+              nx -= direction[0]
+              ny -= direction[1]
+            }
             break
         }
 
@@ -72,7 +77,7 @@ export function handleIceLogic(
             //     continue;
             // }
             if (blockedDirections[currentDirKey]) {
-                console.log(`skip!`);
+                console.log(`轉向遇到牆壁`);
                 continue;
             }
         }
@@ -166,7 +171,7 @@ export function handleIceLogic(
   }
   
 
-function isCornerSolidForBody(x,y, dx,dy, icePlacement) {
+export function isCornerSolidForBody(x,y, dx,dy, icePlacement) {
     const nextX = x + dx
     const nextY = y + dy
     const bodyIsBelow = nextY < y;

@@ -2,7 +2,7 @@ import { DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, PLACEMEN
 import { LevelSchema, PlacementSchema } from "@/helpers/types";
 import PriorityQueue from "./PriorityQueue";
 import { iceTileCornerBlockedMoves, iceTileCornerRedirection } from "@/game-objects/IcePlacement";
-import { getDirectionKey, handleIceLogic } from "./handleIceLogic";
+import { getDirectionKey, handleIceLogic, isCornerSolidForBody } from "./handleIceLogic";
 
 // 簡化地圖為二維矩陣，並記錄所有物件位置
 export function createMap(level: LevelSchema) {
@@ -141,6 +141,7 @@ export default function findSolutionPath(gameMap, width, height, placements) {
     // 探索四個方向
     for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
       let nx = x + dx, ny = y + dy;
+      // 超出邊界
       if (nx < 1 || nx > width || ny < 1 || ny > height) continue;
 
       const cellType = gameMap[ny - 1][nx - 1];
@@ -223,37 +224,36 @@ export default function findSolutionPath(gameMap, width, height, placements) {
         }
       }
 
-      // 處理 Ice：這部分維持原有邏輯（不在此示範細部修改）
+      // 檢查 corner-block (外部阻擋: 在 非ice 要往 ice corner 走) 
       const cornerIce = placements.find(p =>
         p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE && p.corner
       );
       if (cornerIce) {
+         // 代表 (nx, ny) 是 corner
         const cornerType = cornerIce.corner;
         const blockedDirections = iceTileCornerBlockedMoves[cornerType];
         if (blockedDirections) {
           const currentDirKey = getDirectionKey([dx, dy]);
           console.log(`User at [${x},${y}] to [${dx}, ${dy}](${currentDirKey}), Corner(${cornerType}) at [${nx}, ${ny}]`);
           if (isCornerSolidForBody(x, y, dx, dy, cornerIce)) {
+            // 非 ice tile 到 ice corner
             console.log(`skip! isCornerSolidForBody`);
+            continue;
+          }
+          if (blockedDirections[currentDirKey]) { 
+            // ice tile 到 ice corner 但轉不出去(可能輸出方向有牆)
+            console.log(`轉向遇到牆壁!`);
             continue;
           }
         }
       }
       // ※ isCornerSolidForBody 可定義在外層（這裡不重複每次定義）
-      function isCornerSolidForBody(x, y, dx, dy, icePlacement) {
-        const nextX = x + dx;
-        const nextY = y + dy;
-        if (nextY < y && icePlacement.corner?.includes("BOTTOM")) return true;
-        if (nextY > y && icePlacement.corner?.includes("TOP")) return true;
-        if (nextX > x && icePlacement.corner?.includes("LEFT")) return true;
-        if (nextX < x && icePlacement.corner?.includes("RIGHT")) return true;
-        return false;
-      }
 
       // 處理 Ice 的連續滑行邏輯
       const [finalX, finalY] = handleIceLogic(
         nx, ny, dx, dy, gameMap, placements, (newItemMask & 4) > 0, width, height
       );
+      // 如果 handleIceLogic 回傳跟原位置一樣 => 被 corner 阻擋 /無法前進
       if (finalX === x && finalY === y) continue;
 
       // 生成新的 state key：用簡短的字串結合數值資訊

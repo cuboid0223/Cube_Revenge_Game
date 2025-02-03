@@ -1,4 +1,4 @@
-import { RoomInfo, RoomsGrid, RoomType } from "@/helpers/typeRooms";
+import { RoomInfo, RoomsGrid, RoomType } from "@/helpers/roomTemplatesMap";
 /**
  * 產生一個 NxN 的房間網格。
  * 從 (sr, sc) 開始，隨機往上下左右走，直到到達 (gr, gc)。
@@ -23,10 +23,11 @@ function createEmptyRooms(n: number): RoomsGrid {
 
 /**
  * 產生一個 NxN 的房間網格.
+ * 如果 N=3  則會產生 3*3 = 9 個房間
  * 每個房間存有 {up,down,left,right} 布林，表示出口方向。
  * 從 (sr,sc) => (gr,gc) 隨機走上下左右 (撞牆→往下, 超過步數→connectToGoal)。
  */
-export default function  generateRoomsWalks(n: number): RoomsGrid {
+export default function  generateRooms(n: number): RoomsGrid {
     const rooms = createEmptyRooms(n);
   
     // pick random start/goal

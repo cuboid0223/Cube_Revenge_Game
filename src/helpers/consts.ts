@@ -38,6 +38,18 @@ export const DIRECTION_DOWN = "DOWN";
 
 export const DEATH_TYPE_CLOCK = "CLOCK";
 
+// bodyPlacement 可以踩過的 placements，用來塗顏色顯示最短路徑
+export const COLORED_TYPES = [
+  PLACEMENT_TYPE_FIRE,
+  PLACEMENT_TYPE_WATER,
+  PLACEMENT_TYPE_ICE,
+  PLACEMENT_TYPE_CONVEYOR,
+  PLACEMENT_TYPE_SWITCH,
+  PLACEMENT_TYPE_SWITCH_DOOR,
+  PLACEMENT_TYPE_TELEPORT,
+  PLACEMENT_TYPE_THIEF,
+];
+
 type DirectionUpdateMapType = {
   [key: string]: { x: number; y: number };
 };

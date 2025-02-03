@@ -1,4 +1,4 @@
-import { DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, PLACEMENT_TYPE_CONVEYOR, PLACEMENT_TYPE_FIRE, PLACEMENT_TYPE_FIRE_PICKUP, PLACEMENT_TYPE_FLOUR, PLACEMENT_TYPE_GOAL, PLACEMENT_TYPE_ICE, PLACEMENT_TYPE_ICE_PICKUP, PLACEMENT_TYPE_KEY, PLACEMENT_TYPE_LOCK, PLACEMENT_TYPE_SWITCH, PLACEMENT_TYPE_SWITCH_DOOR, PLACEMENT_TYPE_TELEPORT, PLACEMENT_TYPE_THIEF, PLACEMENT_TYPE_WALL, PLACEMENT_TYPE_WATER, PLACEMENT_TYPE_WATER_PICKUP } from "@/helpers/consts";
+import { DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, PLACEMENT_TYPE_CONVEYOR, PLACEMENT_TYPE_FIRE, PLACEMENT_TYPE_FIRE_PICKUP, PLACEMENT_TYPE_FLOUR, PLACEMENT_TYPE_GOAL, PLACEMENT_TYPE_HERO, PLACEMENT_TYPE_ICE, PLACEMENT_TYPE_ICE_PICKUP, PLACEMENT_TYPE_KEY, PLACEMENT_TYPE_LOCK, PLACEMENT_TYPE_SWITCH, PLACEMENT_TYPE_SWITCH_DOOR, PLACEMENT_TYPE_TELEPORT, PLACEMENT_TYPE_THIEF, PLACEMENT_TYPE_WALL, PLACEMENT_TYPE_WATER, PLACEMENT_TYPE_WATER_PICKUP } from "@/helpers/consts";
 import { LevelSchema, PlacementSchema } from "@/helpers/types";
 import PriorityQueue from "./PriorityQueue";
 import { iceTileCornerBlockedMoves, iceTileCornerRedirection } from "@/game-objects/IcePlacement";
@@ -35,8 +35,8 @@ export function findPositions(placements: PlacementSchema[], type: string) {
 }
 
 // A* Algo 檢查路徑並返回通關路徑
-export default function findSolutionPath(start, gameMap, width, height, placements) {
- 
+export default function findSolutionPath(gameMap, width, height, placements) {
+    const startPosition = findPositions(placements, PLACEMENT_TYPE_HERO)[0]; 
     const flourPositions = placements
       .filter(p => p.type === PLACEMENT_TYPE_FLOUR)
       .map(p => [p.x, p.y]);
@@ -58,7 +58,8 @@ export default function findSolutionPath(start, gameMap, width, height, placemen
     const init_hasFirePickup = false, init_hasWaterPickup = false, init_hasIcePickup = false
     const init_isSwitchDoorOpen = true
     const init_hasKey = false
-    queue.push([0, 0, start[0], start[1], init_collected, init_hasFirePickup, init_hasWaterPickup, init_hasIcePickup, init_isSwitchDoorOpen,init_hasKey, []]); // (f, g, x, y, collectedFlours, hasFirePickup, path)
+    const init_path: [number,number][] = []
+    queue.push([0, 0, startPosition[0], startPosition[1], init_collected, init_hasFirePickup, init_hasWaterPickup, init_hasIcePickup, init_isSwitchDoorOpen,init_hasKey, init_path]); // (f, g, x, y, collectedFlours, hasFirePickup, path)
     const visited = new Set();
   
     while (!queue.isEmpty()) {
@@ -238,72 +239,6 @@ export default function findSolutionPath(start, gameMap, width, height, placemen
         if (finalX === x && finalY === y) {
           continue; // skip
         }
-        
-        
-        // if (gameMap[ny - 1][nx - 1] === PLACEMENT_TYPE_ICE) {
-        //   let direction: [number, number] = [dx, dy];
-        //   let sliding = !hasIcePickup;
-
-        //   while (true) {
-        //     const ice = placements.find(
-        //       (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE
-        //     );
-
-        //     if (!ice) break; // 停止滑動，已離開 ICE 範圍
-
-        //     if (ice.corner) {
-        //       const blockedDirections = iceTileCornerBlockedMoves[ice.corner as keyof typeof iceTileCornerBlockedMoves];
-        //       const currentDirection = getDirectionKey(direction);
-
-        //       // 檢查 corner 是否阻擋當前方向
-        //       if (blockedDirections[currentDirection as keyof typeof blockedDirections]) {
-        //         console.log(
-        //           `Sliding blocked by corner at (${nx}, ${ny}). Cannot move ${currentDirection}.`
-        //         );
-        //         // nx -= direction[0]
-        //         // ny -= direction[1]
-        //         break
-        //         // return [nx - direction[0], ny - direction[1]]; // 回退到合法位置
-        //       }
-
-        //       // 如果有合法轉向，更新滑動方向
-        //       const possibleRedirects = iceTileCornerRedirection[ice.corner as keyof typeof iceTileCornerRedirection];
-        //       const directionKey = `${direction[0]},${direction[1]}` as keyof typeof possibleRedirects;
-        //       if (possibleRedirects && possibleRedirects[directionKey]) {
-        //         direction = possibleRedirects[directionKey];
-        //       }
-        //     }
-
-        //     // 如果玩家有 ICE_PICKUP，不進行滑動檢查，允許自由行走
-        //     if (hasIcePickup) {
-        //       console.log(`Walking freely on ice at (${nx}, ${ny}) due to ICE_PICKUP.`);
-        //       break;
-        //     }
-
-        //     // 滑動到下一個位置
-        //     nx += direction[0];
-        //     ny += direction[1];
-
-        //     // 停止滑動的條件
-        //     if (
-        //       nx < 1 ||
-        //       nx > width ||
-        //       ny < 1 ||
-        //       ny > height || // 出界
-        //       gameMap[ny - 1][nx - 1] === PLACEMENT_TYPE_WALL || // 遇到牆
-        //       (gameMap[ny - 1][nx - 1] !== PLACEMENT_TYPE_ICE &&
-        //         !placements.find((p) => p.x === nx && p.y === ny)) // 非 ICE 範圍
-        //     ) {
-        //       console.log(`Stopped sliding at (${nx}, ${ny}) due to invalid condition.`);
-        //       nx -= direction[0]
-        //       ny -= direction[1]
-        //       break
-        //       // return [nx - direction[0], ny - direction[1]]; // 回退到合法位置
-        //     }
-          
-            
-        //   }
-        // }
 
         
 

@@ -2,9 +2,9 @@ import generateMap from "@/utils/generateMap";
 import DemoLevel1 from "./DemoLevel1";
 import DemoLevel2 from "./DemoLevel2";
 
-const Levels = {
+const levels = {
   DemoLevel1: generateMap(),
   DemoLevel2: DemoLevel2,
 };
 
-export default Levels;
+export default levels;

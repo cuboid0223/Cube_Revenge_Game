@@ -1,4 +1,4 @@
-import { RoomExits, RoomInfo, RoomsGrid, TileMap } from "./typeRooms";
+import { RoomExits, RoomInfo, RoomsGrid, TileMap } from "./roomTemplatesMap";
 
 /**
  * 將 macro-level 的 RoomsGrid 轉成最終 tileMap

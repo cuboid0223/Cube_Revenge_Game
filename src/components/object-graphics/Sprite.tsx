@@ -20,13 +20,13 @@ function Sprite({ frameCoord, size = 16 }: SpriteProps) {
 
     //Clear out anything in the canvas tag
     // ctx efs to "context"
-    ctx?.clearRect(0, 0, canvasEl.width, canvasEl.height);
+    // ctx?.clearRect(0, 0, canvasEl.width, canvasEl.height);
 
     //Draw a graphic to the canvas tag
     // frameCoord => "1x0", "2x0"
     const tileSheetX = Number(frameCoord.split("x")[0]);
     const tileSheetY = Number(frameCoord.split("x")[1]);
-
+  
     ctx?.drawImage(
       spriteSheetImage, // Image to pull from
       tileSheetX * CELL_SIZE, // Left X corner of frame
@@ -38,6 +38,7 @@ function Sprite({ frameCoord, size = 16 }: SpriteProps) {
       size, //How large to scale it (X)
       size //How large to scale it (Y)
     );
+   
   }, [spriteSheetImage, frameCoord, size]);
 
   return <canvas width={size} height={size} ref={canvasRef} />;

@@ -13,9 +13,9 @@ import TopHud from "../hud/TopHud";
 import findSolutionPath, {  createMap , findPositions} from "@/utils/findSolutionPath";
 import DemoLevel1 from "@/levels/DemoLevel1";
 import DemoLevel2 from "@/levels/DemoLevel2";
-import generateRoomsWalks from "@/utils/generateRoomsRandomWalk";
+import generateRoomsWalks from "@/utils/generateRooms";
 import { buildTileMap } from "@/helpers/buildTileMap";
-import { templateMap } from "@/helpers/typeRooms";
+import { templateMap } from "@/helpers/roomTemplatesMap";
 import tileMapToLevel from "@/utils/tileMapToLevel";
 
 export default function RenderLevel() {
@@ -23,39 +23,7 @@ export default function RenderLevel() {
   const currentLevelId = useRecoilValue(currentLevelIdAtom);
 
 
-  // useEffect(()=>{
-   
-  //   const rooms = generateRoomsWalks(3);
-  //   const tileMap = buildTileMap(rooms, 3, 3, templateMap);
-  //   const levelData = tileMapToLevel(tileMap, "LEVEL_THEMES.YELLOW");
-  //   console.log(levelData);
 
-  //   // 生成地圖
-  //   const { gameMap, placements } = createMap(levelData);
-
-  //   // 主角、目標、收集物、障礙物
-  //   const heroPos = findPositions(placements, PLACEMENT_TYPE_HERO)[0];
-  //   const goalPos = findPositions(placements,PLACEMENT_TYPE_GOAL)[0];
-  //   const flourPositions = findPositions(placements, PLACEMENT_TYPE_FLOUR);
-  //   const firePickupPositions = findPositions(placements, PLACEMENT_TYPE_FIRE_PICKUP);
-  //   const teleportPositions = findPositions(placements, PLACEMENT_TYPE_TELEPORT);
-
-  //   // 檢查能否完成
-  //   const solutionPath = findSolutionPath(
-  //     heroPos,
-  //     // [...flourPositions, goalPos],
-  //     gameMap,
-  //     levelData.tilesWidth,
-  //     levelData.tilesHeight,
-  //     placements
-  //   );
-
-  //   console.log(solutionPath);
-
-  
-  //   // console.log(tileMap);
-
-  // },[])
 
   useEffect(() => {
     // Create and subscribe to state changes

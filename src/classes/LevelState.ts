@@ -3,11 +3,12 @@ import { PLACEMENT_TYPE_HERO, PLACEMENT_TYPE_WALL } from "../helpers/consts";
 import { placementFactory } from "./PlacementFactory";
 import { GameLoop } from "./GameLoop";
 import { DirectionControls } from "./DirectionControls";
-import LevelsMap from "../levels/levelsMap";
 import { Inventory } from "./Inventory";
 import { LevelAnimatedFrames } from "./LevelAnimatedFrames";
 import { Camera } from "./Camera";
 import { Clock } from "./Clock";
+import levels from "../levels/levelsMap";
+import findSolutionPath, { createMap } from "@/utils/findSolutionPath";
 type OnEmitType = (level: LevelSchema) => void;
 
 export class LevelState {
@@ -28,7 +29,7 @@ export class LevelState {
   }
 
   start() {
-    const levelData = LevelsMap[this.id];
+    const levelData = levels[this.id];
     this.deathOutcome = null;
     this.theme = levelData.theme;
     this.tilesWidth = levelData.tilesWidth;
@@ -36,6 +37,8 @@ export class LevelState {
     this.placements = levelData.placements.map((config) => {
       return placementFactory.createPlacement(config, this);
     });
+    this.gameMap = createMap(levelData).gameMap
+    this.solutionPath = findSolutionPath(this.gameMap,  this.tilesWidth,this.tilesHeight,levelData.placements)
 
     this.inventory = new Inventory();
 
@@ -144,6 +147,7 @@ export class LevelState {
       tilesWidth: this.tilesWidth,
       tilesHeight: this.tilesHeight,
       placements: this.placements,
+      solutionPath: this.solutionPath,
       deathOutcome: this.deathOutcome,
       isCompleted: this.isCompleted,
       cameraTransformX: this.camera.transformX,

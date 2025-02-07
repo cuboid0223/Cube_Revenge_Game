@@ -20,7 +20,9 @@ export function buildTileMap(
   const tileCols = N * roomW;
 
   // 初始化 tileMap 為全 "0" 二維陣列
-  const tileMap: TileMap = Array.from({ length: tileRows }, () => new Array(tileCols).fill("0"));
+  const tileMap: TileMap = Array.from({ length: tileRows }, () =>
+    new Array(tileCols).fill("0")
+  );
 
   // 逐一處理每個房間
   for (let roomRow = 0; roomRow < N; roomRow++) {
@@ -30,7 +32,15 @@ export function buildTileMap(
       const templates = templateMap[exitsKey] || templateMap[""];
       const chosenTemplate = randomPick(templates);
 
-      placeRoomTemplate(tileMap, chosenTemplate, roomRow, roomCol, roomW, roomH, room);
+      placeRoomTemplate(
+        tileMap,
+        chosenTemplate,
+        roomRow,
+        roomCol,
+        roomW,
+        roomH,
+        room
+      );
     }
   }
 
@@ -38,7 +48,7 @@ export function buildTileMap(
 }
 
 /**
- * 根據房間出口資訊建立模板 key 字串。  
+ * 根據房間出口資訊建立模板 key 字串。
  * 順序需與 templateMap 的 key 一致。
  *
  * @param exits - 房間出口資訊
@@ -94,7 +104,9 @@ function placeRoomTemplate(
   // 將模板內容貼到 tileMap 中
   for (let r = 0; r < roomH; r++) {
     for (let c = 0; c < roomW; c++) {
-      const { code: baseCode, p } = splitCode(roomTemplate[r][c]);
+      const { codePart: baseCode, probability: p } = splitCodeProbability(
+        roomTemplate[r][c]
+      );
       // 根據機率決定是否放置該 tile
       const code = Math.random() < p ? baseCode : "0";
 
@@ -113,7 +125,9 @@ function placeRoomTemplate(
   // 若房間為起始或目標房間，檢查是否已放置特殊 tile，
   // 若沒有則從候選空白位置中隨機補上一個 "H" 或 "G"
   if (room.isStartRoom || room.isGoalRoom) {
-    if (!isSpecialTilePresent(tileMap, startRow, startCol, roomW, roomH, room)) {
+    if (
+      !isSpecialTilePresent(tileMap, startRow, startCol, roomW, roomH, room)
+    ) {
       placeRandomSpecialTile(tileMap, startRow, startCol, roomW, roomH, room);
     }
   }
@@ -184,25 +198,74 @@ function placeRandomSpecialTile(
 }
 
 /**
- * 分割模板中的 code 字串以取得基本 tile code 與機率。  
- * 格式："{code}-{probability}"，例如 "h-50" 表示有 50% 的機率放置 'h'。
+ * 分割模板中的 code 字串以取得基本 tile code、下底線後的字串 (subCode) 與機率。
+ * 格式："{code}"，例如 "1" 表示有 100% 的機率放置 '1'(WALL)。
+ * 格式："{code}-{probability}"，例如 "1-50" 表示有 50% 的機率放置 '1'(WALL)。
+ * 格式："{code}_{subCode}-{probability}"，
+ * 例如 "I_TL-50" 表示有 50% 的機率放置 'I'(ICE)，subCode 為 "TL" (例如表示 TOP_LEFT)。
+ * 例如 "SD_0-25" 表示有 25% 的機率放置 'SD'(SWITCH DOOR)，subCode 為 "0" (例如表示 isRaised 為 false)。
+ * 例如 "C_L-75" 表示有 75% 的機率放置 'C'(CONVEYOR)，subCode 為 "L" (例如表示 direction 為 LEFT)。
  *
  * @param codeString - 模板中的字串
- * @returns 物件包含 base code 與 p (機率值，介於 0 與 1 之間)
+ * @returns 物件包含 base code、subCode (如果存在) 與 p (機率值，介於 0 與 1 之間)
  */
-function splitCode(codeString: string): { code: string; p: number } {
-  if (!codeString.includes("-")) {
-    return { code: codeString, p: 1 };
+
+/**
+ * 將包含機率的字串拆分為 code 部分與機率部分。
+ * 範例：
+ *   "I_TL-50" 會拆分成 { codePart: "I_TL", probability: 50 }
+ *   "1" 則回傳 { codePart: "1", probability: 100 }，預設機率為 100。
+ *
+ * @param codeString - 包含機率的字串，例如 "I_TL-50"
+ * @returns 物件包含 codePart 與 probability (以百分比數值表示)
+ */
+function splitCodeProbability(codeString: string): {
+  codePart: string;
+  probability: number;
+} {
+  if (codeString.includes("-")) {
+    // 使用 dash 分隔，例如 "I_TL-50" 分成 ["I_TL", "50"]
+    const [codePart, probabilityStr] = codeString.split("-");
+    // 將機率部分轉為數字（例如 50 代表 50%）
+    const probability = parseInt(probabilityStr, 10) / 100;
+    return { codePart, probability };
+  } else {
+    // 若無 dash，預設機率為 100%
+    return { codePart: codeString, probability: 1 };
   }
-
-  const regex = /^([A-Za-z]+)-(\d+)$/;
-  const match = codeString.match(regex);
-
-  if (match) {
-    const extractedCode = match[1];
-    const probability = parseInt(match[2], 10) / 100;
-    return { code: extractedCode, p: probability };
-  }
-
-  return { code: "0", p: 1 };
 }
+
+// function splitCode(codeString: string): {
+//   code: string;
+//   subCode?: string;
+//   p: number;
+// } {
+//   // 若字串不含 '-'，則預設機率為 1，並檢查是否有底線來分割基本 code 與 subCode
+//   if (!codeString.includes("-")) {
+//     if (codeString.includes("_")) {
+//       const [base, sub] = codeString.split("_");
+//       return { code: base, subCode: sub, p: 1 };
+//     }
+//     return { code: codeString, p: 1 };
+//   }
+
+//   // 正則說明：
+//   // ^                        : 字串開頭
+//   // ([A-Za-z0-9]+)           : 捕獲基本 tile code（由一個或多個英文字母或數字組成）
+//   // (?:_([A-Za-z0-9_]+))?     : 非捕獲群組，可選的底線與下底線後的字串（捕獲到 group 2）
+//   // -                        : dash
+//   // (\d+)                    : 捕獲機率數字
+//   // $                        : 字串結尾
+//   const regex = /^([A-Za-z0-9]+)(?:_([A-Za-z0-9_]+))?-(\d+)$/;
+//   const match = codeString.match(regex);
+
+//   if (match) {
+//     const baseCode = match[1];
+//     const subCode = match[2] || undefined;
+//     const probability = parseInt(match[3], 10) / 100;
+//     return { code: baseCode, subCode, p: probability };
+//   }
+
+//   // 若格式不符合預期，則回傳預設值
+//   return { code: "0", p: 1 };
+// }

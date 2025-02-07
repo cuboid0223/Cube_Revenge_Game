@@ -1,5 +1,3 @@
-
-
 // export type Placement = {
 //     x: number,
 //     y: number,
@@ -13,6 +11,6 @@
 //   placements: Placement[]
 // };
 
+export type FrameCoord = `${number}x${number}`;
 
-
-export  type Direction = "LEFT" | "RIGHT" | "UP" | "DOWN"
+export type Direction = "LEFT" | "RIGHT" | "UP" | "DOWN";

@@ -65,9 +65,8 @@ export const directions = [
   [-1, 0],
   [1, 0],
   [0, -1],
-  [0, 1]
-]
-
+  [0, 1],
+];
 
 export const BODY_SKINS = {
   NORMAL: "NORMAL",
@@ -156,31 +155,31 @@ export const THEME_TILES_MAP = {
 };
 
 export const PLACEMENT_TYPES_CODE = {
-  "HERO": "H", // "h" -> 關卡內可指定出生點
-  // "NPC": "N"          
-  "GOAL": "G",   // "g" -> 關卡內可指定 goal        
-  "WALL": "1", // 1-50, 1-25, 1-75
-  
-  "WATER": "W",
-  "WATER_PICKUP": "WP",
-  "FIRE": "F",
-  "FIRE_PICKUP": "FP",
-  "ICE": "I",
-  "ICE_PICKUP": "IP",
-           
-  "FLOUR": "M",
+  HERO: "H", // "h" -> 關卡內可指定出生點
+  // "NPC": "N"
+  GOAL: "G", // "g" -> 關卡內可指定 goal
+  WALL: "1", // 1-50, 1-25, 1-75
+
+  WATER: "W",
+  WATER_PICKUP: "WP",
+  FIRE: "F",
+  FIRE_PICKUP: "FP",
+  ICE: "I",
+  ICE_PICKUP: "IP",
+
+  FLOUR: "M",
   // "Moon": "M",
-  "LOCK": "L",
-  "KEY": "K",
-  "CONVEYOR": "C",
-  "TELEPORT": "T",
-  "THIEF": "R",// Reset
-  "SWITCH_DOOR": "SD",
-  "SWITCH": "S",
-  
-  "GROUND_ENEMY": "GE",
-  "FLYING_ENEMY": "FE",
-  "ROAMING_ENEMY": "RE",
-  "CIABATTA": "C",
+  LOCK: "L",
+  KEY: "K",
+  CONVEYOR: "C",
+  TELEPORT: "T",
+  THIEF: "R", // Reset
+  SWITCH_DOOR: "SD",
+  SWITCH: "S",
+
+  GROUND_ENEMY: "GE",
+  FLYING_ENEMY: "FE",
+  ROAMING_ENEMY: "RE",
+  CIABATTA: "BOSS",
   // ...
-}
+};

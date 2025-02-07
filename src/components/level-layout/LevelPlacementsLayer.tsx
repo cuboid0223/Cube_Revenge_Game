@@ -1,13 +1,22 @@
 import React, { CSSProperties } from "react";
 import { LevelSchema } from "@/helpers/types";
-import { CELL_SIZE, PLACEMENT_TYPE_CONVEYOR, PLACEMENT_TYPE_FIRE, PLACEMENT_TYPE_ICE, PLACEMENT_TYPE_SWITCH, PLACEMENT_TYPE_SWITCH_DOOR, PLACEMENT_TYPE_TELEPORT, PLACEMENT_TYPE_THIEF, PLACEMENT_TYPE_WATER } from "@/helpers/consts";
+import {
+  CELL_SIZE,
+  PLACEMENT_TYPE_CONVEYOR,
+  PLACEMENT_TYPE_FIRE,
+  PLACEMENT_TYPE_ICE,
+  PLACEMENT_TYPE_SWITCH,
+  PLACEMENT_TYPE_SWITCH_DOOR,
+  PLACEMENT_TYPE_TELEPORT,
+  PLACEMENT_TYPE_THIEF,
+  PLACEMENT_TYPE_WATER,
+} from "@/helpers/consts";
 import { handleColoredTile } from "@/utils/handleColoredTile";
 import { Placement } from "@/game-objects/Placement";
 type Props = {
   level: LevelSchema;
 };
 export default function LevelPlacementsLayer({ level }: Props) {
- 
   return level.placements
     .filter((placement) => {
       return !placement.hasBeenCollected;
@@ -15,7 +24,6 @@ export default function LevelPlacementsLayer({ level }: Props) {
     .map((placement) => {
       // Wrap each Sprite in a positioned div
       const [x, y] = placement.displayXY();
-      const {isColored, hslColor} = handleColoredTile(placement.type, x, y, level.solutionPath)
       const style: CSSProperties = {
         position: "absolute",
         transform: `translate3d(${x}px, ${y}px, 0)`,
@@ -33,23 +41,9 @@ export default function LevelPlacementsLayer({ level }: Props) {
             level.deletePlacement(placement);
           }}
         >
-          {/* { isColored && (
-            <div 
-              style={{
-                width: CELL_SIZE,
-                height: CELL_SIZE,
-                backgroundColor: hslColor
-              
-              }}  
-              className={` overflow-hidden`}>
-                2
-            </div>
-          )} */}
-
           {/* <Sprite frameCoord={placement.frameCoord} /> */}
           {placement.renderComponent()}
         </div>
       );
     });
 }
-

@@ -37,8 +37,13 @@ export class LevelState {
     this.placements = levelData.placements.map((config) => {
       return placementFactory.createPlacement(config, this);
     });
-    this.gameMap = createMap(levelData).gameMap
-    this.solutionPath = findSolutionPath(this.gameMap, this.tilesWidth,this.tilesHeight, levelData.placements)
+    this.gameMap = createMap(levelData).gameMap;
+    this.solutionPath = findSolutionPath(
+      this.gameMap,
+      this.tilesWidth,
+      this.tilesHeight,
+      levelData.placements
+    );
 
     this.inventory = new Inventory();
 
@@ -59,15 +64,12 @@ export class LevelState {
 
   addPlacement(config) {
     this.placements.push(placementFactory.createPlacement(config, this));
-    this.updateSolutionPath()
   }
 
   deletePlacement(placementToRemove) {
     this.placements = this.placements.filter((p) => {
       return p.id !== placementToRemove.id;
     });
-    this.updateSolutionPath()
-
   }
 
   startGameLoop() {
@@ -78,9 +80,14 @@ export class LevelState {
     });
   }
 
-  updateSolutionPath(){
-    this.gameMap = createMap(this.getState()).gameMap
-    this.solutionPath = findSolutionPath(this.gameMap, this.tilesWidth,this.tilesHeight,this.placements)
+  updateSolutionPath() {
+    this.gameMap = createMap(this.getState()).gameMap;
+    this.solutionPath = findSolutionPath(
+      this.gameMap,
+      this.tilesWidth,
+      this.tilesHeight,
+      this.placements
+    );
     // this.onEmit(this.getState());
   }
 
@@ -149,7 +156,6 @@ export class LevelState {
     this.editModePlacementType = newType;
   }
 
-
   getState() {
     // 讓外部使用 levelState
     return {
@@ -168,7 +174,7 @@ export class LevelState {
       restart: () => {
         this.start();
       },
-     
+
       // Edit Mode API
       // 將 method 傳出去供外部使用
       enableEditing: true,
@@ -177,7 +183,7 @@ export class LevelState {
       deletePlacement: this.deletePlacement.bind(this),
       setEditModePlacementType: this.setEditModePlacementType.bind(this),
       copyPlacementsToClipboard: this.copyPlacementsToClipboard.bind(this),
-      updateSolutionPath: this.updateSolutionPath.bind(this)
+      updateSolutionPath: this.updateSolutionPath.bind(this),
     };
   }
 
@@ -205,6 +211,7 @@ export class LevelState {
         placement.toggleIsRaised();
       }
     });
+    console.log(this.placements);
   }
   destroy() {
     // Tear down the level.

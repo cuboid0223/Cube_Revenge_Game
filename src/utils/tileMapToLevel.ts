@@ -1,4 +1,33 @@
-import { PLACEMENT_TYPE_CIABATTA, PLACEMENT_TYPE_CONVEYOR, PLACEMENT_TYPE_FIRE, PLACEMENT_TYPE_FIRE_PICKUP, PLACEMENT_TYPE_FLOUR, PLACEMENT_TYPE_FLYING_ENEMY, PLACEMENT_TYPE_GOAL, PLACEMENT_TYPE_GROUND_ENEMY, PLACEMENT_TYPE_HERO, PLACEMENT_TYPE_ICE, PLACEMENT_TYPE_ICE_PICKUP, PLACEMENT_TYPE_KEY, PLACEMENT_TYPE_LOCK, PLACEMENT_TYPE_ROAMING_ENEMY, PLACEMENT_TYPE_SWITCH, PLACEMENT_TYPE_SWITCH_DOOR, PLACEMENT_TYPE_TELEPORT, PLACEMENT_TYPE_THIEF, PLACEMENT_TYPE_WALL, PLACEMENT_TYPE_WATER, PLACEMENT_TYPE_WATER_PICKUP, PLACEMENT_TYPES_CODE } from "@/helpers/consts";
+import {
+  ICE_CORNERS,
+  PLACEMENT_TYPE_CIABATTA,
+  PLACEMENT_TYPE_CONVEYOR,
+  PLACEMENT_TYPE_FIRE,
+  PLACEMENT_TYPE_FIRE_PICKUP,
+  PLACEMENT_TYPE_FLOUR,
+  PLACEMENT_TYPE_FLYING_ENEMY,
+  PLACEMENT_TYPE_GOAL,
+  PLACEMENT_TYPE_GROUND_ENEMY,
+  PLACEMENT_TYPE_HERO,
+  PLACEMENT_TYPE_ICE,
+  PLACEMENT_TYPE_ICE_PICKUP,
+  PLACEMENT_TYPE_KEY,
+  PLACEMENT_TYPE_LOCK,
+  PLACEMENT_TYPE_ROAMING_ENEMY,
+  PLACEMENT_TYPE_SWITCH,
+  PLACEMENT_TYPE_SWITCH_DOOR,
+  PLACEMENT_TYPE_TELEPORT,
+  PLACEMENT_TYPE_THIEF,
+  PLACEMENT_TYPE_WALL,
+  PLACEMENT_TYPE_WATER,
+  PLACEMENT_TYPE_WATER_PICKUP,
+  PLACEMENT_TYPES_CODE,
+  DIRECTION_LEFT,
+  DIRECTION_RIGHT,
+  DIRECTION_UP,
+  DIRECTION_DOWN,
+} from "@/helpers/consts";
+
 import { PlacementSchema } from "@/helpers/types";
 
 /**
@@ -19,91 +48,181 @@ import { PlacementSchema } from "@/helpers/types";
  * @param theme optional theme
  */
 export default function tileMapToLevel(
-    tileMap: string[][],
-    theme: string = "LEVEL_THEMES.YELLOW"
-  ): any {
-    const height = tileMap.length;
-    const width = tileMap[0]?.length ?? 0;
-  
-    // 收集 placements
-    const placements: any[] = [];
-  
-    for (let row = 0; row < height; row++) {
-      for (let col = 0; col < width; col++) {
-        const cell = tileMap[row][col];
-        // 依 cell 字元 => 對應 type
-        if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_HERO]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_HERO)
-          // placements.push({
-          //   type: "HERO",
-          //   x: col + 1, // x 要從 1 開始
-          //   y: row + 1, // y 亦如此
-          // });
-        } else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_GOAL]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_GOAL)
-        } else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_WALL]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_WALL)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_WATER]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_WATER)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_WATER_PICKUP]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_WATER_PICKUP)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_FIRE]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_FIRE)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_FIRE_PICKUP]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_FIRE_PICKUP)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_ICE]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_ICE)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_ICE_PICKUP]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_ICE_PICKUP)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_FLOUR]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_FLOUR)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_LOCK]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_LOCK)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_KEY]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_KEY)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_CONVEYOR]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_CONVEYOR)
+  tileMap: string[][],
+  theme: string = "LEVEL_THEMES.YELLOW"
+): any {
+  const height = tileMap.length;
+  const width = tileMap[0]?.length ?? 0;
 
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_TELEPORT]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_TELEPORT)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_THIEF]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_THIEF)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_SWITCH_DOOR]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_SWITCH_DOOR)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_SWITCH]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_SWITCH)
-        }
-        else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_GROUND_ENEMY]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_GROUND_ENEMY)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_FLYING_ENEMY]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_FLYING_ENEMY)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_ROAMING_ENEMY]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_ROAMING_ENEMY)
-        }else if (cell === PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_CIABATTA]) {
-          addPlacement(placements, col, row, PLACEMENT_TYPE_CIABATTA)
-        }
-        // 其他符號可以再自行判斷
-        // else if (cell==="pushBlock") => ...
+  // 收集 placements
+  const placements: any[] = [];
+
+  // 建立 cell code 到 placement type 的對照表
+  const cellToPlacementType: { [code: string]: string } = {
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_HERO]]: PLACEMENT_TYPE_HERO,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_GOAL]]: PLACEMENT_TYPE_GOAL,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_WALL]]: PLACEMENT_TYPE_WALL,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_WATER]]: PLACEMENT_TYPE_WATER,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_WATER_PICKUP]]:
+      PLACEMENT_TYPE_WATER_PICKUP,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_FIRE]]: PLACEMENT_TYPE_FIRE,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_FIRE_PICKUP]]:
+      PLACEMENT_TYPE_FIRE_PICKUP,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_ICE]]: PLACEMENT_TYPE_ICE,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_ICE_PICKUP]]:
+      PLACEMENT_TYPE_ICE_PICKUP,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_FLOUR]]: PLACEMENT_TYPE_FLOUR,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_LOCK]]: PLACEMENT_TYPE_LOCK,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_KEY]]: PLACEMENT_TYPE_KEY,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_CONVEYOR]]: PLACEMENT_TYPE_CONVEYOR,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_TELEPORT]]: PLACEMENT_TYPE_TELEPORT,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_THIEF]]: PLACEMENT_TYPE_THIEF,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_SWITCH_DOOR]]:
+      PLACEMENT_TYPE_SWITCH_DOOR,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_SWITCH]]: PLACEMENT_TYPE_SWITCH,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_GROUND_ENEMY]]:
+      PLACEMENT_TYPE_GROUND_ENEMY,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_FLYING_ENEMY]]:
+      PLACEMENT_TYPE_FLYING_ENEMY,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_ROAMING_ENEMY]]:
+      PLACEMENT_TYPE_ROAMING_ENEMY,
+    [PLACEMENT_TYPES_CODE[PLACEMENT_TYPE_CIABATTA]]: PLACEMENT_TYPE_CIABATTA,
+  };
+
+  // 遍歷 tileMap，每個 cell 若有對應的 placement type 就呼叫 addPlacement
+  tileMap.forEach((rowArray, row) => {
+    rowArray.forEach((cell, col) => {
+      const { baseCode, subCode } = splitBaseAndSubCode(cell);
+      const placementType = cellToPlacementType[baseCode];
+
+      if (placementType) {
+        addPlacement(placements, col, row, placementType, subCode);
       }
-    }
-  
-    // 組出想要的物件結構
-    const levelObject = {
-      theme,
-      tilesWidth: width,
-      tilesHeight: height,
-      placements
-    };
-  
-    return levelObject;
-  }
-  
-
-
-  function addPlacement(placements: PlacementSchema[], col:number, row:number, placementType: string){
-    placements.push({
-      type: placementType,
-      x: col + 1, // x 要從 1 開始
-      y: row + 1, // y 亦如此
+      // 其他符號可在此處理，例如 pushBlock 等...
     });
+  });
+
+  // 組成最終的 level 物件
+  return {
+    theme,
+    tilesWidth: width,
+    tilesHeight: height,
+    placements,
+  };
+}
+
+/**
+ * 將 code 部分拆分為基本 code 與下底線後的子 code (subCode)。
+ * 範例：
+ *   "I_TL" 會拆成 { baseCode: "I", subCode: "TL" }
+ *   若沒有底線，例如 "1"，則回傳 { baseCode: "1" }。
+ *
+ * @param codePart - 不含機率的字串，例如 "I_TL"
+ * @returns 物件包含 baseCode 與（如果存在）subCode
+ */
+function splitBaseAndSubCode(codePart: string): {
+  baseCode: string;
+  subCode?: string;
+} {
+  if (codePart.includes("_")) {
+    // 使用底線拆分，例如 "I_TL" 分成 ["I", "TL"]
+    const [baseCode, subCode] = codePart.split("_");
+    return { baseCode, subCode };
+  } else {
+    return { baseCode: codePart };
   }
+}
+
+function transformIceCorner(corner: string): string {
+  const iceCornerMap: { [key: string]: string } = {
+    BR: ICE_CORNERS.BOTTOM_RIGHT,
+    BL: ICE_CORNERS.BOTTOM_LEFT,
+    TL: ICE_CORNERS.TOP_LEFT,
+    TR: ICE_CORNERS.TOP_RIGHT,
+  };
+
+  if (iceCornerMap[corner]) {
+    return iceCornerMap[corner];
+  }
+
+  console.log(`沒有 ice corner 叫做 ${corner}，只有 I_BR, I_BL, I_TL, I_TR`);
+  return "";
+}
+
+function transformDirection(direction: string): string {
+  const directionMap: { [key: string]: string } = {
+    R: DIRECTION_RIGHT,
+    L: DIRECTION_LEFT,
+    D: DIRECTION_DOWN,
+    U: DIRECTION_UP,
+  };
+
+  if (directionMap[direction]) {
+    return directionMap[direction];
+  }
+
+  console.log(`沒有 direction 叫做 ${direction}，只有 C_R, C_U, C_L, C_D`);
+  return DIRECTION_RIGHT;
+}
+
+function transformDefaultRaised(raisedCode: string): boolean {
+  return parseInt(raisedCode, 10) === 1;
+}
+
+function addPlacement(
+  placements: PlacementSchema[],
+  col: number,
+  row: number,
+  placementType: string,
+  subCode?: string
+  // conveyorDirectionCode?: string,
+  // iceCornerCode?: string,
+  // raisedCode?: string
+): void {
+  // 將 col 與 row 調整為從 1 開始
+  const x = col + 1;
+  const y = row + 1;
+
+  switch (placementType) {
+    case PLACEMENT_TYPE_ICE:
+      if (subCode) {
+        placements.push({
+          type: placementType,
+          x,
+          y,
+          corner: transformIceCorner(subCode),
+        });
+        return;
+      }
+    case PLACEMENT_TYPE_SWITCH_DOOR:
+      if (subCode) {
+        placements.push({
+          type: placementType,
+          x,
+          y,
+          isRaised: transformDefaultRaised(subCode),
+        });
+        return;
+      }
+      break;
+
+    case PLACEMENT_TYPE_CONVEYOR:
+      if (subCode) {
+        placements.push({
+          type: placementType,
+          x,
+          y,
+          direction: transformDirection(subCode),
+        });
+        return;
+      }
+      break;
+  }
+
+  // 預設情況
+  placements.push({
+    type: placementType,
+    x,
+    y,
+  });
+}

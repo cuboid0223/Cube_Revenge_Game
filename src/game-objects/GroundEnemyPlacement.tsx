@@ -72,10 +72,12 @@ export class GroundEnemyPlacement extends BodyPlacement {
       return;
     }
     // Vertical change
-    currentDir === DIRECTION_UP ? DIRECTION_DOWN : DIRECTION_UP;
+    if (currentDir === DIRECTION_UP || currentDir === DIRECTION_DOWN) {
+      this.movingPixelDirection =
+        currentDir === DIRECTION_UP ? DIRECTION_DOWN : DIRECTION_UP;
+      return;
+    }
   }
-
-
 
   renderComponent() {
     const frameCoord =

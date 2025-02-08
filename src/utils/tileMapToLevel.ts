@@ -217,6 +217,28 @@ function addPlacement(
         return;
       }
       break;
+    case PLACEMENT_TYPE_GROUND_ENEMY:
+      if (subCode) {
+        placements.push({
+          type: placementType,
+          x,
+          y,
+          initialDirection: transformDirection(subCode),
+        });
+        return;
+      }
+      break;
+    case PLACEMENT_TYPE_FLYING_ENEMY:
+      if (subCode) {
+        placements.push({
+          type: placementType,
+          x,
+          y,
+          initialDirection: transformDirection(subCode),
+        });
+        return;
+      }
+      break;
   }
 
   // 預設情況

@@ -21,6 +21,10 @@ import {
   PLACEMENT_TYPE_TELEPORT,
   PLACEMENT_TYPE_THIEF,
   PLACEMENT_TYPE_CIABATTA,
+  DIRECTION_RIGHT,
+  DIRECTION_LEFT,
+  DIRECTION_UP,
+  DIRECTION_DOWN,
 } from "../helpers/consts";
 
 // const DemoLevel1 = {
@@ -254,104 +258,104 @@ const DemoLevel1 = {
       x: 6,
       y: 5,
     },
-    {
-      type: PLACEMENT_TYPE_CONVEYOR,
-      direction: "DOWN",
-      x: 1,
-      y: 2,
-    },
-    {
-      type: PLACEMENT_TYPE_CONVEYOR,
-      direction: "DOWN",
-      x: 1,
-      y: 3,
-    },
-    {
-      type: PLACEMENT_TYPE_CONVEYOR,
-      direction: "DOWN",
-      x: 1,
-      y: 4,
-    },
-    {
-      type: PLACEMENT_TYPE_CONVEYOR,
-      direction: "RIGHT",
-      x: 1,
-      y: 5,
-    },
-    {
-      type: PLACEMENT_TYPE_ICE,
-      x: 6,
-      y: 1,
-    },
-    {
-      type: PLACEMENT_TYPE_ICE,
-      x: 7,
-      y: 1,
-    },
-    {
-      type: PLACEMENT_TYPE_ICE,
-      x: 8,
-      y: 1,
-    },
-    {
-      type: PLACEMENT_TYPE_ICE,
-      corner: "TOP_RIGHT",
-      x: 9,
-      y: 1,
-    },
-    {
-      type: PLACEMENT_TYPE_ICE,
-      x: 9,
-      y: 2,
-    },
-    {
-      type: PLACEMENT_TYPE_ICE,
-      x: 9,
-      y: 3,
-    },
-    {
-      type: PLACEMENT_TYPE_ICE,
-      x: 9,
-      y: 4,
-    },
-    {
-      type: PLACEMENT_TYPE_ICE,
-      x: 9,
-      y: 5,
-    },
-    {
-      type: PLACEMENT_TYPE_ICE,
-      x: 8,
-      y: 5,
-    },
-    {
-      type: PLACEMENT_TYPE_ICE,
-      x: 7,
-      y: 5,
-    },
+    // {
+    //   type: PLACEMENT_TYPE_CONVEYOR,
+    //   direction: "DOWN",
+    //   x: 1,
+    //   y: 2,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_CONVEYOR,
+    //   direction: "DOWN",
+    //   x: 1,
+    //   y: 3,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_CONVEYOR,
+    //   direction: "DOWN",
+    //   x: 1,
+    //   y: 4,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_CONVEYOR,
+    //   direction: "RIGHT",
+    //   x: 1,
+    //   y: 5,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_ICE,
+    //   x: 6,
+    //   y: 1,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_ICE,
+    //   x: 7,
+    //   y: 1,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_ICE,
+    //   x: 8,
+    //   y: 1,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_ICE,
+    //   corner: "TOP_RIGHT",
+    //   x: 9,
+    //   y: 1,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_ICE,
+    //   x: 9,
+    //   y: 2,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_ICE,
+    //   x: 9,
+    //   y: 3,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_ICE,
+    //   x: 9,
+    //   y: 4,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_ICE,
+    //   x: 9,
+    //   y: 5,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_ICE,
+    //   x: 8,
+    //   y: 5,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_ICE,
+    //   x: 7,
+    //   y: 5,
+    // },
 
+    // {
+    //   type: PLACEMENT_TYPE_SWITCH_DOOR,
+    //   x: 3,
+    //   y: 1,
+    //   isRaised: true,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_SWITCH_DOOR,
+    //   x: 4,
+    //   y: 1,
+    //   isRaised: false,
+    // },
+    // {
+    //   type: PLACEMENT_TYPE_SWITCH_DOOR,
+    //   x: 3,
+    //   y: 3,
+    // },
     {
-      type: PLACEMENT_TYPE_SWITCH_DOOR,
-      x: 3,
+      type: PLACEMENT_TYPE_GROUND_ENEMY,
+      x: 7,
       y: 1,
-      isRaised: true,
-    },
-    {
-      type: PLACEMENT_TYPE_SWITCH_DOOR,
-      x: 4,
-      y: 1,
-      isRaised: false,
-    },
-    {
-      type: PLACEMENT_TYPE_SWITCH_DOOR,
-      x: 3,
-      y: 3,
-    },
-    {
-      type: PLACEMENT_TYPE_SWITCH,
-      x: 5,
-      y: 1,
-      isRaised: true,
+      // initialDirection: DIRECTION_DOWN,
     },
   ],
 };

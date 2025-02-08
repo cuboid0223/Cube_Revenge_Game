@@ -3,7 +3,7 @@ import DemoLevel1 from "./DemoLevel1";
 import DemoLevel2 from "./DemoLevel2";
 
 const levels = {
-  DemoLevel1: DemoLevel1, //DemoLevel1,
+  DemoLevel1: generateMap(), // generateMap(), //DemoLevel1,
   DemoLevel2: DemoLevel2,
 };
 

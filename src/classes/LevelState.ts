@@ -211,7 +211,7 @@ export class LevelState {
         placement.toggleIsRaised();
       }
     });
-    console.log(this.placements);
+   
   }
   destroy() {
     // Tear down the level.

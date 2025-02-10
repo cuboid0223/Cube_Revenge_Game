@@ -7,19 +7,21 @@ import { RoomInfo, RoomsGrid, RoomType } from "@/helpers/roomTemplatesMap";
  */
 
 function createEmptyRooms(n: number): RoomsGrid {
-    const rooms: RoomsGrid = [];
-    for (let r=0; r<n; r++) {
-      const row: RoomInfo[] = [];
-      for (let c=0; c<n; c++){
-        row.push({
-          exits: { up:false, down:false, left:true, right:true },
-          inSolutionPath: false,
-        });
-      }
-      rooms.push(row);
+  const rooms: RoomsGrid = [];
+  for (let r = 0; r < n; r++) {
+    const row: RoomInfo[] = [];
+    for (let c = 0; c < n; c++) {
+      row.push({
+        exits: { up: false, down: false, left: true, right: true },
+        inSolutionPath: false,
+        isStartRoom: false,
+        isGoalRoom: false,
+      });
     }
-    return rooms;
+    rooms.push(row);
   }
+  return rooms;
+}
 
 /**
  * 產生一個 NxN 的房間網格.
@@ -27,158 +29,148 @@ function createEmptyRooms(n: number): RoomsGrid {
  * 每個房間存有 {up,down,left,right} 布林，表示出口方向。
  * 從 (sr,sc) => (gr,gc) 隨機走上下左右 (撞牆→往下, 超過步數→connectToGoal)。
  */
-export default function  generateRooms(n: number): RoomsGrid {
-    const rooms = createEmptyRooms(n);
-  
-    // pick random start/goal
-    const [sr, sc] = pickRandomRoom(n);
-    const [gr, gc] = pickRandomRoom(n);
-  
-    rooms[sr][sc].isStartRoom = true;
-    rooms[gr][gc].isGoalRoom  = true;
-  
-    let r=sr, c=sc;
-    rooms[r][c].inSolutionPath = true;
-  
-    const limit = n*n*5;
-    let steps=0;
-  
-    while(true) {
-      steps++;
-      if (steps>limit) {
-        // 超過 => connectToGoal
-        connectToGoalExits(r,c, gr,gc, rooms);
-        break;
-      }
-  
-      if (r===gr && c===gc) {
-        // 到達 goal
-        break;
-      }
-  
-      // 擲骰 (6面)
-      const dice = Math.floor(Math.random()*6)+1;
-      let nr=r, nc=c;
-  
-      switch(dice) {
-        case 1: // left
-          nc = c-1;
-          break;
-        case 2: // right
-          nc = c+1;
-          break;
-        case 3: // down
-          nr = r+1;
-          break;
-        case 4: // up
-          nr = r-1;
-          break;
-        case 5: // right
-          nc = c+1;
-          break;
-        case 6: // down
-          nr = r+1;
-          break;
-      }
-  
-      // 邊界檢查
-      if (nr<0 || nr>=n || nc<0 || nc>=n) {
-        // 撞邊 => 往下
-        nr = r+1;
-        nc = c;
-      }
-      if (nr>=n) {
-        connectToGoalExits(r,c, gr,gc, rooms);
-        break;
-      }
-  
-      // 若是往下
-      if (nr === r+1 && nc===c) {
-        rooms[r][c].exits.down = true;
-        rooms[nr][nc].exits.up = true;
-      }
-      // 若是往上
-      else if (nr === r-1 && nc===c) {
-        rooms[r][c].exits.up = true;
-        rooms[nr][nc].exits.down = true;
-      }
-      // 左右就不需要改，因為一開始就 left=right=true
-  
-      // 移動
-      rooms[nr][nc].inSolutionPath = true;
-      r=nr; c=nc;
+export default function generateRooms(n: number): RoomsGrid {
+  const rooms = createEmptyRooms(n);
+
+  // 設定最小距離，例如可以設定為 n/2 (根據需求調整)
+  const minDistance = Math.floor(n / 2);
+
+  // 隨機選取 start 房間
+  const [sr, sc] = pickRandomRoom(n);
+
+  // 反覆選取 goal 房間，直到符合最小距離的限制
+  let gr: number, gc: number;
+  [gr, gc] = pickRandomRoom(n);
+  // do {
+  //   [gr, gc] = pickRandomRoom(n);
+  // } while (
+  //   (sr === gr && sc === gc) ||
+  //   Math.abs(sr - gr) + Math.abs(sc - gc) < minDistance
+  // );
+
+  rooms[sr][sc].isStartRoom = true;
+  rooms[gr][gc].isGoalRoom = true;
+
+  let r = sr,
+    c = sc;
+  rooms[r][c].inSolutionPath = true;
+
+  const limit = n * n * 5;
+  let steps = 0;
+
+  while (true) {
+    steps++;
+    if (steps > limit) {
+      // 超過 limit 則直接連通到 goal
+      connectToGoalExits(r, c, gr, gc, rooms);
+      break;
     }
-  
-    return rooms;
-  }
-  /** 
-   * 與前面 connectToGoal 的概念相似, 
-   * 直接把 (r,c) => (gr,gc) 都用 connectRoom(...) 連上
-   * (先上下,再左右,或反之).
-   */
-// 直接連通到Goal
-function connectToGoalExits(r:number, c:number, gr:number, gc:number, rooms: RoomsGrid){
-    const n= rooms.length;
-    // 簡易: 先上下,再左右
-    while(r<gr && r<n-1){
+
+    if (r === gr && c === gc) {
+      // 到達 goal
+      break;
+    }
+
+    // 擲骰 (6 面骰)
+    const dice = Math.floor(Math.random() * 6) + 1;
+    let nr = r,
+      nc = c;
+
+    switch (dice) {
+      case 1: // left
+        nc = c - 1;
+        break;
+      case 2: // right
+        nc = c + 1;
+        break;
+      case 3: // down
+        nr = r + 1;
+        break;
+      case 4: // up
+        nr = r - 1;
+        break;
+      case 5: // right
+        nc = c + 1;
+        break;
+      case 6: // down
+        nr = r + 1;
+        break;
+    }
+
+    // 邊界檢查
+    if (nr < 0 || nr >= n || nc < 0 || nc >= n) {
+      // 撞到邊界則往下走
+      nr = r + 1;
+      nc = c;
+    }
+    if (nr >= n) {
+      connectToGoalExits(r, c, gr, gc, rooms);
+      break;
+    }
+
+    // 如果是往下
+    if (nr === r + 1 && nc === c) {
       rooms[r][c].exits.down = true;
-      rooms[r+1][c].exits.up = true;
-      rooms[r+1][c].inSolutionPath=true;
-      r++;
+      rooms[nr][nc].exits.up = true;
     }
-    while(r>gr && r>0){
+    // 如果是往上
+    else if (nr === r - 1 && nc === c) {
       rooms[r][c].exits.up = true;
-      rooms[r-1][c].exits.down = true;
-      rooms[r-1][c].inSolutionPath=true;
-      r--;
+      rooms[nr][nc].exits.down = true;
     }
-    while(c<gc && c<n-1){
-      // 左右已是true, 其實不用再設
-      rooms[r][c].inSolutionPath=true;
-      c++;
-    }
-    while(c>gc && c>0){
-      rooms[r][c].inSolutionPath=true;
-      c--;
-    }
-    rooms[r][c].inSolutionPath=true;
+    // 左右出口一開始預設就是 true
+
+    // 標記進入解題路徑
+    rooms[nr][nc].inSolutionPath = true;
+    r = nr;
+    c = nc;
   }
-  
-  
 
+  return rooms;
+}
 
-//   function connectRoom(rooms: RoomsGrid, r:number, c:number, nr:number, nc:number) {
-//     // ex. 如果 (nr===r+1, nc===c) => 往下
-//     if (nr===r+1 && nc===c) {
-//       rooms[r][c].exits.down = true;         // 當前房間 => 下開口
-//       rooms[nr][nc].exits.up   = true;       // 下面房間 => 上開口
-//     }
-//     // 若 (nr===r-1 && nc===c) => 往上
-//     else if (nr===r-1 && nc===c) {
-//       rooms[r][c].exits.up = true;
-//       rooms[nr][nc].exits.down = true;
-//     }
-//     // 若 (nr===r && nc===c+1) => 往右
-//     else if (nr===r && nc===c+1) {
-//       rooms[r][c].exits.right = true;
-//       rooms[nr][nc].exits.left = true;
-//     }
-//     // 若 (nr===r && nc===c-1) => 往左
-//     else if (nr===r && nc===c-1) {
-//       rooms[r][c].exits.left = true;
-//       rooms[nr][nc].exits.right = true;
-//     }
-  
-//     // 同時標記路徑
-//     rooms[r][c].inSolutionPath = true;
-//     rooms[nr][nc].inSolutionPath = true;
-//   }
-  
-  
-
-  function pickRandomRoom(n: number): [number,number] {
-    // n×n 的房間網格 => 隨機 row,col in [0..n-1]
-    const r = Math.floor(Math.random() * n);
-    const c = Math.floor(Math.random() * n);
-    return [r, c];
+/**
+ * 與前面 connectToGoal 的概念相似,
+ * 直接把 (r,c) => (gr,gc) 都用 connectRoom(...) 連上
+ * (先上下,再左右,或反之).
+ */
+// 直接連通到Goal
+function connectToGoalExits(
+  r: number,
+  c: number,
+  gr: number,
+  gc: number,
+  rooms: RoomsGrid
+) {
+  const n = rooms.length;
+  // 簡易: 先上下,再左右
+  while (r < gr && r < n - 1) {
+    rooms[r][c].exits.down = true;
+    rooms[r + 1][c].exits.up = true;
+    rooms[r + 1][c].inSolutionPath = true;
+    r++;
   }
+  while (r > gr && r > 0) {
+    rooms[r][c].exits.up = true;
+    rooms[r - 1][c].exits.down = true;
+    rooms[r - 1][c].inSolutionPath = true;
+    r--;
+  }
+  while (c < gc && c < n - 1) {
+    // 左右已是true, 其實不用再設
+    rooms[r][c].inSolutionPath = true;
+    c++;
+  }
+  while (c > gc && c > 0) {
+    rooms[r][c].inSolutionPath = true;
+    c--;
+  }
+  rooms[r][c].inSolutionPath = true;
+}
+
+function pickRandomRoom(n: number): [number, number] {
+  // n×n 的房間網格 => 隨機 row,col in [0..n-1]
+  const r = Math.floor(Math.random() * n);
+  const c = Math.floor(Math.random() * n);
+  return [r, c];
+}

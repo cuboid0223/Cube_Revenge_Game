@@ -92,12 +92,27 @@ export default function tileMapToLevel(
   // 遍歷 tileMap，每個 cell 若有對應的 placement type 就呼叫 addPlacement
   tileMap.forEach((rowArray, row) => {
     rowArray.forEach((cell, col) => {
-      const { baseCode, subCode } = splitBaseAndSubCode(cell);
-      const placementType = cellToPlacementType[baseCode];
-
-      if (placementType) {
-        addPlacement(placements, col, row, placementType, subCode);
+      let placementTypes: string[] = [];
+      if (cell.includes("&")) {
+        placementTypes = cell.split("&");
       }
+      if (placementTypes?.length !== 0) {
+        placementTypes.forEach((p) => {
+          const { baseCode, subCode } = splitBaseAndSubCode(p);
+          const placementType = cellToPlacementType[baseCode];
+          if (placementType) {
+            addPlacement(placements, col, row, placementType, subCode);
+          }
+        });
+      } else {
+        const { baseCode, subCode } = splitBaseAndSubCode(cell);
+        const placementType = cellToPlacementType[baseCode];
+
+        if (placementType) {
+          addPlacement(placements, col, row, placementType, subCode);
+        }
+      }
+
       // 其他符號可在此處理，例如 pushBlock 等...
     });
   });
@@ -133,6 +148,7 @@ function splitBaseAndSubCode(codePart: string): {
   }
 }
 
+// 處理 ICE CORNER
 function transformIceCorner(corner: string): string {
   const iceCornerMap: { [key: string]: string } = {
     BR: ICE_CORNERS.BOTTOM_RIGHT,
@@ -149,6 +165,7 @@ function transformIceCorner(corner: string): string {
   return "";
 }
 
+// 處理 CONVEYOR 上下左右
 function transformDirection(direction: string): string {
   const directionMap: { [key: string]: string } = {
     R: DIRECTION_RIGHT,

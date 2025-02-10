@@ -53,8 +53,7 @@ export default function generateMap({
       continue; // 重新來一次
     }
 
-    // 6) 嘗試找解法
-    //   假設 findSolutionPath(...) 回傳陣列 (若無解 => 為空 or null)
+    // 嘗試找解法
     const solutionPath = findSolutionPath(
       gameMap,
       levelData.tilesWidth,
@@ -63,7 +62,6 @@ export default function generateMap({
     );
 
     if (solutionPath && solutionPath.length > 0) {
-      // 表示有可行路徑 => 就可以返回這個 levelData
       console.log(
         `在經過 ${
           attempt + 1
@@ -71,8 +69,6 @@ export default function generateMap({
       );
       return { ...levelData, solutionPath };
     }
-
-    // 若無解 => 繼續下一回合
   }
 
   // 超過MAX_ATTEMPTS還沒找到 => 拋出錯誤或回傳null

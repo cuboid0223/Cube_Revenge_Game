@@ -155,31 +155,63 @@ export const THEME_TILES_MAP = {
 };
 
 export const PLACEMENT_TYPES_CODE = {
-  HERO: "H", // "h" -> 關卡內可指定出生點
-  // "NPC": "N"
-  GOAL: "G", // "g" -> 關卡內可指定 goal
-  WALL: "1", // 1-50, 1-25, 1-75
+  EMPTY: "0",
+  DEFAULT_HERO_CODE: "h",
+  HERO: "H", // "h" 代表該模板房間入被選為出生房間其預設出生位置
+  DEFAULT_GOAL_CODE: "g",
+  GOAL: "G", //  "g" 代表該模板房間入被選為終點房間其預設終點位置
+  WALL: "1", // 1-50, 1-25, 1-75  使用 dash 後面接數字代表該物體出現機率，例如 1-50 代表 WALL 出現機率 50%
 
   WATER: "W",
-  WATER_PICKUP: "WP",
+  WATER_PICKUP: "WP", // 可以使用 & 在同一位置上出現兩種物體 例如在該冰上有50%機率出現 WATER_PICKUP 則 "WP-50&I"
   FIRE: "F",
   FIRE_PICKUP: "FP",
   ICE: "I",
+  ICE_BOTTOM_RIGHT: "I_BR",
+  ICE_BOTTOM_LEFT: "I_BL",
+  ICE_TOP_LEFT: "I_TL",
+  ICE_TOP_RIGHT: "I_TR",
+
   ICE_PICKUP: "IP",
 
   FLOUR: "M",
-  // "Moon": "M",
   LOCK: "L",
   KEY: "K",
   CONVEYOR: "C",
+  // CONVEYOR_RIGHT: "C_R",
+  // CONVEYOR_LEFT: "C_L",
+  // CONVEYOR_UP: "C_U",
+  // CONVEYOR_DOWN: "C_D",
+
   TELEPORT: "T",
-  THIEF: "R", // Reset
+  THIEF: "R", // Reset tile
   SWITCH_DOOR: "SD",
+  SWITCH_DOOR_Default_Raised: "SD_1",
+  SWITCH_DOOR_Default_Without_Raised: "SD_0",
   SWITCH: "S",
 
   GROUND_ENEMY: "GE",
-  FLYING_ENEMY: "FE",
-  ROAMING_ENEMY: "RE",
+  // 預設 ENEMY 是水平(左右)移動 也可以設置  GE_D (DOWN)或是 GE_U (UP) 垂直走
+  FLYING_ENEMY: "FE", // 同理 GROUND_ENEMY ，FE_D, FE_U
+  ROAMING_ENEMY: "RE", // ROAMING_ENEMY 是隨機行走的
   CIABATTA: "BOSS",
-  // ...
 };
+
+// 可以踩在腳下的 placements
+export const BOTTOM_PLACEMENTS = [
+  PLACEMENT_TYPES_CODE.WATER,
+  PLACEMENT_TYPES_CODE.FIRE,
+  PLACEMENT_TYPES_CODE.ICE,
+  PLACEMENT_TYPES_CODE.CONVEYOR,
+  PLACEMENT_TYPES_CODE.THIEF,
+  PLACEMENT_TYPES_CODE.TELEPORT,
+  PLACEMENT_TYPES_CODE.SWITCH,
+];
+// 可以獲取的 placements
+export const FLOATING_PLACEMENTS = [
+  PLACEMENT_TYPES_CODE.KEY,
+  PLACEMENT_TYPES_CODE.FLOUR,
+  PLACEMENT_TYPES_CODE.WATER_PICKUP,
+  PLACEMENT_TYPES_CODE.FIRE_PICKUP,
+  PLACEMENT_TYPES_CODE.ICE_PICKUP,
+];

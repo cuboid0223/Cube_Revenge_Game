@@ -1,3 +1,4 @@
+import { BOTTOM_PLACEMENTS, PLACEMENT_TYPES_CODE } from "./consts";
 import { RoomExits, RoomInfo, RoomsGrid, TileMap } from "./roomTemplatesMap";
 
 /**
@@ -54,7 +55,7 @@ export function buildTileMap(
  * @param exits - 房間出口資訊
  * @returns 模板 key 字串 (例如："LR", "LRU", "LRD", "LRUD", 等)
  */
-function buildExitsKey(exits: RoomExits): string {
+function buildExitsKey(exits: RoomExits) {
   // 固定包含左右 ("LR")，依據出口資訊增加上下
   let key = "LR";
   if (exits.up) {
@@ -63,7 +64,7 @@ function buildExitsKey(exits: RoomExits): string {
   if (exits.down) {
     key += "D";
   }
-  return key;
+  return key as "LR" | "LRU" | "LRD" | "LRUD";
 }
 
 /**
@@ -104,18 +105,17 @@ function placeRoomTemplate(
   // 將模板內容貼到 tileMap 中
   for (let r = 0; r < roomH; r++) {
     for (let c = 0; c < roomW; c++) {
-      const { codePart: baseCode, probability: p } = splitCodeProbability(
-        roomTemplate[r][c]
-      );
-      // 根據機率決定是否放置該 tile
-      const code = Math.random() < p ? baseCode : "0";
+      const code = mergeCodeByProbability(roomTemplate[r][c]);
 
       // 若模板 tile 為特殊 tile ("h" 或 "g")，根據房間類型轉換成 "H" 或 "G"
       let finalTile = code;
-      if (code === "h" && room.isStartRoom) {
-        finalTile = "H";
-      } else if (code === "g" && room.isGoalRoom) {
-        finalTile = "G";
+      if (code === PLACEMENT_TYPES_CODE.DEFAULT_HERO_CODE && room.isStartRoom) {
+        finalTile = PLACEMENT_TYPES_CODE.HERO;
+      } else if (
+        code === PLACEMENT_TYPES_CODE.DEFAULT_GOAL_CODE &&
+        room.isGoalRoom
+      ) {
+        finalTile = PLACEMENT_TYPES_CODE.GOAL;
       }
 
       tileMap[startRow + r][startCol + c] = finalTile;
@@ -152,7 +152,9 @@ function isSpecialTilePresent(
   roomH: number,
   room: RoomInfo
 ): boolean {
-  const specialTile = room.isStartRoom ? "H" : "G";
+  const specialTile = room.isStartRoom
+    ? PLACEMENT_TYPES_CODE.HERO
+    : PLACEMENT_TYPES_CODE.GOAL;
   for (let r = 0; r < roomH; r++) {
     for (let c = 0; c < roomW; c++) {
       if (tileMap[startRow + r][startCol + c] === specialTile) {
@@ -185,7 +187,7 @@ function placeRandomSpecialTile(
 
   for (let r = 0; r < roomH; r++) {
     for (let c = 0; c < roomW; c++) {
-      if (tileMap[startRow + r][startCol + c] === "0") {
+      if (tileMap[startRow + r][startCol + c] === PLACEMENT_TYPES_CODE.EMPTY) {
         candidates.push([startRow + r, startCol + c]);
       }
     }
@@ -193,22 +195,11 @@ function placeRandomSpecialTile(
 
   if (candidates.length > 0) {
     const [globalRow, globalCol] = randomPick(candidates);
-    tileMap[globalRow][globalCol] = room.isStartRoom ? "H" : "G";
+    tileMap[globalRow][globalCol] = room.isStartRoom
+      ? PLACEMENT_TYPES_CODE.HERO
+      : PLACEMENT_TYPES_CODE.GOAL;
   }
 }
-
-/**
- * 分割模板中的 code 字串以取得基本 tile code、下底線後的字串 (subCode) 與機率。
- * 格式："{code}"，例如 "1" 表示有 100% 的機率放置 '1'(WALL)。
- * 格式："{code}-{probability}"，例如 "1-50" 表示有 50% 的機率放置 '1'(WALL)。
- * 格式："{code}_{subCode}-{probability}"，
- * 例如 "I_TL-50" 表示有 50% 的機率放置 'I'(ICE)，subCode 為 "TL" (例如表示 TOP_LEFT)。
- * 例如 "SD_0-25" 表示有 25% 的機率放置 'SD'(SWITCH DOOR)，subCode 為 "0" (例如表示 isRaised 為 false)。
- * 例如 "C_L-75" 表示有 75% 的機率放置 'C'(CONVEYOR)，subCode 為 "L" (例如表示 direction 為 LEFT)。
- *
- * @param codeString - 模板中的字串
- * @returns 物件包含 base code、subCode (如果存在) 與 p (機率值，介於 0 與 1 之間)
- */
 
 /**
  * 將包含機率的字串拆分為 code 部分與機率部分。
@@ -235,37 +226,47 @@ function splitCodeProbability(codeString: string): {
   }
 }
 
-// function splitCode(codeString: string): {
-//   code: string;
-//   subCode?: string;
-//   p: number;
-// } {
-//   // 若字串不含 '-'，則預設機率為 1，並檢查是否有底線來分割基本 code 與 subCode
-//   if (!codeString.includes("-")) {
-//     if (codeString.includes("_")) {
-//       const [base, sub] = codeString.split("_");
-//       return { code: base, subCode: sub, p: 1 };
-//     }
-//     return { code: codeString, p: 1 };
-//   }
+/**
+ * 將包含機率的字串合併為最終的 code 字串。
+ * 例如當 codeString 為 "I-50&F-50&WP" 時，
+ * 如果 I 或 F 其中一個已經被選中，後續同屬於 BOTTOM_TILES 的 code 就不會再加入，
+ * 最終可能出現 "I&WP" 或 "F&WP"（而不會同時出現 I 與 F）。
+ * @param codeString - The code string to merge.
+ * @returns The merged code string.
+ */
+function mergeCodeByProbability(codeString: string): string {
+  const mergedCodes: string[] = [];
+  // 用來記錄是否已加入過 BOTTOM_TILES 的 tile
+  let bottomTileAdded = false;
 
-//   // 正則說明：
-//   // ^                        : 字串開頭
-//   // ([A-Za-z0-9]+)           : 捕獲基本 tile code（由一個或多個英文字母或數字組成）
-//   // (?:_([A-Za-z0-9_]+))?     : 非捕獲群組，可選的底線與下底線後的字串（捕獲到 group 2）
-//   // -                        : dash
-//   // (\d+)                    : 捕獲機率數字
-//   // $                        : 字串結尾
-//   const regex = /^([A-Za-z0-9]+)(?:_([A-Za-z0-9_]+))?-(\d+)$/;
-//   const match = codeString.match(regex);
+  if (codeString.includes("&")) {
+    const codeTypes = codeString.split("&");
+    codeTypes.forEach((c) => {
+      const { codePart, probability } = splitCodeProbability(c);
+      // 根據機率判斷是否加入該 tile
+      if (Math.random() < probability) {
+        // 如果這個 tile 屬於 BOTTOM_TILES
+        if (BOTTOM_PLACEMENTS.includes(codePart)) {
+          // 如果尚未加入過任何 BOTTOM_TILES 的 tile，則加入並標記
+          if (!bottomTileAdded) {
+            mergedCodes.push(codePart);
+            bottomTileAdded = true;
+          }
+          // 若已加入過，則跳過此 tile
+        } else {
+          // 非 BOTTOM_TILES 類型直接加入
+          mergedCodes.push(codePart);
+        }
+      }
+    });
+  } else {
+    const { codePart, probability } = splitCodeProbability(codeString);
+    if (Math.random() < probability) {
+      mergedCodes.push(codePart);
+    } else {
+      mergedCodes.push(PLACEMENT_TYPES_CODE.EMPTY);
+    }
+  }
 
-//   if (match) {
-//     const baseCode = match[1];
-//     const subCode = match[2] || undefined;
-//     const probability = parseInt(match[3], 10) / 100;
-//     return { code: baseCode, subCode, p: probability };
-//   }
-
-//   // 若格式不符合預期，則回傳預設值
-//   return { code: "0", p: 1 };
-// }
+  return mergedCodes.join("&");
+}

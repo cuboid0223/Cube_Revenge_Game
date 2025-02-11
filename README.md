@@ -1,11 +1,14 @@
 This game is based on a paid course from https://drewconley.itch.io/ciabattas-revenge.
 In this project, additional features have been implemented, including shortest path generation (based on game mechanics) and random level generation.
 
+The hero must collect all the `FLOUR` on the map and reach the goal to clear the level.
+
 ## Features
 
 1. No game engine used; rendering is entirely handled with React.
 
 2. Implements an ==A\* algorithm to find the shortest path to complete the game based on game mechanics==.
+   ![image](/public/4.gif)
 
 3. ==Random level generation is achieved through the Random Walker algorithm==.
 
@@ -39,12 +42,15 @@ Please follow the coding guidelines below to edit levels.
 
 ```javascript
 export const PLACEMENT_TYPES_CODE = {
-  HERO: "h", // 該模板房間入被選為出生房間其預設出生位置
-  GOAL: "g", // 該模板房間入被選為終點房間其預設終點位置
+  EMPTY: "0",
+  DEFAULT_HERO_CODE: "h",
+  HERO: "H", // "h" 代表該模板房間入被選為出生房間其預設出生位置
+  DEFAULT_GOAL_CODE: "g",
+  GOAL: "G", //  "g" 代表該模板房間入被選為終點房間其預設終點位置
   WALL: "1", // 1-50, 1-25, 1-75  使用 dash 後面接數字代表該物體出現機率，例如 1-50 代表 WALL 出現機率 50%
 
   WATER: "W",
-  WATER_PICKUP: "WP", // 可以使用 & 在同一位置上出現兩種物體 例如在該冰上有50%機率出現 WATER_PICKUP 則 "WP-50&I"
+  WATER_PICKUP: "WP", // 可以使用 & 在同一位置上出現兩種物體 例如在該冰上有50%機率出現 WATER_PICKUP 則 "I&WP-50"
   FIRE: "F",
   FIRE_PICKUP: "FP",
   ICE: "I",
@@ -58,16 +64,17 @@ export const PLACEMENT_TYPES_CODE = {
   FLOUR: "M",
   LOCK: "L",
   KEY: "K",
-  CONVEYOR_RIGHT: "C_R",
-  CONVEYOR_LEFT: "C_L",
-  CONVEYOR_UP: "C_U",
-  CONVEYOR_DOWN: "C_D",
+  CONVEYOR: "C",
+  // CONVEYOR_RIGHT: "C_R",
+  // CONVEYOR_LEFT: "C_L",
+  // CONVEYOR_UP: "C_U",
+  // CONVEYOR_DOWN: "C_D",
 
   TELEPORT: "T",
   THIEF: "R", // Reset tile
   SWITCH_DOOR: "SD",
-  //   SWITCH_DOOR_Default_Raised: "SD_1",
-  //   SWITCH_DOOR_Default_Without_Raised: "SD_0",
+  SWITCH_DOOR_Default_Raised: "SD_1",
+  SWITCH_DOOR_Default_Without_Raised: "SD_0",
   SWITCH: "S",
 
   GROUND_ENEMY: "GE",
@@ -99,8 +106,7 @@ export const PLACEMENT_TYPES_CODE = {
 
 ### Room Template Example 2
 
-如`WP, FP, M` 這類 可以撿拾的 placements，須放置在字串尾端 eg. `"I-50&F-50&WP"`
-若放置在字串前端會被覆蓋 eg. `"WP&I-50&F-50"`
+For placements such as `WP`, `FP`,`K` and `M`, which can be picked up, they must be placed at the end of the string, e.g., `"I-50&F-50&WP"`. If they are placed at the beginning of the string, they will be overridden, e.g., `"WP&I-50&F-50"`.
 
 ```javascript
     [

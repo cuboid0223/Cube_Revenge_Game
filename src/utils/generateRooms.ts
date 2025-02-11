@@ -40,13 +40,13 @@ export default function generateRooms(n: number): RoomsGrid {
 
   // 反覆選取 goal 房間，直到符合最小距離的限制
   let gr: number, gc: number;
-  [gr, gc] = pickRandomRoom(n);
-  // do {
-  //   [gr, gc] = pickRandomRoom(n);
-  // } while (
-  //   (sr === gr && sc === gc) ||
-  //   Math.abs(sr - gr) + Math.abs(sc - gc) < minDistance
-  // );
+
+  do {
+    [gr, gc] = pickRandomRoom(n);
+  } while (
+    (sr === gr && sc === gc) ||
+    Math.abs(sr - gr) + Math.abs(sc - gc) < minDistance
+  );
 
   rooms[sr][sc].isStartRoom = true;
   rooms[gr][gc].isGoalRoom = true;

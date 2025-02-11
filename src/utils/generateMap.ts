@@ -9,8 +9,8 @@ import {
 } from "@/helpers/consts";
 import generateRooms from "./generateRooms";
 
-const MAX_ATTEMPTS = 50;
-const ROOM_GRID_SIZE = 3;
+const MAX_ATTEMPTS = 10;
+const ROOM_GRID_SIZE = 2;
 const ROOM_WIDTH = 10,
   ROOM_HEIGHT = 10;
 

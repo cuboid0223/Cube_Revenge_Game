@@ -1,0 +1,1 @@
+export const removeTrailingDigit = (s: string) => s.replace(/\d$/, '');

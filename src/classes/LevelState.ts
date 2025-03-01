@@ -9,11 +9,16 @@ import { Camera } from "./Camera";
 import { Clock } from "./Clock";
 import levels from "../levels/levelsMap";
 import findSolutionPath, { createMap } from "@/utils/findSolutionPath";
+import { Direction } from "@/types/global";
 type OnEmitType = (level: Level) => void;
+
+
+type EditModePlacementType =  {type: string, corner?: string, isRaised?: boolean, initialDirection?: Direction,direction?: Direction}
 
 export class LevelState {
   id: string;
   onEmit: OnEmitType;
+  editModePlacement: EditModePlacementType
 
   constructor(levelId: string, onEmit: OnEmitType) {
     // publisher-subscriber pattern
@@ -22,7 +27,7 @@ export class LevelState {
     this.onEmit = onEmit;
     this.directionControls = new DirectionControls();
     this.isCompleted = false;
-    this.editModePlacementType = PLACEMENT_TYPE_WALL;
+    this.editModePlacement = {type: PLACEMENT_TYPE_WALL};
 
     //Start the level!
     this.start();
@@ -152,8 +157,8 @@ export class LevelState {
     );
   }
 
-  setEditModePlacementType(newType) {
-    this.editModePlacementType = newType;
+  setEditModePlacement(newPlacement:EditModePlacementType) {
+    this.editModePlacement = newPlacement;
   }
 
   getState() {
@@ -178,10 +183,10 @@ export class LevelState {
       // Edit Mode API
       // 將 method 傳出去供外部使用
       enableEditing: true,
-      editModePlacementType: this.editModePlacementType,
+      editModePlacement: this.editModePlacement,
       addPlacement: this.addPlacement.bind(this),
       deletePlacement: this.deletePlacement.bind(this),
-      setEditModePlacementType: this.setEditModePlacementType.bind(this),
+      setEditModePlacement: this.setEditModePlacement.bind(this),
       copyPlacementsToClipboard: this.copyPlacementsToClipboard.bind(this),
       updateSolutionPath: this.updateSolutionPath.bind(this),
     };

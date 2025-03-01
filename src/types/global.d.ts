@@ -11,6 +11,6 @@
 //   placements: Placement[]
 // };
 
-export type FrameCoord = `${number}x${number}`;
+// export type FrameCoord = `${number}x${number}`;
 
 export type Direction = "LEFT" | "RIGHT" | "UP" | "DOWN";

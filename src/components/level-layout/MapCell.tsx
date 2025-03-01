@@ -1,8 +1,7 @@
 import Sprite from "../object-graphics/Sprite";
 import { CELL_SIZE } from "../../helpers/consts";
 import { handleColoredTile } from "@/utils/handleColoredTile";
-import { Level } from "@/helpers/types";
-import { FrameCoord } from "@/types/global";
+import { FrameCoord, Level } from "@/helpers/types";
 
 type MapCellType = {
   level: Level;
@@ -32,7 +31,7 @@ export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
           level.addPlacement({
             x: x,
             y: y,
-            type: level.editModePlacementType,
+            ...level.editModePlacement
           });
         }
       }}

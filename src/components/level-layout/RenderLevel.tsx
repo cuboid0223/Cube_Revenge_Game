@@ -1,6 +1,6 @@
-import React, {useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./RenderLevel.module.css";
-import { PLACEMENT_TYPE_FIRE_PICKUP, PLACEMENT_TYPE_FLOUR, PLACEMENT_TYPE_GOAL, PLACEMENT_TYPE_HERO, PLACEMENT_TYPE_TELEPORT, THEME_BACKGROUNDS } from "../../helpers/consts";
+import { THEME_BACKGROUNDS } from "../../helpers/consts";
 import LevelBackgroundTilesLayer from "./LevelBackgroundTilesLayer";
 import LevelPlacementsLayer from "./LevelPlacementsLayer";
 import { LevelState } from "../../classes/LevelState";
@@ -10,19 +10,26 @@ import { useRecoilValue } from "recoil";
 import { currentLevelIdAtom } from "../../atoms/currentLevelIdAtom";
 import DeathMessage from "../hud/DeathMessage";
 import TopHud from "../hud/TopHud";
-// import DemoLevel1 from "@/levels/DemoLevel1";
-// import DemoLevel2 from "@/levels/DemoLevel2";
-// import generateRoomsWalks from "@/utils/generateRooms";
-// import { buildTileMap } from "@/helpers/buildTileMap";
-// import { templateMap } from "@/helpers/roomTemplatesMap";
-// import tileMapToLevel from "@/utils/tileMapToLevel";
+
+import soundsManager from "@/classes/Sounds";
+
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+
+import { usePathname } from "next/navigation";
+import EditorPanel from "../hud/EditorPanel";
+
+soundsManager.init();
 
 export default function RenderLevel() {
   const [level, setLevel] = useState<Level | null>(null);
   const currentLevelId = useRecoilValue(currentLevelIdAtom);
 
-
-
+  const pathname = usePathname();
+  const showEditorPanel = pathname === "/edit";
 
   useEffect(() => {
     // Create and subscribe to state changes
@@ -45,28 +52,42 @@ export default function RenderLevel() {
   const cameraTranslate = `translate3d(${level.cameraTransformX}, ${level.cameraTransformY}, 0)`;
 
   return (
-    <div
-      className={styles.fullScreenContainer}
-      style={{
-        background: THEME_BACKGROUNDS[level.theme],
-      }}
-    >
-      <div className={styles.gameScreen}>
+    <ResizablePanelGroup direction="horizontal">
+      {showEditorPanel && (
+        <>
+          <ResizablePanel>
+            {/* edit panel */}
+            <EditorPanel level={level} />
+          </ResizablePanel>
+          <ResizableHandle />
+        </>
+      )}
+
+      <ResizablePanel className="relative h-screen">
         <div
+          className={styles.fullScreenContainer}
           style={{
-            transform: cameraTranslate,
+            background: THEME_BACKGROUNDS[level.theme],
           }}
         >
-          {/* 遊戲場景層 */}
-          <LevelBackgroundTilesLayer level={level} />
-          {/* 遊戲物體層 */}
-          <LevelPlacementsLayer level={level} />
-        </div>
+          <div className={styles.gameScreen}>
+            <div
+              style={{
+                transform: cameraTranslate,
+              }}
+            >
+              {/* 遊戲場景層 */}
+              <LevelBackgroundTilesLayer level={level} />
+              {/* 遊戲物體層 */}
+              <LevelPlacementsLayer level={level} />
+            </div>
 
-        {level.isCompleted && <LevelCompleteMessage />}
-        {level.deathOutcome && <DeathMessage level={level} />}
-      </div>
-      <TopHud level={level} />
-    </div>
+            {level.isCompleted && <LevelCompleteMessage />}
+            {level.deathOutcome && <DeathMessage level={level} />}
+          </div>
+          <TopHud level={level} />
+        </div>
+      </ResizablePanel>
+    </ResizablePanelGroup>
   );
 }

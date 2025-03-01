@@ -7,6 +7,6 @@ export class DoorSwitchPlacement extends Placement {
     return body.interactsWithGround;
   }
   renderComponent() {
-    return <Sprite frameCoord={TILES.PURPLE_BUTTON} />;
+    return <Sprite frameCoord={TILES.SWITCH} />;
   }
 }

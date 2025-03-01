@@ -1,16 +1,21 @@
 import { z } from "zod";
 
+
+const frameCoordSchema = z
+.string()
+.includes("x", { message: "'x' is required, eg. 0x1, 6x4" })
+.optional()
+
 const placementSchema = z.object({
   id: z.number().optional(),
   x: z.number(),
   y: z.number(),
-  type: z.string().optional(),
-  frameCoord: z
-    .string()
-    .includes("x", { message: "'x' is required, eg. 0x1, 6x4" })
-    .optional(),
+  type: z.string(),
+  frameCoord: frameCoordSchema,
   // renderComponent: z.function<ReactElement>({}).nullable(),
 });
+
+
 
 const levelSchema = z.object({
   theme: z.string(),
@@ -22,3 +27,4 @@ const levelSchema = z.object({
 
 export type Placement = z.infer<typeof placementSchema>;
 export type Level = z.infer<typeof levelSchema>;
+export type FrameCoord = z.infer<typeof frameCoordSchema>;

@@ -8,6 +8,7 @@ import soundsManager from "@/classes/Sounds";
 
 soundsManager.init();
 
+
 export default function EditPage() {
   const [spriteSheetImage, setSpriteSheetImage] =
     useRecoilState(spriteSheetImageAtom);
@@ -19,9 +20,6 @@ export default function EditPage() {
       setSpriteSheetImage(image);
     };
   }, [setSpriteSheetImage]);
-
-
-
 
   if (!spriteSheetImage) {
     return null;

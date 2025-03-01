@@ -17,8 +17,8 @@ export class SwitchableDoorPlacement extends Placement {
 
   renderComponent() {
     const frameCoord = this.isRaised
-      ? TILES.PURPLE_DOOR_SOLID
-      : TILES.PURPLE_DOOR_OUTLINE;
+      ? TILES.SWITCH_DOOR_SOLID
+      : TILES.SWITCH_DOOR_OUTLINE;
     return <Sprite frameCoord={frameCoord} />;
   }
 }

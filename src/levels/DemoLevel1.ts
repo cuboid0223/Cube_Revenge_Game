@@ -355,7 +355,7 @@ const DemoLevel1 = {
       type: PLACEMENT_TYPE_GROUND_ENEMY,
       x: 7,
       y: 1,
-      // initialDirection: DIRECTION_DOWN,
+      initialDirection: DIRECTION_DOWN,
     },
   ],
 };

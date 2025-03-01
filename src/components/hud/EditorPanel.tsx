@@ -1,0 +1,128 @@
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Sprite from "@/components/object-graphics/Sprite";
+import { PLACEMENT_TYPE_CONVEYOR, PLACEMENT_TYPE_FLYING_ENEMY, PLACEMENT_TYPE_GROUND_ENEMY, PLACEMENT_TYPE_ICE, SELECTED_CATEGORY_MAP } from "@/helpers/consts";
+import { Level } from "@/helpers/types";
+import { TILES } from "@/helpers/tiles";
+import { removeTrailingDigit } from "@/utils/removeTrailingDigit";
+import { splitAtFirstUnderscore, splitAtSecondUnderscore } from "@/utils/splitAtFirstUnderscore";
+
+type EditorPanelProps = {
+  level: Level;
+};
+
+function EditorPanel({ level }: EditorPanelProps) {
+  const [selectedCategory, setSelectedCategory] = useState("basics");
+  const [selectedTile, setSelectedTile] = useState("");
+  return (
+    <main className="flex flex-col p-2 h-screen">
+      <section className="flex-1 flex flex-col gap-2">
+        {/* Level title input */}
+        <div className="grid w-full max-w-sm items-center gap-1.5">
+          <Label htmlFor="levelTitle">LEVEL TITLE</Label>
+          <Input id="levelTitle" placeholder="Level Title" />
+        </div>
+
+        {/* object category select */}
+        <Label htmlFor="objectCategory">OBJECT CATEGORY</Label>
+        <Select onValueChange={(value) => setSelectedCategory(value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Basics" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="basics">Basics</SelectItem>
+            <SelectItem value="tiles">Tiles</SelectItem>
+            <SelectItem value="pickups">Pickups</SelectItem>
+            <SelectItem value="enemies">Enemies</SelectItem>
+          </SelectContent>
+        </Select>
+        <div className="flex flex-wrap gap-2 mt-4">
+          {SELECTED_CATEGORY_MAP[selectedCategory]?.map((tile, index) => (
+            <Button
+              variant="outline"
+              value={tile}
+              key={index}
+              className={`w-fit h-fit p-1 ${
+                tile === selectedTile && "p-1 bg-blue-700"
+              } `}
+              onClick={() => {
+                setSelectedTile(tile);
+                const tileName = Object.keys(TILES).find(
+                  (key) => TILES[key] === tile
+                ) as string;
+               
+             
+                console.log(tileName);
+                const hasCorner = tileName === "ICE_BOTTOM_LEFT" || tileName === "ICE_BOTTOM_RIGHT" || tileName === "ICE_TOP_LEFT" || tileName === "ICE_TOP_RIGHT"
+                const hasDirection = tileName === "CONVEYOR_UP" || tileName === "CONVEYOR_DOWN" || tileName === "CONVEYOR_LEFT" || tileName === "CONVEYOR_RIGHT"
+                const isSwitchDoor = tileName === "SWITCH_DOOR_OUTLINE" || tileName === "SWITCH_DOOR_SOLID"
+                const isLock = tileName === "BLUE_LOCK" || tileName === "GREEN_LOCK"
+                const isKey = tileName === "BLUE_KEY" || tileName === "GREEN_KEY"
+                // removeTrailingDigit() -> "WATER1" -> "WATER"
+                if(hasCorner){
+                    const [type, corner] = splitAtFirstUnderscore(tileName)
+                    level.setEditModePlacement({ type, corner});
+                }else if(hasDirection){
+                    const [type, direction] = splitAtFirstUnderscore(tileName)
+                    level.setEditModePlacement({ type, direction});
+                }else if(isSwitchDoor){
+                    const [type, subStr] = splitAtSecondUnderscore(tileName)
+
+                    level.setEditModePlacement({ type, isRaised: subStr === "SOLID"});
+                }else if(isLock || isKey){
+                    const [color, type] = splitAtFirstUnderscore(tileName)
+                    level.setEditModePlacement({ type, color});
+                }else{
+                    level.setEditModePlacement({ type: removeTrailingDigit(tileName)});
+                }
+              }}
+            >
+              <div className="relative w-[calc(16px*3)] h-[calc(16px*3)]">
+                <div className="origin-top-left transform scale-[3]">
+                  <Sprite frameCoord={tile} />
+                </div>
+              </div>
+            </Button>
+          ))}
+        </div>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        {/* change theme button */}
+        <Button variant="default" className="w-full">
+          Change Theme
+        </Button>
+        {/* clear map button */}
+        <Button variant="default" className="w-full">
+          Clear Map
+        </Button>
+        {/* map width height editor */}
+        <div className="flex justify-around items-center">
+          <Button variant="default">-</Button>
+          Width: 7<Button variant="default">+</Button>
+        </div>
+
+        <div className="flex justify-around items-center">
+          <Button variant="default">-</Button>
+          Height: 7<Button variant="default">+</Button>
+        </div>
+
+        {/* export button */}
+        <Button variant="default" className="w-full">
+          Export & copy
+        </Button>
+      </section>
+    </main>
+  );
+}
+
+export default EditorPanel;

@@ -1,5 +1,6 @@
 export const TILES = {
   // Basics
+  WALL: "0x2",
   SHADOW: "1x3",
   FLOUR: "2x3",
   FIRE_PICKUP: "3x3",
@@ -67,9 +68,9 @@ export const TILES = {
   GOAL_ENABLED: "1x9",
 
   //Switches, Other
-  PURPLE_BUTTON: "0x10",
-  PURPLE_DOOR_OUTLINE: "1x10",
-  PURPLE_DOOR_SOLID: "2x10",
+  SWITCH: "0x10",
+  SWITCH_DOOR_OUTLINE: "1x10",
+  SWITCH_DOOR_SOLID: "2x10",
   TELEPORT1: "3x10",
   TELEPORT2: "4x10",
   TELEPORT3: "5x10",

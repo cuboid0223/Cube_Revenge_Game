@@ -4,11 +4,11 @@ import ClockCount from "./ClockCount";
 import InventoryList from "./InventoryList";
 import EditorDropdown from "./EditorDropdown";
 import { usePathname } from "next/navigation";
-import { LevelSchema } from "@/helpers/types";
+import { Level} from "@/helpers/types";
 
 
 type TopHudProps  = {
-  level: LevelSchema
+  level: Level
 }
 
 export default function TopHud({ level }:TopHudProps ) {

@@ -1,5 +1,5 @@
 import { PLACEMENT_TYPE_ICE } from "@/helpers/consts";
-import { LevelSchema, PlacementSchema } from "@/helpers/types";
+import { Level, Placement } from "@/helpers/types";
 import { Direction } from "@/types/global";
 
 type PositionType = {
@@ -8,16 +8,16 @@ type PositionType = {
 } | null;
 
 export class Collision {
-  forBody: PlacementSchema;
-  level: LevelSchema;
-  placementsAtPosition: PlacementSchema[];
+  forBody: Placement;
+  level: Level;
+  placementsAtPosition: Placement[];
   x: number;
   y: number;
   
 
   constructor(
-    forBody: PlacementSchema,
-    level: LevelSchema,
+    forBody: Placement,
+    level: Level,
     position?: PositionType
   ) {
     this.forBody = forBody;

@@ -1,6 +1,6 @@
 import { iceTileCornerBlockedMoves, iceTileCornerRedirection } from "@/game-objects/IcePlacement";
 import { DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, directionUpdateMap, PLACEMENT_TYPE_ICE, PLACEMENT_TYPE_WALL } from "@/helpers/consts";
-import { PlacementSchema } from "@/helpers/types";
+import { Placement } from "@/helpers/types";
 
 /**
  * 處理玩家從 (startX, startY) 往 [dx, dy] 方向移動時，
@@ -23,7 +23,7 @@ export function handleIceLogic(
     dx: number,
     dy: number,
     gameMap: string[][],
-    placements: PlacementSchema[],
+    placements: Placement[],
     hasIcePickup: boolean,
     width: number,
     height: number

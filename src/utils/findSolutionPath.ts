@@ -1,11 +1,11 @@
 import { DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, PLACEMENT_TYPE_CONVEYOR, PLACEMENT_TYPE_FIRE, PLACEMENT_TYPE_FIRE_PICKUP, PLACEMENT_TYPE_FLOUR, PLACEMENT_TYPE_GOAL, PLACEMENT_TYPE_HERO, PLACEMENT_TYPE_ICE, PLACEMENT_TYPE_ICE_PICKUP, PLACEMENT_TYPE_KEY, PLACEMENT_TYPE_LOCK, PLACEMENT_TYPE_SWITCH, PLACEMENT_TYPE_SWITCH_DOOR, PLACEMENT_TYPE_TELEPORT, PLACEMENT_TYPE_THIEF, PLACEMENT_TYPE_WALL, PLACEMENT_TYPE_WATER, PLACEMENT_TYPE_WATER_PICKUP } from "@/helpers/consts";
-import { LevelSchema, PlacementSchema } from "@/helpers/types";
+import { Level, Placement } from "@/helpers/types";
 import PriorityQueue from "./PriorityQueue";
 import { iceTileCornerBlockedMoves, iceTileCornerRedirection } from "@/game-objects/IcePlacement";
 import { getDirectionKey, handleIceLogic, isCornerSolidForBody } from "./handleIceLogic";
 
 // 簡化地圖為二維矩陣，並記錄所有物件位置
-export function createMap(level: LevelSchema) {
+export function createMap(level: Level) {
   /*
             x (width)
             ------------
@@ -30,14 +30,14 @@ export function createMap(level: LevelSchema) {
 }
 
 // 查找所有物件位置
-export function findPositions(placements: PlacementSchema[], type: string) {
+export function findPositions(placements: Placement[], type: string) {
   return placements.filter(p => p.type === type).map(p => [p.x, p.y]);
 }
 
 //––––– 事前準備 –––––//
 // 為面粉建立一個 mapping：key = "x,y" ； value = index（從 0 開始）
 // 假設 placements 中面粉數量不多
-function buildFlourMapping(placements: PlacementSchema[]) {
+function buildFlourMapping(placements: Placement[]) {
   const flourPositions = placements.filter(p => p.type === PLACEMENT_TYPE_FLOUR);
   const flourMap = new Map();
   flourPositions.forEach((p, index) => {
@@ -47,7 +47,7 @@ function buildFlourMapping(placements: PlacementSchema[]) {
 }
 
 // 為 switchDoor 建立固定順序的 mapping：key = "x,y" ； value = index
-function buildSwitchDoorMapping(placements: PlacementSchema[]) {
+function buildSwitchDoorMapping(placements: Placement[]) {
   const doorPlacements = placements.filter(p => p.type === PLACEMENT_TYPE_SWITCH_DOOR);
   const doorMap = new Map();
   doorPlacements.forEach((p, index) => {

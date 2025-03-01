@@ -1,5 +1,5 @@
 import React, { CSSProperties } from "react";
-import { LevelSchema } from "@/helpers/types";
+import { Level } from "@/helpers/types";
 import {
   CELL_SIZE,
   PLACEMENT_TYPE_CONVEYOR,
@@ -14,7 +14,7 @@ import {
 import { handleColoredTile } from "@/utils/handleColoredTile";
 import { Placement } from "@/game-objects/Placement";
 type Props = {
-  level: LevelSchema;
+  level: Level;
 };
 export default function LevelPlacementsLayer({ level }: Props) {
   return level.placements

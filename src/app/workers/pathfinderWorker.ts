@@ -1,5 +1,3 @@
-// 如果你使用 ES modules 的方式，則需要 import 模組（根據你的專案結構調整路徑）
- // 這個模組內含你原先的 A* 演算法
 
 import findSolutionPath from "@/utils/findSolutionPath";
 

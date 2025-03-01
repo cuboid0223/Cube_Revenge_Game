@@ -1,4 +1,4 @@
-import { LevelSchema } from "@/helpers/types";
+import { Level } from "@/helpers/types";
 import {
   PLACEMENT_TYPE_WALL,
   PLACEMENT_TYPE_FIRE,
@@ -19,7 +19,7 @@ const placements: Record<PlacementType, string> = {
 };
 
 type PropType = {
-  level: LevelSchema;
+  level: Level;
 };
 
 export default function EditorDropdown({ level }: PropType) {

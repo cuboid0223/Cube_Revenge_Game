@@ -3,8 +3,17 @@ import FlourCount from "./FlourCount";
 import ClockCount from "./ClockCount";
 import InventoryList from "./InventoryList";
 import EditorDropdown from "./EditorDropdown";
+import { usePathname } from "next/navigation";
+import { LevelSchema } from "@/helpers/types";
 
-export default function TopHud({ level }) {
+
+type TopHudProps  = {
+  level: LevelSchema
+}
+
+export default function TopHud({ level }:TopHudProps ) {
+  const pathname = usePathname();
+  const showEditorDropdown = pathname === "/edit";
   return (
     <div className={styles.topHud}>
       <div className={styles.topHudLeft}>
@@ -14,7 +23,8 @@ export default function TopHud({ level }) {
       </div>
       <div className={styles.topHudRight}>
         {/*<span>Come back to me</span>*/}
-        <EditorDropdown level={level} />
+        {showEditorDropdown &&  <EditorDropdown level={level} />}
+       
       </div>
     </div>
   );

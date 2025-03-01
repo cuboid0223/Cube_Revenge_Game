@@ -20,5 +20,5 @@ const levelSchema = z.object({
   isPositionOutOfBounds:  z.function().args(z.number(), z.number()).returns(z.boolean())
 });
 
-export type PlacementSchema = z.infer<typeof placementSchema>;
-export type LevelSchema = z.infer<typeof levelSchema>;
+export type Placement = z.infer<typeof placementSchema>;
+export type Level = z.infer<typeof levelSchema>;

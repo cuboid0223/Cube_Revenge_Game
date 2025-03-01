@@ -1,4 +1,4 @@
-import { LevelSchema, PlacementSchema } from "@/helpers/types";
+import { Level, Placement } from "@/helpers/types";
 import {
   DIRECTION_RIGHT,
   CELL_SIZE,
@@ -12,7 +12,7 @@ export class Placement {
   type?: string;
   x: number;
   y: number;
-  level: LevelSchema;
+  level: Level;
   skin: string;
   travelPixelsPerFrame: number;
   movingPixelsRemaining: number;
@@ -24,7 +24,7 @@ export class Placement {
 
   renderFn: () => React.JSX.Element | null;
 
-  constructor(properties: PlacementSchema, level: LevelSchema) {
+  constructor(properties: Placement, level: Level) {
     this.id = properties.id;
     this.type = properties.type;
     this.x = properties.x;
@@ -52,7 +52,7 @@ export class Placement {
     return null;
   }
 
-  isSolidForBody(_body: PlacementSchema): boolean {
+  isSolidForBody(_body: Placement): boolean {
     // base class init isSolidForBody()
     return false;
   }
@@ -130,7 +130,7 @@ export class Placement {
     return null;
   }
 
-  damagesBodyOnCollide(_body: PlacementSchema) {
+  damagesBodyOnCollide(_body: Placement) {
     return null;
   }
 

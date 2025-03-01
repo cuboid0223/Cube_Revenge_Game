@@ -1,9 +1,9 @@
 import MapCell from "./MapCell";
 import { THEME_TILES_MAP } from "../../helpers/consts";
-import { LevelSchema } from "@/helpers/types";
+import { Level } from "@/helpers/types";
 
 type Props = {
-  level: LevelSchema;
+  level: Level;
 };
 
 export default function LevelBackgroundTilesLayer({ level }: Props) {

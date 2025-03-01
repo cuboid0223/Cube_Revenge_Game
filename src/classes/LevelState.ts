@@ -1,4 +1,4 @@
-import { LevelSchema, PlacementSchema } from "@/helpers/types";
+import { Level, Placement } from "@/helpers/types";
 import { PLACEMENT_TYPE_HERO, PLACEMENT_TYPE_WALL } from "../helpers/consts";
 import { placementFactory } from "./PlacementFactory";
 import { GameLoop } from "./GameLoop";
@@ -9,7 +9,7 @@ import { Camera } from "./Camera";
 import { Clock } from "./Clock";
 import levels from "../levels/levelsMap";
 import findSolutionPath, { createMap } from "@/utils/findSolutionPath";
-type OnEmitType = (level: LevelSchema) => void;
+type OnEmitType = (level: Level) => void;
 
 export class LevelState {
   id: string;

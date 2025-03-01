@@ -11,7 +11,8 @@ import {
   PLACEMENT_TYPE_HERO,
   PLACEMENT_TYPE_ICE_PICKUP,
 } from "../helpers/consts";
-import { PlacementSchema } from "@/helpers/types";
+import { Placement as PlacementType, Level } from "@/helpers/types";
+import { Direction } from "@/types/global";
 
 const iceTileCornerFramesMap = {
   [ICE_CORNERS.TOP_LEFT]: TILES.ICE_TOP_LEFT,
@@ -62,7 +63,7 @@ export const iceTileCornerBlockedMoves = {
 export class IcePlacement extends Placement {
   corner: string | null;
   
-  constructor(properties: PlacementSchema, level: LevelSchema) {
+  constructor(properties: PlacementType, level: Level) {
     super(properties, level);
     this.corner = properties.corner ?? null;
   }

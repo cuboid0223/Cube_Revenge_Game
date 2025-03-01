@@ -46,7 +46,7 @@ import { ThiefPlacement } from "../game-objects/ThiefPlacement";
 import { CiabattaPlacement } from "../game-objects/CiabattaPlacement";
 
 // types
-import { LevelSchema, PlacementSchema } from "@/helpers/types";
+import { Level, Placement } from "@/helpers/types";
 import { WaterPickupPlacement } from "@/game-objects/WaterPickupPlacement";
 
 const placementTypeClassMap = {
@@ -75,7 +75,7 @@ const placementTypeClassMap = {
 };
 
 class PlacementFactory {
-  createPlacement(config: PlacementSchema, level: LevelSchema) {
+  createPlacement(config: Placement, level: Level) {
     const placementClass = placementTypeClassMap[config.type];
     if (!placementClass) {
       console.warn("NO TYPE FOUND", config.type);
@@ -86,7 +86,7 @@ class PlacementFactory {
     return instance;
   }
 
-  // getInstance(config: PlacementSchema, level: LevelSchema) {
+  // getInstance(config: Placement, level: Level) {
   //   switch (config.type) {
   //     case PLACEMENT_TYPE_HERO:
   //       return new HeroPlacement(config, level);

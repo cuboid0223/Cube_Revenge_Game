@@ -4,7 +4,7 @@ import { PLACEMENT_TYPE_FIRE_PICKUP, PLACEMENT_TYPE_FLOUR, PLACEMENT_TYPE_GOAL, 
 import LevelBackgroundTilesLayer from "./LevelBackgroundTilesLayer";
 import LevelPlacementsLayer from "./LevelPlacementsLayer";
 import { LevelState } from "../../classes/LevelState";
-import { LevelSchema } from "@/helpers/types";
+import { Level } from "@/helpers/types";
 import LevelCompleteMessage from "../hud/LevelCompleteMessage";
 import { useRecoilValue } from "recoil";
 import { currentLevelIdAtom } from "../../atoms/currentLevelIdAtom";
@@ -18,7 +18,7 @@ import TopHud from "../hud/TopHud";
 // import tileMapToLevel from "@/utils/tileMapToLevel";
 
 export default function RenderLevel() {
-  const [level, setLevel] = useState<LevelSchema | null>(null);
+  const [level, setLevel] = useState<Level | null>(null);
   const currentLevelId = useRecoilValue(currentLevelIdAtom);
 
 

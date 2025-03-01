@@ -28,7 +28,7 @@ import {
   DIRECTION_DOWN,
 } from "@/helpers/consts";
 
-import { PlacementSchema } from "@/helpers/types";
+import { Placement } from "@/helpers/types";
 
 /**
  * 將 2D tileMap (例如 9×9) 轉成:
@@ -187,7 +187,7 @@ function transformDefaultRaised(raisedCode: string): boolean {
 }
 
 function addPlacement(
-  placements: PlacementSchema[],
+  placements: Placement[],
   col: number,
   row: number,
   placementType: string,

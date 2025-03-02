@@ -91,7 +91,18 @@ export class LevelState {
     this.startGameLoop();
   }
 
-  addPlacement(config) {
+  addPlacement(config: Placement) {
+    if (
+      config.type === PLACEMENT_TYPE_HERO_SPAWN ||
+      config.type === PLACEMENT_TYPE_GOAL_ENABLED
+    ) {
+      // 找出目前地圖上已有的相同類型的 placement
+      const existing = this.placements.filter((p) => p.type === config.type);
+      existing.forEach((placement) => {
+        this.deletePlacement(placement);
+      });
+    }
+  
     this.placements.push(placementFactory.createPlacement(config, this));
     this.saveLevelToLocalStorage();
   }

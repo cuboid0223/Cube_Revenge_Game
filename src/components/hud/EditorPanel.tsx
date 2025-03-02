@@ -37,10 +37,10 @@ function EditorPanel({ level }: EditorPanelProps) {
     <main className="flex flex-col p-2 h-screen overflow-scroll">
       <section className="flex-1 flex flex-col gap-2">
         {/* Level title input */}
-        <div className="grid w-full max-w-sm items-center gap-1.5">
+        {/* <div className="grid w-full max-w-sm items-center gap-1.5">
           <Label htmlFor="levelTitle">LEVEL TITLE</Label>
           <Input id="levelTitle" placeholder="Level Title" />
-        </div>
+        </div> */}
         {/* zoom slider */}
         <Label htmlFor="zoom">Zoom: {level.zoom}</Label>
         <Slider
@@ -133,6 +133,16 @@ function EditorPanel({ level }: EditorPanelProps) {
       </section>
 
       <section className="flex flex-col gap-3">
+         {/* solution path button */}
+         <Button
+          variant="default"
+          className="w-full"
+          onClick={() => {
+            level.updateSolutionPath()
+          }}
+        >
+          Solution Path
+        </Button>
         {/* change theme button */}
         <Button
           variant="default"
@@ -145,7 +155,7 @@ function EditorPanel({ level }: EditorPanelProps) {
         </Button>
         {/* clear map button */}
         <Button
-          variant="default"
+          variant="destructive"
           className="w-full"
           onClick={() => {
             level.clearPlacements();

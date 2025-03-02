@@ -12,85 +12,43 @@ import DeathMessage from "../hud/DeathMessage";
 import TopHud from "../hud/TopHud";
 
 import soundsManager from "@/classes/Sounds";
-
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
-
 import { usePathname } from "next/navigation";
-import EditorPanel from "../hud/EditorPanel";
-import { transform } from "next/dist/build/swc";
 
 soundsManager.init();
 
-export default function RenderLevel() {
-  const [level, setLevel] = useState<Level | null>(null);
-  const currentLevelId = useRecoilValue(currentLevelIdAtom);
+type RenderLevelProps = {
+  level: Level
+}
 
+export default function RenderLevel({ level }:RenderLevelProps) {
   const pathname = usePathname();
   const showEditorPanel = pathname === "/edit";
-
-  useEffect(() => {
-    // Create and subscribe to state changes
-    const levelState = new LevelState(currentLevelId, (newState) => {
-      setLevel(newState);
-    });
-
-    //Get initial state
-    setLevel(levelState.getState());
-
-    //Destroy method when this component unmounts for cleanup
-    return () => {
-      levelState.destroy();
-    };
-  }, [currentLevelId]);
-
-  if (!level) {
-    return null;
-  }
-  const cameraTranslate = `translate3d(${level.cameraTransformX}, ${level.cameraTransformY}, 0)`;
-
-  
+  // const cameraTranslate = `translate3d(${level.cameraTransformX}, ${level.cameraTransformY}, 0)`;
+  const zoomFactor = showEditorPanel ? level.zoom : 1;
+const adjustedCameraTranslate = `translate3d(${level.cameraTransformX / zoomFactor}px, ${level.cameraTransformY / zoomFactor}px, 0)`;
   return (
-    <ResizablePanelGroup direction="horizontal">
-      {showEditorPanel && (
-        <>
-          <ResizablePanel>
-            {/* edit panel */}
-            <EditorPanel level={level} />
-          </ResizablePanel>
-          <ResizableHandle />
-        </>
-      )}
-
-      <ResizablePanel className="relative h-screen">
+    <div
+      className={styles.fullScreenContainer}
+      style={{
+        background: THEME_BACKGROUNDS[level.theme],
+      }}
+    >
+      <div className={styles.gameScreen}>
         <div
-          className={styles.fullScreenContainer}
           style={{
-            background: THEME_BACKGROUNDS[level.theme],
+            transform: `scale(${showEditorPanel ? level.zoom: 1}) ${adjustedCameraTranslate}  `,
           }}
         >
-          <div className={styles.gameScreen}>
-            <div
-              style={{
-               transform: `scale(${level.zoom}) ${cameraTranslate}`,
-              }}
-            >
-              {/* 遊戲場景層 */}
-              <LevelBackgroundTilesLayer level={level} />
-              {/* 遊戲物體層 */}
-              <LevelPlacementsLayer level={level} />
-            </div>
-          
-
-            {level.isCompleted && <LevelCompleteMessage />}
-            {level.deathOutcome && <DeathMessage level={level} />}
-          </div>
-          <TopHud level={level} />
+          {/* 遊戲場景層 */}
+          <LevelBackgroundTilesLayer level={level} />
+          {/* 遊戲物體層 */}
+          <LevelPlacementsLayer level={level} />
         </div>
-      </ResizablePanel>
-    </ResizablePanelGroup>
+
+        {level.isCompleted && <LevelCompleteMessage />}
+        {level.deathOutcome && <DeathMessage level={level} />}
+      </div>
+      <TopHud level={level} showEditorPanel={showEditorPanel}/>
+    </div>
   );
 }

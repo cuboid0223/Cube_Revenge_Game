@@ -147,13 +147,9 @@ const DemoLevel1 = {
   tilesWidth: 10,
   tilesHeight: 7,
   placements: [
+
     {
-      type: PLACEMENT_TYPE_HERO_SPAWN,
-      x: 1,
-      y: 1,
-    },
-    {
-      type: PLACEMENT_TYPE_HERO_EDITING,
+      type: PLACEMENT_TYPE_HERO,
       x: 5,
       y: 2,
     },

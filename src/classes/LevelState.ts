@@ -21,7 +21,7 @@ import { Inventory } from "./Inventory";
 import { LevelAnimatedFrames } from "./LevelAnimatedFrames";
 import { Camera } from "./Camera";
 import { Clock } from "./Clock";
-import levels from "../levels/levelsMap";
+// import levels from "../levels/levelsMap";
 import findSolutionPath, { createMap } from "@/utils/findSolutionPath";
 import { Direction } from "@/types/global";
 type OnEmitType = (level: Level) => void;
@@ -35,13 +35,15 @@ type EditModePlacementType = {
 };
 
 export class LevelState {
+  levels?: Level[];
   id: string;
   onEmit: OnEmitType;
   editModePlacement: EditModePlacementType;
 
-  constructor(levelId: string, onEmit: OnEmitType) {
+  constructor(levels?: Level[], levelId: string, onEmit: OnEmitType) {
     // publisher-subscriber pattern
     // onEmit 函數在這裡被用作一種回調機制，允許外部程式碼 "訂閱" LevelState 的狀態變化。
+    this.levels = levels;
     this.id = levelId;
     this.onEmit = onEmit;
     this.directionControls = new DirectionControls();
@@ -53,7 +55,7 @@ export class LevelState {
   }
 
   start() {
-    const levelData = levels[this.id];
+    const levelData = this.levels[this.id];
     this.deathOutcome = null;
     this.theme = levelData.theme;
     this.tilesWidth = levelData.tilesWidth;
@@ -91,29 +93,54 @@ export class LevelState {
 
   addPlacement(config) {
     this.placements.push(placementFactory.createPlacement(config, this));
+    this.saveLevelToLocalStorage();
   }
 
   deletePlacement(placementToRemove) {
     this.placements = this.placements.filter((p) => {
       return p.id !== placementToRemove.id;
     });
+    this.saveLevelToLocalStorage();
   }
 
   clearPlacements() {
     this.placements = this.placements.filter((p) => {
       return !p.canBeDeleted();
     });
+    this.saveLevelToLocalStorage();
   }
+
+  saveLevelToLocalStorage() {
+    const keys = ["type", "x", "y", "isRaised", "direction", "color", "corner"];
+
+    // 假設 getState 返回一個純資料物件，不包含循環引用
+    const levelStateData = {
+      id: this.id,
+      theme: this.theme,
+      tilesWidth: this.tilesWidth,
+      tilesHeight: this.tilesHeight,
+      placements: this.placements.map((p) => {
+        return Object.fromEntries(
+          keys.filter((key) => p[key] != null).map((key) => [key, p[key]])
+        )
+      })
+    };
+
+    localStorage.setItem("levelState", JSON.stringify(levelStateData));
+  }
+
+
+  
 
   updateTilesWidth(diff: number) {
     this.tilesWidth = this.tilesWidth + diff;
-
+    this.saveLevelToLocalStorage();
     return this.tilesWidth;
   }
 
   updateTilesHeight(diff: number) {
     this.tilesHeight = this.tilesHeight + diff;
-
+    this.saveLevelToLocalStorage();
     return this.tilesHeight;
   }
 
@@ -175,15 +202,7 @@ export class LevelState {
     // Convert the Placements to type,x,y JSON
     // 先將 PlacementsData 轉成 json
 
-    const keys = [
-      "type",
-      "x",
-      "y",
-      "isRaised",
-      "direction",
-      "color",
-      "corner",
-    ];
+    const keys = ["type", "x", "y", "isRaised", "direction", "color", "corner"];
 
     const overrideMapping: Record<
       string,
@@ -221,38 +240,45 @@ export class LevelState {
         type: PLACEMENT_TYPE_FLYING_ENEMY,
         initialDirection: DIRECTION_DOWN,
       },
-      HERO_SPAWN:{
+      HERO_SPAWN: {
         type: PLACEMENT_TYPE_HERO,
       },
-      CIABATTA_SPAWN:{
+      CIABATTA_SPAWN: {
         type: PLACEMENT_TYPE_CIABATTA,
-      }
+      },
     };
 
     const placementsData = this.placements
-    .filter((p) => p.type !== PLACEMENT_TYPE_HERO_EDITING)
-    .map((p) => {
-      if (overrideMapping[p.type]) {
-        return {
-          x: p.x,
-          y: p.y,
-          ...overrideMapping[p.type],
-        };
-      }
+      .filter((p) => p.type !== PLACEMENT_TYPE_HERO_EDITING)
+      .map((p) => {
+        if (overrideMapping[p.type]) {
+          return {
+            x: p.x,
+            y: p.y,
+            ...overrideMapping[p.type],
+          };
+        }
 
-      return Object.fromEntries(
-        keys.filter((key) => p[key] != null).map((key) => [key, p[key]])
-      );
-    });
+        return Object.fromEntries(
+          keys.filter((key) => p[key] != null).map((key) => [key, p[key]])
+        );
+      });
+
+    const level = {
+      theme: this.theme,
+      tilesWidth: this.tilesWidth,
+      tilesHeight: this.tilesHeight,
+      placements: placementsData,
+    };
 
     // Copy the data to the clipboard for moving into map files after editing
     // 複製到剪貼簿
-    navigator.clipboard.writeText(JSON.stringify(placementsData)).then(
+    navigator.clipboard.writeText(JSON.stringify(level)).then(
       () => {
         console.log("Content copied to clipboard");
 
         // Also console log the output
-        console.log(placementsData);
+        console.log(level);
       },
       () => {
         console.error("Failed to copy");
@@ -277,6 +303,26 @@ export class LevelState {
     this.camera.setZoom(n);
     return this.camera.zoom;
   }
+
+  // // 用來從 localStorage 中讀取的資料重建 LevelState 實例
+  // static fromJSON(savedData: any, levels: Level[], onEmit: (level: Level) => void): LevelState {
+  //   // 使用預設的建構式建立一個 LevelState
+  //   const levelState = new LevelState(levels, savedData.id, onEmit);
+
+  //   // 根據 savedData 設定各項屬性
+  //   levelState.theme = savedData.theme;
+  //   levelState.tilesWidth = savedData.tilesWidth;
+  //   levelState.tilesHeight = savedData.tilesHeight;
+  //   // 如果 placements 存的是純資料，就用 factory 重新建立實例（假設 savedData.placements 是陣列）
+  //   levelState.placements = savedData.placements.map((config: any) =>
+  //     placementFactory.createPlacement(config, levelState)
+  //   );
+
+  //   // 其他需要還原的屬性也在這裡設定，例如 solutionPath、inventory、camera 等
+  //   // 注意：camera、clock、gameLoop 等可能需要在建構式內重新初始化
+
+  //   return levelState;
+  // }
 
   getState() {
     // 讓外部使用 levelState

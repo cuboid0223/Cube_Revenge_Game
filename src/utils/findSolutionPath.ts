@@ -1,4 +1,4 @@
-import { DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, PLACEMENT_TYPE_CONVEYOR, PLACEMENT_TYPE_FIRE, PLACEMENT_TYPE_FIRE_PICKUP, PLACEMENT_TYPE_FLOUR, PLACEMENT_TYPE_GOAL, PLACEMENT_TYPE_HERO, PLACEMENT_TYPE_ICE, PLACEMENT_TYPE_ICE_PICKUP, PLACEMENT_TYPE_KEY, PLACEMENT_TYPE_LOCK, PLACEMENT_TYPE_SWITCH, PLACEMENT_TYPE_SWITCH_DOOR, PLACEMENT_TYPE_TELEPORT, PLACEMENT_TYPE_THIEF, PLACEMENT_TYPE_WALL, PLACEMENT_TYPE_WATER, PLACEMENT_TYPE_WATER_PICKUP } from "@/helpers/consts";
+import { DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, PLACEMENT_TYPE_CONVEYOR, PLACEMENT_TYPE_FIRE, PLACEMENT_TYPE_FIRE_PICKUP, PLACEMENT_TYPE_FLOUR, PLACEMENT_TYPE_GOAL, PLACEMENT_TYPE_GOAL_ENABLED, PLACEMENT_TYPE_HERO, PLACEMENT_TYPE_HERO_SPAWN, PLACEMENT_TYPE_ICE, PLACEMENT_TYPE_ICE_PICKUP, PLACEMENT_TYPE_KEY, PLACEMENT_TYPE_LOCK, PLACEMENT_TYPE_SWITCH, PLACEMENT_TYPE_SWITCH_DOOR, PLACEMENT_TYPE_TELEPORT, PLACEMENT_TYPE_THIEF, PLACEMENT_TYPE_WALL, PLACEMENT_TYPE_WATER, PLACEMENT_TYPE_WATER_PICKUP } from "@/helpers/consts";
 import { Level, Placement } from "@/helpers/types";
 import PriorityQueue from "./PriorityQueue";
 import { iceTileCornerBlockedMoves, iceTileCornerRedirection } from "@/game-objects/IcePlacement";
@@ -76,12 +76,12 @@ function toggleSwitchDoorMask(doorMask: number, totalDoors: number) {
 //––––– 主函式 –––––//
 export default function findSolutionPath(gameMap, width, height, placements) {
   console.log("開始路徑搜尋");
-  const startPosition = placements.find(p => p.type === PLACEMENT_TYPE_HERO);
+  const startPosition = placements.find(p => p.type === PLACEMENT_TYPE_HERO || p.type === PLACEMENT_TYPE_HERO_SPAWN);
   if (!startPosition) {
     console.error("找不到 HERO 位置");
     return null;
   }
-  const goalPosition = placements.find(p => p.type === PLACEMENT_TYPE_GOAL);
+  const goalPosition = placements.find(p => p.type === PLACEMENT_TYPE_GOAL || p.type === PLACEMENT_TYPE_GOAL_ENABLED);
   if (!goalPosition) {
     console.error("找不到 GOAL 位置");
     return null;

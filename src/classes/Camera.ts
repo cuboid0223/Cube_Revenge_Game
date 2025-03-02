@@ -31,11 +31,11 @@ export class Camera {
   }
 
   get transformX() {
-    return -this.cameraX - this.transformOffset + "px";
+    return -this.cameraX - this.transformOffset ;
   }
 
   get transformY() {
-    return -this.cameraY - this.transformOffset + "px";
+    return -this.cameraY - this.transformOffset ;
   }
 
 

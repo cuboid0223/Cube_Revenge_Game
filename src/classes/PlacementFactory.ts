@@ -34,6 +34,7 @@ import {
   PLACEMENT_TYPE_ENEMY_FLYING_DOWN_SPAWN,
   PLACEMENT_TYPE_ENEMY_FLYING_UP_SPAWN,
   PLACEMENT_TYPE_ROAMING_ENEMY_SPAWN,
+  PLACEMENT_TYPE_HERO_EDITING,
 } from "../helpers/consts";
 
 import { HeroPlacement } from "../game-objects/HeroPlacement";
@@ -73,10 +74,13 @@ import { EnemyFlyingRightSpawnPlacement } from "@/game-objects/EnemyFlyingRightS
 import { EnemyFlyingDownSpawnPlacement } from "@/game-objects/EnemyFlyingDownSpawnPlacement";
 import { EnemyFlyingUpSpawnPlacement } from "@/game-objects/EnemyFlyingUpSpawnPlacement";
 import { RoamingEnemySpawnPlacement } from "@/game-objects/RoamingEnemySpawnPlacement";
+import { HeroEditingPlacement } from "@/game-objects/HeroEditingPlacement";
 
 const placementTypeClassMap = {
   [PLACEMENT_TYPE_HERO]: HeroPlacement,
   [PLACEMENT_TYPE_HERO_SPAWN]: HeroSpawnPlacement,
+  [PLACEMENT_TYPE_HERO_EDITING]: HeroEditingPlacement,
+
   [PLACEMENT_TYPE_GOAL]: GoalPlacement,
   [PLACEMENT_TYPE_GOAL_ENABLED]: GoalEnabledPlacement,
   [PLACEMENT_TYPE_WALL]: WallPlacement,

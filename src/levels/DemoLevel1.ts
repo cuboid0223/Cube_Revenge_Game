@@ -25,6 +25,7 @@ import {
   DIRECTION_LEFT,
   DIRECTION_UP,
   DIRECTION_DOWN,
+  PLACEMENT_TYPE_HERO_EDITING,
 } from "../helpers/consts";
 
 // const DemoLevel1 = {
@@ -146,7 +147,7 @@ const DemoLevel1 = {
   tilesHeight: 7,
   placements: [
     {
-      type: PLACEMENT_TYPE_HERO,
+      type: PLACEMENT_TYPE_HERO_EDITING,
       x: 5,
       y: 2,
     },

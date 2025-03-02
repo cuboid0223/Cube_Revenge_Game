@@ -29,10 +29,10 @@ export default function EditorDropdown({ level }: PropType) {
 
   return (
     <div className={styles.dropdownContainer}>
-      <select
-        value={level.editModePlacementType}
+      {/* <select
+        value={level.editModePlacement}
         onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
-          level.setEditModePlacementType(event.target.value);
+          level.setEditModePlacement(event.target.value);
         }}
       >
         {Object.entries(placements).map(([placementType, label]) => (
@@ -40,7 +40,7 @@ export default function EditorDropdown({ level }: PropType) {
             {label}
           </option>
         ))}
-      </select>
+      </select> */}
       <button
         onClick={() => {
           level.copyPlacementsToClipboard();

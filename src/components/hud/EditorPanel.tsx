@@ -98,26 +98,32 @@ function EditorPanel({ level }: EditorPanelProps) {
 
       <section className="flex flex-col gap-3">
         {/* change theme button */}
-        <Button variant="default" className="w-full">
+        <Button variant="default" className="w-full" onClick={()=>{
+            level.changeTheme()
+        }}>
           Change Theme
         </Button>
         {/* clear map button */}
-        <Button variant="default" className="w-full">
+        <Button variant="default" className="w-full" onClick={() => {
+          level.clearPlacements();
+        }}>
           Clear Map
         </Button>
         {/* map width height editor */}
         <div className="flex justify-around items-center">
-          <Button variant="default">-</Button>
-          Width: 7<Button variant="default">+</Button>
+          <Button variant="default" onClick={()=>{level.updateTilesWidth(-1)}}>-</Button>
+          Width: {level.tilesWidth}<Button variant="default" onClick={()=>{level.updateTilesWidth(1)}}>+</Button>
         </div>
 
         <div className="flex justify-around items-center">
-          <Button variant="default">-</Button>
-          Height: 7<Button variant="default">+</Button>
+          <Button variant="default" onClick={()=>{level.updateTilesHeight(-1)}}>-</Button>
+          Height: {level.tilesHeight}<Button variant="default" onClick={()=>{level.updateTilesHeight(+1)}}>+</Button>
         </div>
 
         {/* export button */}
-        <Button variant="default" className="w-full">
+        <Button variant="default" className="w-full" onClick={() => {
+          level.copyPlacementsToClipboard();
+        }}>
           Export & copy
         </Button>
       </section>

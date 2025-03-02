@@ -1,3 +1,4 @@
+import { Level } from "@/helpers/types";
 import { CELL_SIZE } from "../helpers/consts";
 import {
   DIRECTION_RIGHT,
@@ -10,12 +11,23 @@ const CAMERA_LOOKAHEAD = 3;
 const USE_SMOOTH_CAMERA = true;
 
 export class Camera {
+  level: Level;
+  cameraX: number;
+  cameraY: number;
+  transformOffset: number;
+  private _zoom: number;
+
   constructor(level) {
     this.level = level;
     const [heroX, heroY] = this.level.heroRef.displayXY();
     this.cameraX = heroX;
     this.cameraY = heroY;
     this.transformOffset = -5.5 * CELL_SIZE;
+    this._zoom = .54; 
+  }
+
+  setZoom(newZoom: number) {
+    this._zoom = newZoom;
   }
 
   get transformX() {
@@ -24,6 +36,11 @@ export class Camera {
 
   get transformY() {
     return -this.cameraY - this.transformOffset + "px";
+  }
+
+
+  get zoom(){
+    return  this._zoom;
   }
 
   static lerp(currentValue, destinationValue, time) {

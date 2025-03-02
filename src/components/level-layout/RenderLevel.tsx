@@ -21,6 +21,7 @@ import {
 
 import { usePathname } from "next/navigation";
 import EditorPanel from "../hud/EditorPanel";
+import { transform } from "next/dist/build/swc";
 
 soundsManager.init();
 
@@ -51,6 +52,7 @@ export default function RenderLevel() {
   }
   const cameraTranslate = `translate3d(${level.cameraTransformX}, ${level.cameraTransformY}, 0)`;
 
+  
   return (
     <ResizablePanelGroup direction="horizontal">
       {showEditorPanel && (
@@ -73,7 +75,7 @@ export default function RenderLevel() {
           <div className={styles.gameScreen}>
             <div
               style={{
-                transform: cameraTranslate,
+               transform: `scale(${level.zoom}) ${cameraTranslate}`,
               }}
             >
               {/* 遊戲場景層 */}
@@ -81,6 +83,7 @@ export default function RenderLevel() {
               {/* 遊戲物體層 */}
               <LevelPlacementsLayer level={level} />
             </div>
+          
 
             {level.isCompleted && <LevelCompleteMessage />}
             {level.deathOutcome && <DeathMessage level={level} />}

@@ -5,7 +5,7 @@ import { Placement } from "./Placement";
 import { TILES } from "../helpers/tiles";
 import Sprite from "../components/object-graphics/Sprite";
 
-export class RoamingEnemySpawnPlacement extends Placement {
+export class EnemyRoamingSpawnPlacement extends Placement {
 
 
   renderComponent() {

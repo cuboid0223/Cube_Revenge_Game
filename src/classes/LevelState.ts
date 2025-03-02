@@ -1,6 +1,13 @@
 import { Level, Placement } from "@/helpers/types";
 import {
+  DIRECTION_DOWN,
+  DIRECTION_LEFT,
+  DIRECTION_RIGHT,
+  DIRECTION_UP,
+  PLACEMENT_TYPE_CIABATTA,
+  PLACEMENT_TYPE_FLYING_ENEMY,
   PLACEMENT_TYPE_GOAL_ENABLED,
+  PLACEMENT_TYPE_GROUND_ENEMY,
   PLACEMENT_TYPE_HERO,
   PLACEMENT_TYPE_HERO_EDITING,
   PLACEMENT_TYPE_HERO_SPAWN,
@@ -175,15 +182,68 @@ export class LevelState {
       "isRaised",
       "direction",
       "color",
-      "initialDirection",
       "corner",
     ];
 
-    const placementsData = this.placements.map((p) =>
-      Object.fromEntries(
+    const overrideMapping: Record<
+      string,
+      { type: string; initialDirection?: string }
+    > = {
+      ENEMY_LEFT_SPAWN: {
+        type: PLACEMENT_TYPE_GROUND_ENEMY,
+        initialDirection: DIRECTION_LEFT,
+      },
+      ENEMY_RIGHT_SPAWN: {
+        type: PLACEMENT_TYPE_GROUND_ENEMY,
+        initialDirection: DIRECTION_RIGHT,
+      },
+      ENEMY_UP_SPAWN: {
+        type: PLACEMENT_TYPE_GROUND_ENEMY,
+        initialDirection: DIRECTION_DOWN,
+      },
+      ENEMY_DOWN_SPAWN: {
+        type: PLACEMENT_TYPE_GROUND_ENEMY,
+        initialDirection: DIRECTION_UP,
+      },
+      ENEMY_FLYING_RIGHT_SPAWN: {
+        type: PLACEMENT_TYPE_FLYING_ENEMY,
+        initialDirection: DIRECTION_RIGHT,
+      },
+      ENEMY_FLYING_LEFT_SPAWN: {
+        type: PLACEMENT_TYPE_FLYING_ENEMY,
+        initialDirection: DIRECTION_LEFT,
+      },
+      ENEMY_FLYING_UP_SPAWN: {
+        type: PLACEMENT_TYPE_FLYING_ENEMY,
+        initialDirection: DIRECTION_UP,
+      },
+      ENEMY_FLYING_DOWN_SPAWN: {
+        type: PLACEMENT_TYPE_FLYING_ENEMY,
+        initialDirection: DIRECTION_DOWN,
+      },
+      HERO_SPAWN:{
+        type: PLACEMENT_TYPE_HERO,
+      },
+      CIABATTA_SPAWN:{
+        type: PLACEMENT_TYPE_CIABATTA,
+      }
+    };
+
+    const placementsData = this.placements
+    .filter((p) => p.type !== PLACEMENT_TYPE_HERO_EDITING)
+    .map((p) => {
+      if (overrideMapping[p.type]) {
+        return {
+          x: p.x,
+          y: p.y,
+          ...overrideMapping[p.type],
+        };
+      }
+
+      return Object.fromEntries(
         keys.filter((key) => p[key] != null).map((key) => [key, p[key]])
-      )
-    );
+      );
+    });
 
     // Copy the data to the clipboard for moving into map files after editing
     // 複製到剪貼簿
@@ -207,11 +267,15 @@ export class LevelState {
   changeTheme() {
     const index = THEME_ARRAY.indexOf(this.theme);
     // 如果找不到或是最後一個，就回到第一個
-    this.theme =  THEME_ARRAY[index + 1];
+    this.theme = THEME_ARRAY[index + 1];
     if (index === -1 || index === THEME_ARRAY.length - 1) {
-      this.theme = THEME_ARRAY[0]
+      this.theme = THEME_ARRAY[0];
     }
-    console.log( this.theme)
+  }
+
+  setZoom(n) {
+    this.camera.setZoom(n);
+    return this.camera.zoom;
   }
 
   getState() {
@@ -226,6 +290,7 @@ export class LevelState {
       isCompleted: this.isCompleted,
       cameraTransformX: this.camera.transformX,
       cameraTransformY: this.camera.transformY,
+      zoom: this.camera.zoom,
       secondsRemaining: this.clock.secondsRemaining,
       inventory: this.inventory,
       // 重新開始
@@ -237,6 +302,7 @@ export class LevelState {
       // 將 method 傳出去供外部使用
       enableEditing: true,
       editModePlacement: this.editModePlacement,
+      setZoom: this.setZoom.bind(this),
       changeTheme: this.changeTheme.bind(this),
       addPlacement: this.addPlacement.bind(this),
       deletePlacement: this.deletePlacement.bind(this),

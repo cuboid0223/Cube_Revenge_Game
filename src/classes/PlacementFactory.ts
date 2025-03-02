@@ -35,6 +35,7 @@ import {
   PLACEMENT_TYPE_ENEMY_FLYING_UP_SPAWN,
   PLACEMENT_TYPE_ROAMING_ENEMY_SPAWN,
   PLACEMENT_TYPE_HERO_EDITING,
+  PLACEMENT_TYPE_ENEMY_ROAMING_SPAWN,
 } from "../helpers/consts";
 
 import { HeroPlacement } from "../game-objects/HeroPlacement";
@@ -73,7 +74,7 @@ import { EnemyFlyingLeftSpawnPlacement } from "@/game-objects/EnemyFlyingLeftSpa
 import { EnemyFlyingRightSpawnPlacement } from "@/game-objects/EnemyFlyingRightSpawnPlacement";
 import { EnemyFlyingDownSpawnPlacement } from "@/game-objects/EnemyFlyingDownSpawnPlacement";
 import { EnemyFlyingUpSpawnPlacement } from "@/game-objects/EnemyFlyingUpSpawnPlacement";
-import { RoamingEnemySpawnPlacement } from "@/game-objects/RoamingEnemySpawnPlacement";
+import { EnemyRoamingSpawnPlacement, RoamingEnemySpawnPlacement } from "@/game-objects/RoamingEnemySpawnPlacement";
 import { HeroEditingPlacement } from "@/game-objects/HeroEditingPlacement";
 
 const placementTypeClassMap = {
@@ -106,7 +107,7 @@ const placementTypeClassMap = {
 
 
   [PLACEMENT_TYPE_ROAMING_ENEMY]: RoamingEnemyPlacement,
-  [PLACEMENT_TYPE_ROAMING_ENEMY_SPAWN]: RoamingEnemySpawnPlacement,
+  [PLACEMENT_TYPE_ENEMY_ROAMING_SPAWN]: EnemyRoamingSpawnPlacement,
   [PLACEMENT_TYPE_CONVEYOR]: ConveyorPlacement,
   [PLACEMENT_TYPE_ICE]: IcePlacement,
   [PLACEMENT_TYPE_ICE_PICKUP]: IcePickupPlacement,
@@ -122,7 +123,6 @@ const placementTypeClassMap = {
 
 class PlacementFactory {
   createPlacement(config: Placement, level: Level) {
-    console.log(config)
     const placementClass = placementTypeClassMap[config.type];
     if (!placementClass) {
       console.warn("NO TYPE FOUND", config.type);

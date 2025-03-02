@@ -26,6 +26,7 @@ import {
   DIRECTION_UP,
   DIRECTION_DOWN,
   PLACEMENT_TYPE_HERO_EDITING,
+  PLACEMENT_TYPE_HERO_SPAWN,
 } from "../helpers/consts";
 
 // const DemoLevel1 = {
@@ -146,6 +147,11 @@ const DemoLevel1 = {
   tilesWidth: 10,
   tilesHeight: 7,
   placements: [
+    {
+      type: PLACEMENT_TYPE_HERO_SPAWN,
+      x: 1,
+      y: 1,
+    },
     {
       type: PLACEMENT_TYPE_HERO_EDITING,
       x: 5,
@@ -353,10 +359,10 @@ const DemoLevel1 = {
     //   y: 3,
     // },
     {
-      type: PLACEMENT_TYPE_GROUND_ENEMY,
+      type: PLACEMENT_TYPE_FLYING_ENEMY,
       x: 7,
       y: 1,
-      initialDirection: DIRECTION_DOWN,
+      initialDirection: DIRECTION_RIGHT,
     },
   ],
 };

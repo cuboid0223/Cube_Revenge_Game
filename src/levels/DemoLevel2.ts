@@ -14,6 +14,7 @@ import {
   PLACEMENT_TYPE_SWITCH_DOOR,
   PLACEMENT_TYPE_WATER,
   PLACEMENT_TYPE_WATER_PICKUP,
+  PLACEMENT_TYPE_HERO_SPAWN,
 } from "../helpers/consts";
 
 const DemoLevel2 = {
@@ -33,7 +34,7 @@ const DemoLevel2 = {
     { x: 3, y: 4, type: PLACEMENT_TYPE_FIRE },
     { x: 1, y: 3, type: PLACEMENT_TYPE_FIRE_PICKUP },
       {
-          "type": PLACEMENT_TYPE_HERO,
+          "type": PLACEMENT_TYPE_HERO_SPAWN,
           "x": 1,
           "y": 1
       },

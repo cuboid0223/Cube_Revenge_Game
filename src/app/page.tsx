@@ -29,7 +29,7 @@ export default function Home() {
 
   useEffect(() => {
     // Create and subscribe to state changes
-    const levelState = new LevelState(levels,currentLevelId, (newState) => {
+    const levelState = new LevelState(levels, currentLevelId, (newState) => {
       setLevel(newState);
     });
 

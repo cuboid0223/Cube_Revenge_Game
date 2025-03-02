@@ -11,6 +11,7 @@ import {
   PLACEMENT_TYPE_HERO,
   PLACEMENT_TYPE_HERO_EDITING,
   PLACEMENT_TYPE_HERO_SPAWN,
+  PLACEMENT_TYPE_ROAMING_ENEMY,
   PLACEMENT_TYPE_WALL,
   THEME_ARRAY,
 } from "../helpers/consts";
@@ -250,6 +251,9 @@ export class LevelState {
       ENEMY_FLYING_DOWN_SPAWN: {
         type: PLACEMENT_TYPE_FLYING_ENEMY,
         initialDirection: DIRECTION_DOWN,
+      },
+      ENEMY_ROAMING_SPAWN: {
+        type: PLACEMENT_TYPE_ROAMING_ENEMY,
       },
       HERO_SPAWN: {
         type: PLACEMENT_TYPE_HERO,

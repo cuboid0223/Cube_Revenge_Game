@@ -135,6 +135,10 @@ For placements such as `WP`, `FP`,`K` and `M`, which can be picked up, they must
 
 [![Demo2](https://i.imgur.com/cbusTjL.png)](https://youtu.be/TXq1DlpzvV8 "demo2") -->
 
+### Level Editor
+![image](/public/editor.gif)
+
+
 ## Future Works
 
 1. Level Editor: Utilize a visual interface to prevent errors caused by manual code input.

@@ -1,7 +1,8 @@
 export class GameLoop {
   private onStep: () => void;
   private rafCallback: number | null;
-
+  private hasStopped: boolean;
+  
   constructor(onStep: () => void) {
     // onStep -> a callback fire on every single frame
     this.onStep = onStep;

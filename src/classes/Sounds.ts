@@ -6,6 +6,9 @@ export const SFX = {
   TELEPORT: "TELEPORT",
 };
 
+type SFXType = typeof SFX[keyof typeof SFX];
+
+
 const SFX_FILES = {
   [SFX.COLLECT]: "/sfx/collect.mp3",
   [SFX.WIN]: "/sfx/win.mp3",
@@ -13,6 +16,9 @@ const SFX_FILES = {
 };
 
 export class Sounds {
+  private howls: Record<string, Howl>;
+  public sfxVolume: number;
+
   constructor() {
     this.howls = {};
     this.sfxVolume = 0.5;
@@ -27,7 +33,7 @@ export class Sounds {
     });
   }
 
-  playSfx(key) {
+  playSfx(key:SFXType) {
     // Reference our sound in memory
     const howl = this.howls[key];
 

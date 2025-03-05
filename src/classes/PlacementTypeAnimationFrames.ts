@@ -1,4 +1,9 @@
 export class PlacementTypeAnimationFrames {
+  private framesSequence: string[];
+  private changeOnFrameCount: number;
+  private showFrame: number;
+  private tickCounter: number;
+
   constructor(framesSequence = ["0x1"], changeOnFrameCount = 30) {
     this.framesSequence = framesSequence; // eg. [TILES.FIRE1, TILES.FIRE2, TILES.FIRE3]
     this.changeOnFrameCount = changeOnFrameCount; //Speed. Higher = slow

@@ -6,6 +6,11 @@ import {
 } from "../helpers/consts";
 
 export class DirectionControls {
+  public directionKeys: Record<string, string>;
+  public heldDirections: string[];
+  public directionKeyDownHandler: (e: KeyboardEvent) => void;
+  public directionKeyUpHandler: (e: KeyboardEvent) => void;
+
   constructor() {
     this.directionKeys = {
       ArrowDown: DIRECTION_DOWN,

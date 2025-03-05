@@ -8,6 +8,9 @@ const FIRE_SEQUENCE = [TILES.FIRE1, TILES.FIRE2, TILES.FIRE3];
 const FIRE_ANIMATION_SPEED = 30;
 
 export class LevelAnimatedFrames {
+  private waterFrames: PlacementTypeAnimationFrames;
+  private fireFrames: PlacementTypeAnimationFrames;
+
   constructor() {
     this.waterFrames = new PlacementTypeAnimationFrames(
       WATER_SEQUENCE,

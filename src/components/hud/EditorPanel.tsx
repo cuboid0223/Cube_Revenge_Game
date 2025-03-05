@@ -11,13 +11,8 @@ import {
 } from "@/components/ui/select";
 import Sprite from "@/components/object-graphics/Sprite";
 import {
-  PLACEMENT_TYPE_CONVEYOR,
-  PLACEMENT_TYPE_FLYING_ENEMY,
-  PLACEMENT_TYPE_GROUND_ENEMY,
-  PLACEMENT_TYPE_ICE,
   SELECTED_CATEGORY_MAP,
 } from "@/helpers/consts";
-import { Level } from "@/helpers/types";
 import { TILES } from "@/helpers/tiles";
 import { removeTrailingDigit } from "@/utils/removeTrailingDigit";
 import {

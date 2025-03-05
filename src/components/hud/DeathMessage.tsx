@@ -12,8 +12,9 @@ import {
   PLACEMENT_TYPE_WATER,
   PLACEMENT_TYPE_CIABATTA,
 } from "../../helpers/consts";
+import { DeathCause, LevelStateSnapshot } from "@/types/global";
 
-const showDeathType = (deathType) => {
+const showDeathType = (deathType: DeathCause) => {
   switch (deathType) {
     case PLACEMENT_TYPE_FIRE:
       return <Sprite frameCoord={TILES.FIRE1} />;
@@ -65,7 +66,7 @@ const showDeathType = (deathType) => {
       return null;
   }
 };
-export default function DeathMessage({ level }) {
+export default function DeathMessage({ level }:{level: LevelStateSnapshot}) {
   const handleRestartLevel = () => {
     level.restart();
   };

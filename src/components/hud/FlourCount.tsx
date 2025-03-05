@@ -3,8 +3,9 @@ import styles from "./FlourCount.module.css";
 import Sprite from "../object-graphics/Sprite";
 import { TILES } from "../../helpers/tiles";
 import PixelNumber from "../object-graphics/PixelNumber";
+import { LevelStateSnapshot } from "@/types/global";
 
-export default function FlourCount({ level }) {
+export default function FlourCount({ level }: {level: LevelStateSnapshot}) {
   const count = level.placements.filter((p) => {
     return p.type === PLACEMENT_TYPE_FLOUR && !p.hasBeenCollected;
   }).length;

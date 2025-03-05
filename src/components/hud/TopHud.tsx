@@ -2,9 +2,7 @@ import styles from "./TopHud.module.css";
 import FlourCount from "./FlourCount";
 import ClockCount from "./ClockCount";
 import InventoryList from "./InventoryList";
-import EditorDropdown from "./EditorDropdown";
 import { usePathname } from "next/navigation";
-import { Level } from "@/helpers/types";
 import { LevelStateSnapshot } from "@/types/global";
 
 type TopHudProps = {
@@ -25,9 +23,7 @@ export default function TopHud({ level }: TopHudProps) {
         <ClockCount level={level} />
         <InventoryList level={level} />
       </div>
-      <div className={styles.topHudRight}>
-        {showEditorPanel && <EditorDropdown level={level} />}
-      </div>
+
     </div>
   );
 }

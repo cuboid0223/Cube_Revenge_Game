@@ -6,6 +6,7 @@ import {
   PLACEMENT_TYPE_ICE_PICKUP,
   PLACEMENT_TYPE_WATER_PICKUP,
 } from "../../helpers/consts";
+import { LevelStateSnapshot } from "@/types/global";
 
 const showInventory = [
   {
@@ -30,7 +31,7 @@ const showInventory = [
   },
 ];
 
-export default function InventoryList({ level }) {
+export default function InventoryList({ level }: {level: LevelStateSnapshot}) {
   return (
     <div className={styles.inventory}>
       {showInventory

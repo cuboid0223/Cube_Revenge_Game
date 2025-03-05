@@ -1,8 +1,8 @@
 // 若使用 TypeScript，最上面可以加入：
 /// <reference lib="webworker" />
 
-// 匯入你用來生成地圖的模組（根據實際路徑調整）
-import generateMap from "@/helpers/generateMap"; // 調整路徑
+
+import generateMap from "@/utils/generateMap";
 
 // 監聽主執行緒傳入的訊息
 self.onmessage = (event) => {
@@ -14,8 +14,11 @@ self.onmessage = (event) => {
     // 將結果回傳給主執行緒
     self.postMessage({ success: true, levelData });
   } catch (error) {
-    // 若發生錯誤，回傳錯誤訊息
-    self.postMessage({ success: false, error: error.message });
+    let message = 'Unknown error';
+    if (error instanceof Error) {
+      message = error.message;
+    }
+    self.postMessage({ success: false, error: message });
   }
 };
 

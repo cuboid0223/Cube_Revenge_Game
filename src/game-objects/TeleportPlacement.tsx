@@ -2,13 +2,15 @@ import { Placement } from "./Placement";
 import Sprite from "../components/object-graphics/Sprite";
 import { TILES } from "../helpers/tiles";
 import { BODY_SKINS, PLACEMENT_TYPE_TELEPORT } from "@/helpers/consts";
+import { BodyPlacement } from "./BodyPlacement";
+import { FrameCoord } from "@/helpers/types";
 
 export class TeleportPlacement extends Placement {
   changesHeroSkinOnCollide() {
     return BODY_SKINS.TELEPORT;
   }
 
-  teleportsToPositionOnCollide(body) {
+  teleportsToPositionOnCollide(body: BodyPlacement) {
     if (body.interactsWithGround) {
       // Get all teleports
       const allTeleports = this.level.placements.filter((p) => {

@@ -111,12 +111,15 @@ export class IcePlacement extends Placement {
     if (bodyIsToRight && this.corner?.includes("RIGHT")) {
       return true;
     }
+
+    return false
   }
 
   changesHeroSkinOnCollide() {
     if (this.level.inventory.has(PLACEMENT_TYPE_ICE_PICKUP)) {
       return BODY_SKINS.ICE;
     }
+    return null
   }
 
   renderComponent() {

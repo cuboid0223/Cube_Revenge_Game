@@ -6,20 +6,24 @@ import {
   DIRECTION_UP,
   DIRECTION_DOWN,
 } from "../helpers/consts";
+import { LevelStateSnapshot } from "@/types/global";
+import { HeroPlacement } from "@/game-objects/HeroPlacement";
+import { HeroEditingPlacement } from "@/game-objects/HeroEditingPlacement";
+import { LevelState } from "./LevelState";
 const CAMERA_SPEED = 0.02;
 const CAMERA_LOOKAHEAD = 3;
 const USE_SMOOTH_CAMERA = true;
 
 export class Camera {
-  level: Level;
+  level: LevelState;
   cameraX: number;
   cameraY: number;
   transformOffset: number;
   private _zoom: number;
 
-  constructor(level) {
+  constructor(level: LevelState) {
     this.level = level;
-    const [heroX, heroY] = this.level.heroRef.displayXY();
+    const [heroX, heroY] = (this.level.heroRef as HeroPlacement | HeroEditingPlacement)  .displayXY();
     this.cameraX = heroX;
     this.cameraY = heroY;
     this.transformOffset = -5.5 * CELL_SIZE;
@@ -43,13 +47,14 @@ export class Camera {
     return  this._zoom;
   }
 
-  static lerp(currentValue, destinationValue, time) {
+  static lerp(currentValue: number, destinationValue: number, time: number) {
     return currentValue * (1 - time) + destinationValue * time;
   }
 
   tick() {
     // Start where the Hero is now
     const hero = this.level.heroRef;
+    if(!hero) return
     const [heroX, heroY] = hero.displayXY();
     let cameraDestinationX = heroX;
     let cameraDestinationY = heroY;

@@ -24,7 +24,6 @@ import {
   PLACEMENT_TYPE_HERO_SPAWN,
   PLACEMENT_TYPE_GOAL_ENABLED,
   PLACEMENT_TYPE_CIABATTA_SPAWN,
-  PLACEMENT_TYPE_GROUND_ENEMY_LEFT_SPAWN,
   PLACEMENT_TYPE_ENEMY_LEFT_SPAWN,
   PLACEMENT_TYPE_ENEMY_RIGHT_SPAWN,
   PLACEMENT_TYPE_ENEMY_DOWN_SPAWN,
@@ -33,7 +32,6 @@ import {
   PLACEMENT_TYPE_ENEMY_FLYING_RIGHT_SPAWN,
   PLACEMENT_TYPE_ENEMY_FLYING_DOWN_SPAWN,
   PLACEMENT_TYPE_ENEMY_FLYING_UP_SPAWN,
-  PLACEMENT_TYPE_ROAMING_ENEMY_SPAWN,
   PLACEMENT_TYPE_HERO_EDITING,
   PLACEMENT_TYPE_ENEMY_ROAMING_SPAWN,
 } from "../helpers/consts";
@@ -59,9 +57,6 @@ import { DoorSwitchPlacement } from "../game-objects/DoorSwitchPlacement";
 import { TeleportPlacement } from "../game-objects/TeleportPlacement";
 import { ThiefPlacement } from "../game-objects/ThiefPlacement";
 import { CiabattaPlacement } from "../game-objects/CiabattaPlacement";
-
-// types
-import { Level, Placement } from "@/helpers/types";
 import { WaterPickupPlacement } from "@/game-objects/WaterPickupPlacement";
 import { HeroSpawnPlacement } from "@/game-objects/HeroSpawnPlacement";
 import { GoalEnabledPlacement } from "@/game-objects/GoalEnabledPlacement";
@@ -74,14 +69,15 @@ import { EnemyFlyingLeftSpawnPlacement } from "@/game-objects/EnemyFlyingLeftSpa
 import { EnemyFlyingRightSpawnPlacement } from "@/game-objects/EnemyFlyingRightSpawnPlacement";
 import { EnemyFlyingDownSpawnPlacement } from "@/game-objects/EnemyFlyingDownSpawnPlacement";
 import { EnemyFlyingUpSpawnPlacement } from "@/game-objects/EnemyFlyingUpSpawnPlacement";
-import { EnemyRoamingSpawnPlacement, RoamingEnemySpawnPlacement } from "@/game-objects/RoamingEnemySpawnPlacement";
+import { EnemyRoamingSpawnPlacement } from "@/game-objects/RoamingEnemySpawnPlacement";
 import { HeroEditingPlacement } from "@/game-objects/HeroEditingPlacement";
+import { LevelState } from "./LevelState";
+import { PlacementConfig } from "@/types/global";
 
 const placementTypeClassMap = {
   [PLACEMENT_TYPE_HERO]: HeroPlacement,
   [PLACEMENT_TYPE_HERO_SPAWN]: HeroSpawnPlacement,
   [PLACEMENT_TYPE_HERO_EDITING]: HeroEditingPlacement,
-
   [PLACEMENT_TYPE_GOAL]: GoalPlacement,
   [PLACEMENT_TYPE_GOAL_ENABLED]: GoalEnabledPlacement,
   [PLACEMENT_TYPE_WALL]: WallPlacement,
@@ -96,16 +92,11 @@ const placementTypeClassMap = {
   [PLACEMENT_TYPE_ENEMY_RIGHT_SPAWN]: EnemyRightSpawnPlacement,
   [PLACEMENT_TYPE_ENEMY_DOWN_SPAWN]: EnemyDownSpawnPlacement,
   [PLACEMENT_TYPE_ENEMY_UP_SPAWN]: EnemyUpSpawnPlacement,
-
   [PLACEMENT_TYPE_FLYING_ENEMY]: FlyingEnemyPlacement,
   [PLACEMENT_TYPE_ENEMY_FLYING_LEFT_SPAWN]: EnemyFlyingLeftSpawnPlacement,
   [PLACEMENT_TYPE_ENEMY_FLYING_RIGHT_SPAWN]: EnemyFlyingRightSpawnPlacement,
   [PLACEMENT_TYPE_ENEMY_FLYING_DOWN_SPAWN]: EnemyFlyingDownSpawnPlacement,
   [PLACEMENT_TYPE_ENEMY_FLYING_UP_SPAWN]: EnemyFlyingUpSpawnPlacement,
-
-
-
-
   [PLACEMENT_TYPE_ROAMING_ENEMY]: RoamingEnemyPlacement,
   [PLACEMENT_TYPE_ENEMY_ROAMING_SPAWN]: EnemyRoamingSpawnPlacement,
   [PLACEMENT_TYPE_CONVEYOR]: ConveyorPlacement,
@@ -121,8 +112,11 @@ const placementTypeClassMap = {
   [PLACEMENT_TYPE_CIABATTA_SPAWN]: CiabattaSpawnPlacement,
 };
 
+export type PlacementType = keyof typeof placementTypeClassMap;
+
 class PlacementFactory {
-  createPlacement(config: Placement, level: Level) {
+  createPlacement(config: PlacementConfig, level: LevelState) {
+    
     const placementClass = placementTypeClassMap[config.type];
     if (!placementClass) {
       console.warn("NO TYPE FOUND", config.type);

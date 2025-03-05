@@ -12,7 +12,6 @@ import {
 import { Collision } from "../classes/Collision";
 import soundsManager, { SFX } from "../classes/Sounds";
 import { Direction } from "@/types/global";
-import { IcePlacement } from "./IcePlacement";
 
 export class BodyPlacement extends Placement {
   getCollisionAtNextPosition(direction: Direction) {
@@ -120,7 +119,7 @@ export class BodyPlacement extends Placement {
     return null;
   }
 
-  onAutoMovement(_direction) {
+  onAutoMovement(_direction: Direction) {
     return null;
   }
 

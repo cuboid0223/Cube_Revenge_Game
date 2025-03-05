@@ -1,23 +1,19 @@
-import React, { useEffect, useState } from "react";
 import styles from "./RenderLevel.module.css";
 import { THEME_BACKGROUNDS } from "../../helpers/consts";
 import LevelBackgroundTilesLayer from "./LevelBackgroundTilesLayer";
 import LevelPlacementsLayer from "./LevelPlacementsLayer";
-import { LevelState } from "../../classes/LevelState";
-import { Level } from "@/helpers/types";
 import LevelCompleteMessage from "../hud/LevelCompleteMessage";
-import { useRecoilValue } from "recoil";
-import { currentLevelIdAtom } from "../../atoms/currentLevelIdAtom";
 import DeathMessage from "../hud/DeathMessage";
 import TopHud from "../hud/TopHud";
 
 import soundsManager from "@/classes/Sounds";
 import { usePathname } from "next/navigation";
+import { LevelStateSnapshot } from "@/types/global";
 
 soundsManager.init();
 
 type RenderLevelProps = {
-  level: Level
+  level: LevelStateSnapshot
 }
 
 export default function RenderLevel({ level }:RenderLevelProps) {
@@ -48,7 +44,7 @@ const adjustedCameraTranslate = `translate3d(${level.cameraTransformX / zoomFact
         {level.isCompleted && <LevelCompleteMessage />}
         {level.deathOutcome && <DeathMessage level={level} />}
       </div>
-      <TopHud level={level} showEditorPanel={showEditorPanel}/>
+      <TopHud level={level} />
     </div>
   );
 }

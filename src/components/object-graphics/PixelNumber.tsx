@@ -204,7 +204,7 @@ const Dash = () => {
   );
 };
 
-const componentMap = {
+const componentMap: Record<number | string, JSX.Element>  = {
   0: <Zero />,
   1: <One />,
   2: <Two />,
@@ -218,7 +218,7 @@ const componentMap = {
   "-": <Dash />,
 };
 
-export default function PixelNumber({ number }) {
+export default function PixelNumber({ number }:{number:number}) {
   const mappedChars = String(number)
     .split("")
     .map((key, i) => {

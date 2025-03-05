@@ -1,6 +1,9 @@
+import { Placement } from "@/game-objects/Placement";
 import {
-  LEVEL_THEMES, PLACEMENT_TYPE_CIABATTA,
-  PLACEMENT_TYPE_FLOUR, PLACEMENT_TYPE_FLYING_ENEMY,
+  LEVEL_THEMES,
+  PLACEMENT_TYPE_CIABATTA,
+  PLACEMENT_TYPE_FLOUR,
+  PLACEMENT_TYPE_FLYING_ENEMY,
   PLACEMENT_TYPE_GOAL,
   PLACEMENT_TYPE_HERO,
   PLACEMENT_TYPE_WALL,
@@ -22,7 +25,7 @@ const DemoLevel2 = {
   tilesWidth: 8,
   tilesHeight: 5,
   placements: [
-    // { x: 1, y: 1, type: PLACEMENT_TYPE_HERO },
+    { x: 1, y: 1, type: PLACEMENT_TYPE_HERO },
     // { x: 3, y: 1, type: PLACEMENT_TYPE_CIABATTA },
     // { x: 2, y: 5, type: PLACEMENT_TYPE_FLYING_ENEMY },
     // { x: 3, y: 5, type: PLACEMENT_TYPE_GROUND_ENEMY },
@@ -33,100 +36,117 @@ const DemoLevel2 = {
     { x: 2, y: 4, type: PLACEMENT_TYPE_FIRE },
     { x: 3, y: 4, type: PLACEMENT_TYPE_FIRE },
     { x: 1, y: 3, type: PLACEMENT_TYPE_FIRE_PICKUP },
-      {
-          "type": PLACEMENT_TYPE_HERO_SPAWN,
-          "x": 1,
-          "y": 1
-      },
-      {
-          "type": PLACEMENT_TYPE_GOAL,
-          "x": 7,
-          "y": 5
-      },
-      {
-          "type": PLACEMENT_TYPE_WALL,
-          "x": 4,
-          "y": 4
-      },
-      {
-          "type": PLACEMENT_TYPE_FLOUR,
-          "x": 3,
-          "y": 2
-      },
-      {
-          "type": PLACEMENT_TYPE_FLOUR,
-          "x": 6,
-          "y": 4
-      },
-      {
-          "type": PLACEMENT_TYPE_WALL,
-          "x": 4,
-          "y": 1
-      },
-      {
-          "type": PLACEMENT_TYPE_WALL,
-          "x": 4,
-          "y": 2
-      },
-      {
-          "type": PLACEMENT_TYPE_WALL,
-          "x": 4,
-          "y": 3
-      },
-      {
-          "type": PLACEMENT_TYPE_WALL,
-          "x": 7,
-          "y": 4
-      },
-      {
-          "type": PLACEMENT_TYPE_WALL,
-          "x": 6,
-          "y": 5
-      },
-      {
-        "type": PLACEMENT_TYPE_WATER,
-        "x": 6,
-        "y": 2
+    {
+      type: PLACEMENT_TYPE_GOAL,
+      x: 7,
+      y: 5,
     },
     {
-      "type": PLACEMENT_TYPE_WATER_PICKUP,
-      "x": 2,
-      "y": 1
-  },
+      type: PLACEMENT_TYPE_WALL,
+      x: 4,
+      y: 4,
+    },
     {
-      "type":PLACEMENT_TYPE_WATER,
-      "x": 7,
-      "y": 2
-  },
-  {
-      "type": PLACEMENT_TYPE_WATER,
-      "x": 6,
-      "y": 3
-  },
-  {
-    "type": PLACEMENT_TYPE_WATER,
-    "x": 7,
-    "y": 3
-  },
-  {
-    "type": PLACEMENT_TYPE_SWITCH,
-    "x": 5,
-    "y": 5
-  },
-  {
-    "type": PLACEMENT_TYPE_SWITCH_DOOR,
-    "x": 8,
-    "y": 4,
-    "isRaised": false
-  },
-  {
-    "type": PLACEMENT_TYPE_SWITCH_DOOR,
-    "x": 3,
-    "y": 1,
-    "isRaised": true
-  }
-  
+      type: PLACEMENT_TYPE_FLOUR,
+      x: 3,
+      y: 2,
+    },
+    {
+      type: PLACEMENT_TYPE_FLOUR,
+      x: 6,
+      y: 4,
+    },
+    {
+      type: PLACEMENT_TYPE_WALL,
+      x: 4,
+      y: 1,
+    },
+    {
+      type: PLACEMENT_TYPE_WALL,
+      x: 4,
+      y: 2,
+    },
+    {
+      type: PLACEMENT_TYPE_WALL,
+      x: 4,
+      y: 3,
+    },
+    {
+      type: PLACEMENT_TYPE_WALL,
+      x: 7,
+      y: 4,
+    },
+    {
+      type: PLACEMENT_TYPE_WALL,
+      x: 6,
+      y: 5,
+    },
+    {
+      type: PLACEMENT_TYPE_WATER,
+      x: 6,
+      y: 2,
+    },
+    {
+      type: PLACEMENT_TYPE_WATER_PICKUP,
+      x: 2,
+      y: 1,
+    },
+    {
+      type: PLACEMENT_TYPE_WATER,
+      x: 7,
+      y: 2,
+    },
+    {
+      type: PLACEMENT_TYPE_WATER,
+      x: 6,
+      y: 3,
+    },
+    {
+      type: PLACEMENT_TYPE_WATER,
+      x: 7,
+      y: 3,
+    },
+    {
+      type: PLACEMENT_TYPE_SWITCH,
+      x: 5,
+      y: 5,
+    },
+    {
+      type: PLACEMENT_TYPE_SWITCH_DOOR,
+      x: 8,
+      y: 4,
+      isRaised: false,
+    },
+    {
+      type: PLACEMENT_TYPE_SWITCH_DOOR,
+      x: 3,
+      y: 1,
+      isRaised: true,
+    },
   ],
+  // ---------TypeScript 真的很嚴格------------
+  solutionPath: null,
+  deathOutcome: null,
+  isCompleted: false,
+  cameraTransformX: 0,
+  cameraTransformY: 0,
+  zoom: 1,
+  secondsRemaining: 60,
+  inventory: {},
+  restart: () => {},
+  enableEditing: true,
+  editModePlacement: { type: "WALL" },
+  setEditingMode: (enableEdit: boolean) => {},
+  setZoom: (n: number) => n,
+  changeTheme: () => {},
+  addPlacement: (config: Placement) => {},
+  deletePlacement: (placement: Placement) => {},
+  clearPlacements: () => {},
+  updateTilesWidth: (diff: number) => 10 + diff,
+  updateTilesHeight: (diff: number) => 10 + diff,
+  setEditModePlacement: (newPlacement: Placement) => {},
+  copyPlacementsToClipboard: () => {},
+  updateSolutionPath: () => {},
 };
 
 export default DemoLevel2;

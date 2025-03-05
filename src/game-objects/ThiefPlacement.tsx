@@ -2,9 +2,10 @@ import { Placement } from "./Placement";
 import { TILES } from "../helpers/tiles";
 import Sprite from "../components/object-graphics/Sprite";
 import { BODY_SKINS, PLACEMENT_TYPE_HERO } from "../helpers/consts";
+import { BodyPlacement } from "./BodyPlacement";
 
 export class ThiefPlacement extends Placement {
-  stealsInventoryOnCollide(body) {
+  stealsInventoryOnCollide(body: BodyPlacement) {
     return body.type === PLACEMENT_TYPE_HERO;
   }
 

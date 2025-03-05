@@ -6,8 +6,12 @@ import {
   Z_INDEX_LAYER_SIZE,
 } from "../helpers/consts";
 import { TILES } from "../helpers/tiles";
-import Body from "../components/object-graphics/Body";
 import { BodyPlacement } from "./BodyPlacement";
+import Body from "../components/object-graphics/Body";
+
+import { Direction } from "@/types/global";
+import { LevelState } from "@/classes/LevelState";
+import { LockPlacement } from "./LockPlacement";
 
 const heroSkinMap = {
   [BODY_SKINS.NORMAL]: [TILES.HERO_EDITING_LEFT, TILES.HERO_EDITING_RIGHT],
@@ -23,14 +27,19 @@ const heroSkinMap = {
 };
 
 export class HeroEditingPlacement extends BodyPlacement {
-  constructor(properties, level) {
+  public canCollectItems: boolean;
+  public canCompleteLevel: boolean;
+  public interactsWithGround: boolean;
+  
+  
+  constructor(properties: BodyPlacement, level:LevelState) {
     super(properties, level);
     this.canCollectItems = true;
     this.canCompleteLevel = false;
     this.interactsWithGround = false;
   }
 
-  controllerMoveRequested(direction) {
+  controllerMoveRequested(direction: Direction) {
     // Attempt to start moving
     // 因為 controllerMoveRequested 是在每一 frame 呼叫的，所以避免重複呼叫需要下面的 return，
     // return; 的意思是指 不讓角色移動
@@ -42,7 +51,9 @@ export class HeroEditingPlacement extends BodyPlacement {
     const possibleLock = this.getLockAtNextPosition(direction);
     if (possibleLock) {
       console.log("解鎖 : ", possibleLock);
-      possibleLock.unlock();
+      if(possibleLock instanceof LockPlacement){
+        possibleLock.unlock();
+      }
       return;
     }
 
@@ -86,10 +97,10 @@ export class HeroEditingPlacement extends BodyPlacement {
     return heroSkinMap[this.skin][index];
   }
 
-  onAutoMovement(direction) {
-    console.log("onAutoMovement : ", direction);
-    this.controllerMoveRequested(direction);
-  }
+  // onAutoMovement(direction: Direction) {
+  //   console.log("onAutoMovement : ", direction);
+  //   this.controllerMoveRequested(direction);
+  // }
 
   //   takesDamage(deathType) {
   //     this.level.setDeathOutcome(deathType);

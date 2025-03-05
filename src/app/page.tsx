@@ -7,8 +7,8 @@ import { spriteSheetImageAtom } from "../atoms/spriteSheetImageAtom";
 import soundsManager from "@/classes/Sounds";
 import { LevelState } from "@/classes/LevelState";
 import { currentLevelIdAtom } from "@/atoms/currentLevelIdAtom";
-import { Level } from "@/helpers/types";
 import levels from "@/levels/levelsMap";
+import { LevelStateSnapshot } from "@/types/global";
 
 soundsManager.init();
 
@@ -24,18 +24,18 @@ export default function Home() {
     };
   }, [setSpriteSheetImage]);
 
-  const [level, setLevel] = useState<Level | null>(null);
+  const [level, setLevel] = useState<LevelStateSnapshot  | null>(null);
   const currentLevelId = useRecoilValue(currentLevelIdAtom);
 
   useEffect(() => {
     // Create and subscribe to state changes
-    const levelState = new LevelState(levels, currentLevelId, (newState) => {
+    const levelState = new LevelState( currentLevelId, (newState) => {
       setLevel(newState);
-    });
+    },levels);
 
     //Get initial state
     setLevel(levelState.getState());
-
+    levelState.setEditingMode(false)
     //Destroy method when this component unmounts for cleanup
     return () => {
       levelState.destroy();

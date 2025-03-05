@@ -13,7 +13,7 @@ export function handleColoredTile(
   placementType: string | undefined,
   x: number,
   y: number,
-  solutionPath: [number, number][] 
+  solutionPath: [number, number][] | null
 ): { isColored: boolean; hslColor: string, frequency:number }{
 
   // 1) 檢查此 (x,y) 是否在 solutionPath 裡

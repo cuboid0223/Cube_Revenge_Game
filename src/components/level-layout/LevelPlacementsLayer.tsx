@@ -13,8 +13,9 @@ import {
 } from "@/helpers/consts";
 import { handleColoredTile } from "@/utils/handleColoredTile";
 import { Placement } from "@/game-objects/Placement";
+import { LevelStateSnapshot } from "@/types/global";
 type Props = {
-  level: Level;
+  level: LevelStateSnapshot;
 };
 export default function LevelPlacementsLayer({ level }: Props) {
   return level.placements

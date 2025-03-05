@@ -5,9 +5,10 @@ import InventoryList from "./InventoryList";
 import EditorDropdown from "./EditorDropdown";
 import { usePathname } from "next/navigation";
 import { Level } from "@/helpers/types";
+import { LevelStateSnapshot } from "@/types/global";
 
 type TopHudProps = {
-  level: Level;
+  level: LevelStateSnapshot;
 };
 
 export default function TopHud({ level }: TopHudProps) {

@@ -1,9 +1,14 @@
 import { DEATH_TYPE_CLOCK } from "../helpers/consts";
+import { LevelState } from "./LevelState";
 const TIME_PER_TICK = 16.6;
 const WARNING_SOUND_SECONDS = 10;
 
 export class Clock {
-  constructor(secondsRemaining, level) {
+  public secondsRemaining: number;
+  public msRemainingInSecond: number;
+  private level: LevelState;
+
+  constructor(secondsRemaining: number, level: LevelState) {
     this.secondsRemaining = secondsRemaining;
     this.level = level;
     this.msRemainingInSecond = 1000;

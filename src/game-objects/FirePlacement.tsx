@@ -7,9 +7,11 @@ import {
   BODY_SKINS,
   PLACEMENT_TYPE_CIABATTA,
 } from "@/helpers/consts";
+import { BodyPlacement } from "./BodyPlacement";
+import { PlacementType } from "@/classes/PlacementFactory";
 
 export class FirePlacement extends Placement {
-  damagesBodyOnCollide(body) {
+  damagesBodyOnCollide(body: BodyPlacement): PlacementType | null {
     const { inventory } = this.level;
     if (
       body.type === PLACEMENT_TYPE_HERO &&

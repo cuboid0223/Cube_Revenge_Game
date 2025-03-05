@@ -1,11 +1,12 @@
 import { DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, PLACEMENT_TYPE_CONVEYOR, PLACEMENT_TYPE_FIRE, PLACEMENT_TYPE_FIRE_PICKUP, PLACEMENT_TYPE_FLOUR, PLACEMENT_TYPE_GOAL, PLACEMENT_TYPE_GOAL_ENABLED, PLACEMENT_TYPE_HERO, PLACEMENT_TYPE_HERO_SPAWN, PLACEMENT_TYPE_ICE, PLACEMENT_TYPE_ICE_PICKUP, PLACEMENT_TYPE_KEY, PLACEMENT_TYPE_LOCK, PLACEMENT_TYPE_SWITCH, PLACEMENT_TYPE_SWITCH_DOOR, PLACEMENT_TYPE_TELEPORT, PLACEMENT_TYPE_THIEF, PLACEMENT_TYPE_WALL, PLACEMENT_TYPE_WATER, PLACEMENT_TYPE_WATER_PICKUP } from "@/helpers/consts";
-import { Level, Placement } from "@/helpers/types";
+import { Placement } from "@/helpers/types";
 import PriorityQueue from "./PriorityQueue";
 import { iceTileCornerBlockedMoves, iceTileCornerRedirection } from "@/game-objects/IcePlacement";
 import { getDirectionKey, handleIceLogic, isCornerSolidForBody } from "./handleIceLogic";
+import { LevelStateSnapshot } from "@/types/global";
 
 // 簡化地圖為二維矩陣，並記錄所有物件位置
-export function createMap(level: Level) {
+export function createMap(level: LevelStateSnapshot) {
   /*
             x (width)
             ------------

@@ -7,6 +7,7 @@ import {
   PLACEMENT_TYPE_SWITCH_DOOR,
 } from "../../helpers/consts";
 import styles from "./EditorDropdown.module.css";
+import { LevelStateSnapshot } from "@/types/global";
 
 type PlacementType = "WALL" | "FIRE" | "WATER" | "SWITCH" | "SWITCH_DOOR";
 
@@ -19,7 +20,7 @@ const placements: Record<PlacementType, string> = {
 };
 
 type PropType = {
-  level: Level;
+  level: LevelStateSnapshot;
 };
 
 export default function EditorDropdown({ level }: PropType) {

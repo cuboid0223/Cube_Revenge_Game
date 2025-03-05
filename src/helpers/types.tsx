@@ -1,3 +1,4 @@
+// import { Inventory } from "@/classes/Inventory";
 import { z } from "zod";
 
 
@@ -15,16 +16,18 @@ const placementSchema = z.object({
   // renderComponent: z.function<ReactElement>({}).nullable(),
 });
 
-
+const inventorySchema = z.record(z.boolean());
 
 const levelSchema = z.object({
   theme: z.string(),
   tilesWidth: z.number(),
   tilesHeight: z.number(),
   placements: z.array(placementSchema),
+  inventory:  inventorySchema,
   isPositionOutOfBounds:  z.function().args(z.number(), z.number()).returns(z.boolean())
 });
 
 export type Placement = z.infer<typeof placementSchema>;
 export type Level = z.infer<typeof levelSchema>;
 export type FrameCoord = z.infer<typeof frameCoordSchema>;
+export type Inventory = z.infer<typeof inventorySchema>;

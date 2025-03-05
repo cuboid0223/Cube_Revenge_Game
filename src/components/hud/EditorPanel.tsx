@@ -25,9 +25,10 @@ import {
   splitAtSecondUnderscore,
 } from "@/utils/splitAtFirstUnderscore";
 import { Slider } from "../ui/slider";
+import { LevelStateSnapshot } from "@/types/global";
 
 type EditorPanelProps = {
-  level: Level;
+  level: LevelStateSnapshot;
 };
 
 function EditorPanel({ level }: EditorPanelProps) {
@@ -77,10 +78,8 @@ function EditorPanel({ level }: EditorPanelProps) {
               onClick={() => {
                 setSelectedTile(tile);
                 const tileName = Object.keys(TILES).find(
-                  (key) => TILES[key] === tile
+                  (key) => TILES[key as keyof typeof TILES] === tile
                 ) as string;
-
-                console.log(tileName);
                 const hasCorner =
                   tileName === "ICE_BOTTOM_LEFT" ||
                   tileName === "ICE_BOTTOM_RIGHT" ||

@@ -1,6 +1,21 @@
 import { PLACEMENT_TYPE_ICE } from "@/helpers/consts";
-import { Level, Placement } from "@/helpers/types";
 import { Direction } from "@/types/global";
+import { LevelState } from "./LevelState";
+import { Placement } from "@/game-objects/Placement";
+import { BodyPlacement } from "@/game-objects/BodyPlacement";
+import { IcePlacement } from "@/game-objects/IcePlacement";
+import { boolean } from "zod";
+
+interface LevelCompletable {
+  canCompleteLevel: boolean;
+}
+
+interface CollectItems{
+  canCollectItems: boolean
+}
+interface InteractsWithGround{
+  interactsWithGround: boolean
+}
 
 type PositionType = {
   x: number;
@@ -8,16 +23,16 @@ type PositionType = {
 } | null;
 
 export class Collision {
-  forBody: Placement;
-  level: Level;
+  forBody: BodyPlacement;
+  level: LevelState;
   placementsAtPosition: Placement[];
   x: number;
   y: number;
   
 
   constructor(
-    forBody: Placement,
-    level: Level,
+    forBody: BodyPlacement,
+    level: LevelState,
     position?: PositionType
   ) {
     this.forBody = forBody;
@@ -53,11 +68,10 @@ export class Collision {
   }
 
   withCompletesLevel() {
-    // 尋找 傳送門 placement 並呼叫 completesLevelOnCollide
-    if (this.forBody.canCompleteLevel) {
-      return this.placementsAtPosition.find((p) => {
-        return p.completesLevelOnCollide();
-      });
+    // 先確認 forBody 是英雄類型，因為只有這兩種才具有 canCompleteLevel 屬性
+    // 直接導入 HeroPlacement 和 HeroEditingPlacement 會造成 BodyPlacement 循環依賴
+    if (this.forBody && 'canCompleteLevel' in this.forBody && (this.forBody as LevelCompletable).canCompleteLevel) {
+      return this.placementsAtPosition.find((p) => p.completesLevelOnCollide());
     }
     return null;
   }
@@ -77,13 +91,14 @@ export class Collision {
 
   withPlacementAddsToInventory() {
     // 撿到 placements 加入到 inventory
-    if (this.forBody.canCollectItems) {
+    if (this.forBody && 'canCollectItems' in this.forBody && (this.forBody as CollectItems).canCollectItems) {
       return this.placementsAtPosition.find((p) => {
         return (
           !p.hasBeenCollected && p.addsItemToInventoryOnCollide(this.forBody)
         );
       });
     }
+ 
     return null;
   }
 
@@ -95,7 +110,7 @@ export class Collision {
   }
 
   withPlacementMovesBody() {
-    if (this.forBody.interactsWithGround) {
+    if (this.forBody && 'interactsWithGround' in this.forBody && (this.forBody as InteractsWithGround).interactsWithGround) {
       return this.placementsAtPosition.find((p) => {
         return p.autoMovesBodyOnCollide(this.forBody);
       });
@@ -104,9 +119,11 @@ export class Collision {
   }
 
   withIceCorner() {
-    // 檢查角色是否在有 corner 的冰上，並回傳該 ice corner tile
     return this.placementsAtPosition.find((p) => {
-      return p.type === PLACEMENT_TYPE_ICE && p.corner;
+      if (p.type === PLACEMENT_TYPE_ICE && p instanceof IcePlacement) {
+        return p.corner;
+      }
+      return false;
     });
   }
 

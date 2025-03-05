@@ -1,4 +1,4 @@
-import { Level, Placement } from "@/helpers/types";
+// import { Level } from "@/helpers/types";
 import {
   DIRECTION_DOWN,
   DIRECTION_LEFT,
@@ -14,18 +14,32 @@ import {
   PLACEMENT_TYPE_ROAMING_ENEMY,
   PLACEMENT_TYPE_WALL,
   THEME_ARRAY,
+  DEATH_TYPE_CLOCK,
+  PLACEMENT_TYPE_GOAL,
 } from "../helpers/consts";
-import { placementFactory } from "./PlacementFactory";
+import { placementFactory, PlacementType } from "./PlacementFactory";
 import { GameLoop } from "./GameLoop";
 import { DirectionControls } from "./DirectionControls";
 import { Inventory } from "./Inventory";
 import { LevelAnimatedFrames } from "./LevelAnimatedFrames";
 import { Camera } from "./Camera";
 import { Clock } from "./Clock";
-// import levels from "../levels/levelsMap";
 import findSolutionPath, { createMap } from "@/utils/findSolutionPath";
-import { Direction } from "@/types/global";
-type OnEmitType = (level: Level) => void;
+import {
+  DeathCause,
+  Direction,
+  LevelStateSnapshot,
+  PlacementConfig,
+} from "@/types/global";
+import { Placement } from "@/game-objects/Placement";
+import { SwitchableDoorPlacement } from "@/game-objects/SwitchableDoorPlacement";
+import { ConveyorPlacement } from "@/game-objects/ConveyorPlacement";
+import { IcePlacement } from "@/game-objects/IcePlacement";
+import { LockPlacement } from "@/game-objects/LockPlacement";
+import { HeroPlacement } from "@/game-objects/HeroPlacement";
+import { HeroEditingPlacement } from "@/game-objects/HeroEditingPlacement";
+
+type OnEmitType = (level: LevelStateSnapshot) => void;
 
 type EditModePlacementType = {
   type: string;
@@ -36,32 +50,51 @@ type EditModePlacementType = {
 };
 
 export class LevelState {
-  levels?: Level[];
+  levels?: Record<string, LevelStateSnapshot>;
   id: string;
   onEmit: OnEmitType;
   editModePlacement: EditModePlacementType;
+  inventory: Inventory;
+  directionControls: DirectionControls;
+  isCompleted: boolean;
+  gameLoop!: GameLoop;
+  theme!: string;
+  tilesWidth!: number;
+  tilesHeight!: number;
+  placements!: Placement[];
+  heroRef: HeroPlacement | HeroEditingPlacement | undefined;
+  camera!: Camera;
+  clock!: Clock;
+  animatedFrames!: LevelAnimatedFrames;
+  solutionPath!: [number, number][] | null;
+  deathOutcome!: PlacementType | null;
+  gameMap!: number[][];
+  enableEditing: boolean;
 
-  constructor(levels?: Level[], levelId: string, onEmit: OnEmitType) {
-    // publisher-subscriber pattern
-    // onEmit 函數在這裡被用作一種回調機制，允許外部程式碼 "訂閱" LevelState 的狀態變化。
+  constructor(
+    levelId: string,
+    onEmit: OnEmitType,
+    levels?: Record<string, LevelStateSnapshot>
+  ) {
     this.levels = levels;
     this.id = levelId;
     this.onEmit = onEmit;
     this.directionControls = new DirectionControls();
     this.isCompleted = false;
     this.editModePlacement = { type: PLACEMENT_TYPE_WALL };
-
-    //Start the level!
+    this.inventory = new Inventory();
+    this.enableEditing = false;
     this.start();
   }
 
   start() {
-    const levelData = this.levels[this.id];
+    const levelData = this.levels![this.id];
+    console.log(this.levels, this.id, levelData);
     this.deathOutcome = null;
     this.theme = levelData.theme;
     this.tilesWidth = levelData.tilesWidth;
     this.tilesHeight = levelData.tilesHeight;
-    this.placements = levelData.placements.map((config) => {
+    this.placements = levelData.placements.map((config: PlacementConfig) => {
       return placementFactory.createPlacement(config, this);
     });
     this.gameMap = createMap(levelData).gameMap;
@@ -72,47 +105,48 @@ export class LevelState {
       levelData.placements
     );
 
-    this.inventory = new Inventory();
-
-    // Cache a reference to the hero
     this.heroRef = this.placements.find(
-      (p) =>
+      (p): p is HeroPlacement | HeroEditingPlacement =>
         p.type === PLACEMENT_TYPE_HERO || p.type === PLACEMENT_TYPE_HERO_EDITING
     );
 
-    // Create a camera
     this.camera = new Camera(this);
-
-    // Create a clock
     this.clock = new Clock(60, this);
-
-    // Create a frame animation manager
     this.animatedFrames = new LevelAnimatedFrames();
 
     this.startGameLoop();
   }
 
+  setEditingMode(enableEditing: boolean){
+    this.enableEditing = enableEditing
+  }
+
   addPlacement(config: Placement) {
+    // 如果是 PLACEMENT_TYPE_HERO_SPAWN或是PLACEMENT_TYPE_GOAL_ENABLED
+    // 一關中各只能存在一個
     if (
       config.type === PLACEMENT_TYPE_HERO_SPAWN ||
       config.type === PLACEMENT_TYPE_GOAL_ENABLED
     ) {
-      // 找出目前地圖上已有的相同類型的 placement
       const existing = this.placements.filter((p) => p.type === config.type);
       existing.forEach((placement) => {
         this.deletePlacement(placement);
       });
     }
-  
+
     this.placements.push(placementFactory.createPlacement(config, this));
-    this.saveLevelToLocalStorage();
+    if (this.enableEditing) {
+      this.saveLevelToLocalStorage();
+    }
   }
 
-  deletePlacement(placementToRemove) {
+  deletePlacement(placementToRemove: Placement) {
     this.placements = this.placements.filter((p) => {
       return p.id !== placementToRemove.id;
     });
-    this.saveLevelToLocalStorage();
+    if (this.enableEditing) {
+      this.saveLevelToLocalStorage();
+    }
   }
 
   clearPlacements() {
@@ -123,41 +157,69 @@ export class LevelState {
   }
 
   saveLevelToLocalStorage() {
-    const keys = ["type", "x", "y", "isRaised", "direction", "color", "corner"];
+    const baseKeys: (keyof Placement)[] = ["type", "x", "y"];
+    const extendedKeys: ("isRaised" | "direction" | "color" | "corner")[] = [
+      "isRaised",
+      "direction",
+      "color",
+      "corner",
+    ];
 
-    // 假設 getState 返回一個純資料物件，不包含循環引用
+    // 輔助函數：根據不同的 Placement 子類別提取擴展屬性
+    function getExtendedProperties(
+      p: Placement
+    ): Partial<Record<"isRaised" | "direction" | "color" | "corner", unknown>> {
+      // 如果是具有擴展屬性的子類，則提取相應的屬性
+      if (
+        p instanceof SwitchableDoorPlacement ||
+        p instanceof ConveyorPlacement ||
+        p instanceof IcePlacement ||
+        p instanceof LockPlacement
+      ) {
+        const extendedProps: Partial<
+          Record<"isRaised" | "direction" | "color" | "corner", unknown>
+        > = {};
+        extendedKeys.forEach((key) => {
+          // 如果屬性存在且不為 null/undefined，就加入結果
+          if (p[key as keyof typeof p] != null) {
+            extendedProps[key] = p[key as keyof typeof p];
+          }
+        });
+        return extendedProps;
+      }
+      return {};
+    }
+
     const levelStateData = {
       id: this.id,
       theme: this.theme,
       tilesWidth: this.tilesWidth,
       tilesHeight: this.tilesHeight,
       placements: this.placements.map((p) => {
-        return Object.fromEntries(
-          keys.filter((key) => p[key] != null).map((key) => [key, p[key]])
-        )
-      })
+        const baseData = Object.fromEntries(
+          baseKeys.filter((key) => p[key] != null).map((key) => [key, p[key]])
+        );
+        const extendedData = getExtendedProperties(p);
+        return { ...baseData, ...extendedData };
+      }),
     };
 
     localStorage.setItem("levelState", JSON.stringify(levelStateData));
   }
 
-
-  
-
-  updateTilesWidth(diff: number) {
+  updateTilesWidth(diff: number): number {
     this.tilesWidth = this.tilesWidth + diff;
     this.saveLevelToLocalStorage();
     return this.tilesWidth;
   }
 
-  updateTilesHeight(diff: number) {
+  updateTilesHeight(diff: number): number {
     this.tilesHeight = this.tilesHeight + diff;
     this.saveLevelToLocalStorage();
     return this.tilesHeight;
   }
 
   startGameLoop() {
-    // 先停止，以免重複開新的 GameLoop
     this.gameLoop?.stop();
     this.gameLoop = new GameLoop(() => {
       this.tick();
@@ -172,36 +234,25 @@ export class LevelState {
       this.tilesHeight,
       this.placements
     );
-    // this.onEmit(this.getState());
   }
 
   tick() {
-    // Check for movement here...
-    // 透過  get direction 取得按鍵方向
     if (this.directionControls.direction) {
-      this.heroRef.controllerMoveRequested(this.directionControls.direction);
+      (this.heroRef as HeroPlacement)?.controllerMoveRequested(
+        this.directionControls.direction
+      );
     }
 
-    // Call 'tick' on any Placement that wants to update
     this.placements.forEach((placement) => {
       placement.tick();
     });
 
-    // Work on animation frames
     this.animatedFrames.tick();
-
-    // Update the camera
     this.camera.tick();
-
-    // Update the clock
-    // this.clock.tick();
-
-    //Emit any changes to React
     this.onEmit(this.getState());
   }
 
-  isPositionOutOfBounds(x: number, y: number) {
-    // 確認角色是否有脫離地圖範圍
+  isPositionOutOfBounds(x: number, y: number): boolean {
     return (
       x === 0 ||
       y === 0 ||
@@ -211,14 +262,11 @@ export class LevelState {
   }
 
   copyPlacementsToClipboard() {
-    // Convert the Placements to type,x,y JSON
-    // 先將 PlacementsData 轉成 json
-
+    // 這裡
     const keys = ["type", "x", "y", "isRaised", "direction", "color", "corner"];
-
     const overrideMapping: Record<
       string,
-      { type: string; initialDirection?: string }
+      { type: PlacementType; initialDirection?: string }
     > = {
       ENEMY_LEFT_SPAWN: {
         type: PLACEMENT_TYPE_GROUND_ENEMY,
@@ -230,11 +278,11 @@ export class LevelState {
       },
       ENEMY_UP_SPAWN: {
         type: PLACEMENT_TYPE_GROUND_ENEMY,
-        initialDirection: DIRECTION_DOWN,
+        initialDirection: DIRECTION_UP,
       },
       ENEMY_DOWN_SPAWN: {
         type: PLACEMENT_TYPE_GROUND_ENEMY,
-        initialDirection: DIRECTION_UP,
+        initialDirection: DIRECTION_DOWN,
       },
       ENEMY_FLYING_RIGHT_SPAWN: {
         type: PLACEMENT_TYPE_FLYING_ENEMY,
@@ -261,23 +309,43 @@ export class LevelState {
       CIABATTA_SPAWN: {
         type: PLACEMENT_TYPE_CIABATTA,
       },
+      GOAL_ENABLED: {
+        type: PLACEMENT_TYPE_GOAL,
+      },
     };
+    // 類型保護函數 hasKey
+    // 這個函數用來檢查一個物件 obj 是否具有指定的屬性 key。
+    function hasKey<T extends object, K extends PropertyKey>(
+      obj: T,
+      key: K
+    ): obj is T & Record<K, unknown> {
+      //返回一個型別謂詞 obj is T & Record<K, unknown>。這告訴 TypeScript：如果函數回傳 true，則 obj 不僅是原來的型別 T，同時還包含一個屬性 key，而且該屬性的值型別是 unknown。
+      return key in obj;
+    }
 
-    const placementsData = this.placements
-      .filter((p) => p.type !== PLACEMENT_TYPE_HERO_EDITING)
-      .map((p) => {
-        if (overrideMapping[p.type]) {
-          return {
-            x: p.x,
-            y: p.y,
-            ...overrideMapping[p.type],
-          };
+    let placementsData = this.placements.map((p) => {
+      // 如果 overrideMapping 中有該 placement type，則回傳合併後的結果
+      if (overrideMapping[p.type]) {
+        return {
+          x: p.x,
+          y: p.y,
+          ...overrideMapping[p.type],
+        };
+      }
+      // 否則，使用 keys 陣列動態取出屬性
+      const entries: [string, unknown][] = [];
+      for (const key of keys) {
+        // 使用類型保護確認屬性存在
+        if (hasKey(p, key) && p[key] != null) {
+          entries.push([key, p[key]]);
         }
+      }
+      return Object.fromEntries(entries);
+    });
 
-        return Object.fromEntries(
-          keys.filter((key) => p[key] != null).map((key) => [key, p[key]])
-        );
-      });
+    placementsData = placementsData.filter(
+      (p) => p.type !== PLACEMENT_TYPE_HERO_EDITING
+    );
 
     const level = {
       theme: this.theme,
@@ -286,13 +354,9 @@ export class LevelState {
       placements: placementsData,
     };
 
-    // Copy the data to the clipboard for moving into map files after editing
-    // 複製到剪貼簿
     navigator.clipboard.writeText(JSON.stringify(level)).then(
       () => {
         console.log("Content copied to clipboard");
-
-        // Also console log the output
         console.log(level);
       },
       () => {
@@ -307,40 +371,19 @@ export class LevelState {
 
   changeTheme() {
     const index = THEME_ARRAY.indexOf(this.theme);
-    // 如果找不到或是最後一個，就回到第一個
-    this.theme = THEME_ARRAY[index + 1];
     if (index === -1 || index === THEME_ARRAY.length - 1) {
       this.theme = THEME_ARRAY[0];
+    } else {
+      this.theme = THEME_ARRAY[index + 1];
     }
   }
 
-  setZoom(n) {
+  setZoom(n: number) {
     this.camera.setZoom(n);
     return this.camera.zoom;
   }
 
-  // // 用來從 localStorage 中讀取的資料重建 LevelState 實例
-  // static fromJSON(savedData: any, levels: Level[], onEmit: (level: Level) => void): LevelState {
-  //   // 使用預設的建構式建立一個 LevelState
-  //   const levelState = new LevelState(levels, savedData.id, onEmit);
-
-  //   // 根據 savedData 設定各項屬性
-  //   levelState.theme = savedData.theme;
-  //   levelState.tilesWidth = savedData.tilesWidth;
-  //   levelState.tilesHeight = savedData.tilesHeight;
-  //   // 如果 placements 存的是純資料，就用 factory 重新建立實例（假設 savedData.placements 是陣列）
-  //   levelState.placements = savedData.placements.map((config: any) =>
-  //     placementFactory.createPlacement(config, levelState)
-  //   );
-
-  //   // 其他需要還原的屬性也在這裡設定，例如 solutionPath、inventory、camera 等
-  //   // 注意：camera、clock、gameLoop 等可能需要在建構式內重新初始化
-
-  //   return levelState;
-  // }
-
-  getState() {
-    // 讓外部使用 levelState
+  getState(): LevelStateSnapshot {
     return {
       theme: this.theme,
       tilesWidth: this.tilesWidth,
@@ -354,15 +397,14 @@ export class LevelState {
       zoom: this.camera.zoom,
       secondsRemaining: this.clock.secondsRemaining,
       inventory: this.inventory,
-      // 重新開始
+      heroRef: this.heroRef,
       restart: () => {
         this.start();
       },
-
-      // Edit Mode API
-      // 將 method 傳出去供外部使用
       enableEditing: true,
+     
       editModePlacement: this.editModePlacement,
+      setEditingMode: this.setEditingMode.bind(this),
       setZoom: this.setZoom.bind(this),
       changeTheme: this.changeTheme.bind(this),
       addPlacement: this.addPlacement.bind(this),
@@ -383,26 +425,25 @@ export class LevelState {
     this.inventory.clear();
   }
 
-  setDeathOutcome(causeOfDeath) {
+  setDeathOutcome(causeOfDeath: DeathCause) {
     this.deathOutcome = causeOfDeath;
     this.gameLoop.stop();
   }
 
   completeLevel() {
     this.isCompleted = true;
-    // 當角色完成該 level 後，所有動作均停止(包含角色移動)
     this.gameLoop.stop();
   }
 
   switchAllDoors() {
-    this.placements.forEach((placement) => {
-      if (placement.toggleIsRaised) {
-        placement.toggleIsRaised();
+    this.placements.forEach((p) => {
+      if (p instanceof SwitchableDoorPlacement) {
+        p.toggleIsRaised();
       }
     });
   }
+
   destroy() {
-    // Tear down the level.
     this.gameLoop.stop();
     this.directionControls.unbind();
   }

@@ -1,10 +1,11 @@
 import Sprite from "../object-graphics/Sprite";
 import { CELL_SIZE } from "../../helpers/consts";
 import { handleColoredTile } from "@/utils/handleColoredTile";
-import { FrameCoord, Level } from "@/helpers/types";
+import { FrameCoord } from "@/helpers/types";
+import { LevelStateSnapshot } from "@/types/global";
 
 type MapCellType = {
-  level: Level;
+  level: LevelStateSnapshot;
   x: number;
   y: number;
   frameCoord: FrameCoord;

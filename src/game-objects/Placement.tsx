@@ -1,4 +1,5 @@
-import { Level, Placement } from "@/helpers/types";
+// import { Level} from "@/helpers/types";
+import { LevelState } from "@/classes/LevelState";
 import {
   DIRECTION_RIGHT,
   CELL_SIZE,
@@ -6,13 +7,15 @@ import {
   DIRECTION_UP,
   BODY_SKINS,
 } from "../helpers/consts";
+import { PlacementType } from "@/classes/PlacementFactory";
+import { BodyPlacement } from "./BodyPlacement";
 
 export class Placement {
   id: number;
-  type?: string;
+  type: PlacementType;
   x: number;
   y: number;
-  level: Level;
+  level: LevelState;
   skin: string;
   travelPixelsPerFrame: number;
   movingPixelsRemaining: number;
@@ -24,7 +27,7 @@ export class Placement {
 
   renderFn: () => React.JSX.Element | null;
 
-  constructor(properties: Placement, level: Level) {
+  constructor(properties: Placement, level: LevelState) {
     this.id = properties.id;
     this.type = properties.type;
     this.x = properties.x;
@@ -48,7 +51,7 @@ export class Placement {
     // base class init tick()
   }
 
-  tickAttemptAiMove() {
+  tickAttemptAiMove(): void | null {
     return null;
   }
 
@@ -57,7 +60,7 @@ export class Placement {
     return false;
   }
 
-  addsItemToInventoryOnCollide() {
+  addsItemToInventoryOnCollide(_body?: Placement): string | null {
     // base class init addsItemToInventoryOnCollide()
     return null;
   }
@@ -107,30 +110,33 @@ export class Placement {
 
   collect() {
     this.hasBeenCollected = true;
-    this.level.inventory.add(this.addsItemToInventoryOnCollide());
+    const item = this.addsItemToInventoryOnCollide();
+    if (item !== null) {
+      this.level.inventory.add(item);
+    }
   }
 
-  autoMovesBodyOnCollide() {
+  autoMovesBodyOnCollide(_body: BodyPlacement):boolean {
     return false;
   }
 
-  changesHeroSkinOnCollide() {
+  changesHeroSkinOnCollide(): string | null {
     return null;
   }
 
-  switchesDoorsOnCollide() {
+  switchesDoorsOnCollide(_body: BodyPlacement): boolean | null {
     return null;
   }
 
-  teleportsToPositionOnCollide() {
+  teleportsToPositionOnCollide(_body: BodyPlacement): { x: number; y: number } | null {
     return null;
   }
 
-  stealsInventoryOnCollide() {
+  stealsInventoryOnCollide(_body: BodyPlacement): boolean | null  {
     return null;
   }
 
-  damagesBodyOnCollide(_body: Placement) {
+  damagesBodyOnCollide(_body: Placement): string | null {
     return null;
   }
 

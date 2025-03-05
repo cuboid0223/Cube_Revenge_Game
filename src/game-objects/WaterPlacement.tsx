@@ -6,6 +6,8 @@ import {
   PLACEMENT_TYPE_HERO,
   PLACEMENT_TYPE_WATER_PICKUP,
 } from "../helpers/consts";
+import { BodyPlacement } from "./BodyPlacement";
+import { PlacementType } from "@/classes/PlacementFactory";
 
 export class WaterPlacement extends Placement {
   changesHeroSkinOnCollide() {
@@ -13,17 +15,28 @@ export class WaterPlacement extends Placement {
     return BODY_SKINS.WATER;
   }
 
-  isSolidForBody(body) {
+  isSolidForBody(body: BodyPlacement) {
     return body.turnsAroundAtWater ?? false;
   }
 
-  damagesBodyOnCollide(body) {
+  // damagesBodyOnCollide(body) {
+  //   const { inventory } = this.level;
+  //   return (
+  //     body.type === PLACEMENT_TYPE_HERO &&
+  //     // 沒有潛水面具則死
+  //     !inventory.has(PLACEMENT_TYPE_WATER_PICKUP)
+  //   );
+  // }
+
+  damagesBodyOnCollide(body: BodyPlacement): PlacementType | null {
     const { inventory } = this.level;
-    return (
+    if (
       body.type === PLACEMENT_TYPE_HERO &&
-      // 沒有潛水面具則死
       !inventory.has(PLACEMENT_TYPE_WATER_PICKUP)
-    );
+    ) {
+      return this.type;
+    }
+    return null;
   }
 
   renderComponent() {

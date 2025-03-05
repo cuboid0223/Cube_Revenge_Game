@@ -27,8 +27,8 @@ function Sprite({ frameCoord, size = 16 }: SpriteProps) {
 
     //Draw a graphic to the canvas tag
     // frameCoord => "1x0", "2x0"
-    const tileSheetX = Number(frameCoord.split("x")[0]);
-    const tileSheetY = Number(frameCoord.split("x")[1]);
+    const tileSheetX = Number(frameCoord?.split("x")[0]);
+    const tileSheetY = Number(frameCoord?.split("x")[1]);
 
     ctx?.drawImage(
       spriteSheetImage, // Image to pull from

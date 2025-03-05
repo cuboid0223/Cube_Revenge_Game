@@ -11,16 +11,15 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { LevelState } from "../../classes/LevelState";
-import { Level } from "@/helpers/types";
 import EditorPanel from "@/components/hud/EditorPanel";
 soundsManager.init();
 
 import editLevels from "@/levels/editLevelsMap";
+import { LevelStateSnapshot } from "@/types/global";
 
 export default function EditPage() {
   const [spriteSheetImage, setSpriteSheetImage] =
     useRecoilState(spriteSheetImageAtom);
-
 
   useEffect(() => {
     const image = new Image();
@@ -30,31 +29,35 @@ export default function EditPage() {
     };
   }, [setSpriteSheetImage]);
 
-  const [level, setLevel] = useState<Level | null>(null);
+  const [level, setLevel] = useState<LevelStateSnapshot | null>(null);
   useEffect(() => {
     // 檢查 localStorage 是否有儲存的 levelState
     const savedLevelJson = localStorage.getItem("levelState");
     let levelState: LevelState;
-    
+
     if (savedLevelJson) {
-      console.log(savedLevelJson)
+      
       const savedData = JSON.parse(savedLevelJson);
+      console.log(savedData);
       // 從 localStorage 的資料中還原 LevelState
-      levelState =  new LevelState({
-        "DefaultLevel": savedData,
-      }
-      , savedData.id, (newState) => {
-        setLevel(newState);
-      });
+      levelState = new LevelState(
+        savedData.id,
+        (newState) => {
+          setLevel(newState);
+        },
+        {DefaultLevel: savedData}
+        
+      );
     } else {
       // 沒有儲存資料，就建立新的 LevelState
-      levelState = new LevelState(editLevels, "DefaultLevel", (newState) => {
+      levelState = new LevelState("DefaultLevel", (newState) => {
         setLevel(newState);
-      });
+      },editLevels);
     }
 
     // 取得初始狀態
     setLevel(levelState.getState());
+    levelState.setEditingMode(true)
 
     // 當元件卸載時，清理 LevelState
     return () => {

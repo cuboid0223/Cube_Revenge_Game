@@ -1,7 +1,13 @@
 import Sprite from "./Sprite";
 import styles from "./CiabattaBody.module.css";
+import { FrameCoord } from "@/helpers/types";
 
-export default function CiabattaBody({ frameCoord, yTranslate }) {
+type CiabattaBodyProps = {
+  frameCoord: FrameCoord;
+  yTranslate: number;
+};
+
+export default function CiabattaBody({ frameCoord, yTranslate }:CiabattaBodyProps) {
   return (
     <div className={styles.ciabatta}>
       <div

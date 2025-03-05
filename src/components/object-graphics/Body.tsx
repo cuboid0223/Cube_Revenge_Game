@@ -1,8 +1,16 @@
 import Sprite from "./Sprite";
 import { TILES } from "../../helpers/tiles";
 import styles from "./Hero.module.css";
+import { FrameCoord } from "@/types/global";
 
-export default function Body({ frameCoord, yTranslate, showShadow }) {
+type BodyProps = {
+  frameCoord: FrameCoord;
+  yTranslate: number;
+  showShadow: boolean
+};
+
+
+export default function Body({ frameCoord, yTranslate, showShadow }: BodyProps) {
   // 設置 yTranslate 讓角色在移動時有跳動的感覺
   return (
     <div className={styles.hero}>

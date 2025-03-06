@@ -9,8 +9,9 @@ import {
 } from "../helpers/consts";
 import { PlacementType } from "@/classes/PlacementFactory";
 import { BodyPlacement } from "./BodyPlacement";
+import { Direction } from "@/types/global";
 
-export class Placement {
+export abstract class Placement {
   id: number;
   type: PlacementType;
   x: number;
@@ -116,12 +117,12 @@ export class Placement {
     }
   }
 
-  autoMovesBodyOnCollide(_body: BodyPlacement):boolean {
+  autoMovesBodyOnCollide(_body: BodyPlacement):boolean | Direction {
     return false;
   }
 
-  changesHeroSkinOnCollide(): string | null {
-    return null;
+  changesHeroSkinOnCollide(): string {
+    return "";
   }
 
   switchesDoorsOnCollide(_body: BodyPlacement): boolean | null {

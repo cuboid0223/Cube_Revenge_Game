@@ -4,6 +4,7 @@ import { CELL_SIZE } from "../../helpers/consts";
 import { useRecoilValue } from "recoil";
 import { spriteSheetImageAtom } from "../../atoms/spriteSheetImageAtom";
 import { FrameCoord } from "@/helpers/types";
+
 type SpriteProps = {
   frameCoord: FrameCoord;
   size?: number;

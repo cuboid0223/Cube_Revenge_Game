@@ -9,9 +9,10 @@ import { TILES } from "../helpers/tiles";
 import { BodyPlacement } from "./BodyPlacement";
 import Body from "../components/object-graphics/Body";
 
-import { Direction } from "@/types/global";
+import { DeathCause, Direction } from "@/types/global";
 import { LevelState } from "@/classes/LevelState";
 import { LockPlacement } from "./LockPlacement";
+import { tree } from "next/dist/build/templates/app-page";
 
 const heroSkinMap = {
   [BODY_SKINS.NORMAL]: [TILES.HERO_EDITING_LEFT, TILES.HERO_EDITING_RIGHT],
@@ -30,9 +31,8 @@ export class HeroEditingPlacement extends BodyPlacement {
   public canCollectItems: boolean;
   public canCompleteLevel: boolean;
   public interactsWithGround: boolean;
-  
-  
-  constructor(properties: BodyPlacement, level:LevelState) {
+
+  constructor(properties: BodyPlacement, level: LevelState) {
     super(properties, level);
     this.canCollectItems = true;
     this.canCompleteLevel = false;
@@ -51,7 +51,7 @@ export class HeroEditingPlacement extends BodyPlacement {
     const possibleLock = this.getLockAtNextPosition(direction);
     if (possibleLock) {
       console.log("解鎖 : ", possibleLock);
-      if(possibleLock instanceof LockPlacement){
+      if (possibleLock instanceof LockPlacement) {
         possibleLock.unlock();
       }
       return;
@@ -102,9 +102,9 @@ export class HeroEditingPlacement extends BodyPlacement {
   //   this.controllerMoveRequested(direction);
   // }
 
-  //   takesDamage(deathType) {
-  //     this.level.setDeathOutcome(deathType);
-  //   }
+  // takesDamage(deathType: DeathCause) {
+  //   this.level.setDeathOutcome(deathType);
+  // }
 
   zIndex() {
     return this.y * Z_INDEX_LAYER_SIZE + 1;

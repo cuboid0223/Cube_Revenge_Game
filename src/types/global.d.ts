@@ -13,7 +13,7 @@ import { HeroPlacement } from "@/game-objects/HeroPlacement";
 export type FrameCoord = `${number}x${number}`;
 export type DeathCause = DEATH_TYPE_CLOCK | PlacementType;
 export type Direction = "LEFT" | "RIGHT" | "UP" | "DOWN";
-
+export type IceCorner = "TOP_LEFT" | "TOP_RIGHT" | "BOTTOM_LEFT" | "BOTTOM_RIGHT";
 export interface LevelStateSnapshot {
     theme: string;
     tilesWidth: number;
@@ -52,3 +52,5 @@ export type PlacementConfig =  {
     id?: number;
     frameCoord?: FrameCoord;
   }
+
+

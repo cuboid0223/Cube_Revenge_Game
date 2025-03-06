@@ -4,7 +4,7 @@ import { FrameCoord } from "@/helpers/types";
 
 type CiabattaBodyProps = {
   frameCoord: FrameCoord;
-  yTranslate: number;
+  yTranslate?: number;
 };
 
 export default function CiabattaBody({ frameCoord, yTranslate }:CiabattaBodyProps) {

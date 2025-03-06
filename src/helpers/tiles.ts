@@ -134,4 +134,4 @@ export const TILES = {
   CIABATTA_BLAST: "6x3",
   CIABATTA_RIGHT: "17x4",
   CIABATTA_TELEPORT: "20x4",
-};
+} as const;

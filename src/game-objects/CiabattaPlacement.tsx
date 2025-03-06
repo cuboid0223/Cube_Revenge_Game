@@ -2,15 +2,32 @@ import { TILES } from "@/helpers/tiles";
 import { GroundEnemyPlacement } from "./GroundEnemyPlacement";
 import CiabattaBody from "@/components/object-graphics/CiabattaBody";
 import { CELL_SIZE, PLACEMENT_TYPE_ROAMING_ENEMY } from "@/helpers/consts";
+import { Placement } from "./Placement";
+import { LevelState } from "@/classes/LevelState";
+import { Direction, FrameCoord, PlacementConfig } from "@/types/global";
+
+type CiabattaAttack = 
+  | { type: "TACKLE"; framesRemaining: number; returnToY: number }
+  | { type: "SPAWN"; framesRemaining: number };
 
 const ATTACKS = {
   TACKLE: "TACKLE",
   SPAWN: "SPAWN",
-};
+} as const;
 const PAIN_FRAMES_LENGTH = 20;
 const DEATH_FRAMES_LENGTH = 140;
 export class CiabattaPlacement extends GroundEnemyPlacement {
-  constructor(properties, level) {
+  public tickBetweenMovesInterval: number;
+  public ticksUntilNextMove: number;
+  public turnsAroundAtWater: boolean;
+  public interactsWithGround: boolean;
+  public normalMovesRemaining: number;
+  public hp: number;
+  public painFramesRemaining: number;
+  public currentAttack: CiabattaAttack | null;
+  public deathFramesUntilDisappear: number;
+
+  constructor(properties: Placement, level: LevelState) {
     super(properties, level);
     this.tickBetweenMovesInterval = 40; // 每一步之間經過的 frame 數
     this.ticksUntilNextMove = this.tickBetweenMovesInterval;
@@ -57,7 +74,7 @@ export class CiabattaPlacement extends GroundEnemyPlacement {
     }
 
     //Turn if next to a wall
-    const direction = this.movingPixelDirection;
+    const direction = this.movingPixelDirection as Direction;
     if (this.isSolidAtNextPosition(direction)) {
       this.switchDirection();
       return;
@@ -113,6 +130,7 @@ export class CiabattaPlacement extends GroundEnemyPlacement {
 
   workOnAttackFrame() {
     // 這個 function 會經過 tick() ，每個 frame 呼叫並持續遞減
+    if(!this.currentAttack) return
     this.currentAttack.framesRemaining -= 1;
     // 當攻擊持續時間結束
     if (this.currentAttack.framesRemaining === 0) {
@@ -130,6 +148,7 @@ export class CiabattaPlacement extends GroundEnemyPlacement {
 
   // 捕捉攻擊
   handleTackleAttackFrame() {
+    if (!this.currentAttack || this.currentAttack.type !== ATTACKS.TACKLE || ! this.level.heroRef) return;
     const { framesRemaining, returnToY } = this.currentAttack;
     // Teleport to above hero's position 瞬移到主角上方一格(警告意味)
     if (framesRemaining === 119) {
@@ -153,6 +172,7 @@ export class CiabattaPlacement extends GroundEnemyPlacement {
 
   // 召喚小丑攻擊
   handleSpawnAttackFrame() {
+    if(!this.currentAttack || !this.level.heroRef) return
     const { framesRemaining } = this.currentAttack;
     if (framesRemaining === 210) {
       // Configure three roaming enemies around the hero
@@ -184,7 +204,7 @@ export class CiabattaPlacement extends GroundEnemyPlacement {
         })
         .forEach((enemyConfig) => {
           // Add to level
-          this.level.addPlacement(enemyConfig);
+          this.level.addPlacement(enemyConfig as PlacementConfig);
         });
     }
 
@@ -210,7 +230,7 @@ export class CiabattaPlacement extends GroundEnemyPlacement {
     }
   }
 
-  getFrame() {
+  getFrame(){
     // Dead skin
     if (this.hp <= 0) {
       return TILES.CIABATTA_DEAD;

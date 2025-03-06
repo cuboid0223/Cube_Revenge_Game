@@ -11,10 +11,12 @@ import {
   PLACEMENT_TYPE_HERO,
   PLACEMENT_TYPE_ICE_PICKUP,
 } from "../helpers/consts";
-import { Placement as PlacementType, Level } from "@/helpers/types";
-import { Direction } from "@/types/global";
 
-const iceTileCornerFramesMap = {
+import { Direction, FrameCoord, IceCorner } from "@/types/global";
+import { BodyPlacement } from "./BodyPlacement";
+import { LevelState } from "@/classes/LevelState";
+
+const iceTileCornerFramesMap: Record<IceCorner, FrameCoord> = {
   [ICE_CORNERS.TOP_LEFT]: TILES.ICE_TOP_LEFT,
   [ICE_CORNERS.TOP_RIGHT]: TILES.ICE_TOP_RIGHT,
   [ICE_CORNERS.BOTTOM_LEFT]: TILES.ICE_BOTTOM_LEFT,
@@ -60,10 +62,15 @@ export const iceTileCornerBlockedMoves = {
   },
 };
 
+export interface IcePlacementConfig extends Placement {
+  corner: IceCorner;
+}
+
+
 export class IcePlacement extends Placement {
-  corner: string | null;
+  corner: IceCorner | null;
   
-  constructor(properties: PlacementType, level: Level) {
+  constructor(properties: IcePlacementConfig, level: LevelState) {
     super(properties, level);
     this.corner = properties.corner ?? null;
   }
@@ -71,30 +78,37 @@ export class IcePlacement extends Placement {
   blocksMovementDirection(direction: Direction): boolean {
     // 根據角色行進方向禁止對應的邊，並回傳 boolean
     if (this.corner) {
-      return iceTileCornerBlockedMoves[this.corner][direction];
+      const moves = iceTileCornerBlockedMoves[this.corner as IceCorner];
+      if (direction in moves) {
+        return moves[direction as keyof typeof moves];
+      }
     }
     return false;
   }
 
-  autoMovesBodyOnCollide(body) {
+  autoMovesBodyOnCollide(body?: BodyPlacement) {
+    if(!body) return false
     // 角色得到 "防滑寶石"
     if (
       body.type === PLACEMENT_TYPE_HERO &&
       this.level.inventory.has(PLACEMENT_TYPE_ICE_PICKUP)
     ) {
-      return null;
+      return false;
     }
 
-    // ice placement with corner
-    const possibleRedirects = iceTileCornerRedirection[this.corner];
-    if (possibleRedirects) {
-      return possibleRedirects[body.movingPixelDirection];
+    // 遇到有轉角的冰
+    if (this.corner) {
+      const possibleRedirects = iceTileCornerRedirection[this.corner as IceCorner];
+      if (possibleRedirects) {
+        const newDirection = possibleRedirects[body.movingPixelDirection as keyof typeof possibleRedirects];
+        return newDirection as Direction;
+      }
     }
-    // normal ice placement
-    return body.movingPixelDirection;
+    // 遇到沒轉角的冰
+    return body.movingPixelDirection as Direction;
   }
 
-  isSolidForBody(body) {
+  isSolidForBody(body: BodyPlacement) {
     const bodyIsBelow = this.y < body.y;
     if (bodyIsBelow && this.corner?.includes("BOTTOM")) {
       return true;
@@ -119,12 +133,12 @@ export class IcePlacement extends Placement {
     if (this.level.inventory.has(PLACEMENT_TYPE_ICE_PICKUP)) {
       return BODY_SKINS.ICE;
     }
-    return null
+    return ""
   }
 
   renderComponent() {
     const frameCoord = this.corner
-      ? iceTileCornerFramesMap[this.corner]
+      ? iceTileCornerFramesMap[this.corner as IceCorner]
       : TILES.ICE;
     return <Sprite frameCoord={frameCoord} />;
   }

@@ -121,7 +121,7 @@ export class LevelState {
     this.enableEditing = enableEditing
   }
 
-  addPlacement(config: Placement) {
+  addPlacement(config: PlacementConfig) {
     // 如果是 PLACEMENT_TYPE_HERO_SPAWN或是PLACEMENT_TYPE_GOAL_ENABLED
     // 一關中各只能存在一個
     if (

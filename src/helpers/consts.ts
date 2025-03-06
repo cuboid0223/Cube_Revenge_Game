@@ -102,7 +102,7 @@ export const ICE_CORNERS = {
   TOP_RIGHT: "TOP_RIGHT",
   BOTTOM_LEFT: "BOTTOM_LEFT",
   BOTTOM_RIGHT: "BOTTOM_RIGHT",
-};
+} as const;
 
 export const HERO_RUN_1 = "HERO_RUN_1";
 export const HERO_RUN_2 = "HERO_RUN_2";

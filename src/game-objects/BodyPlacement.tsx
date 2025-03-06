@@ -11,9 +11,11 @@ import {
 } from "../helpers/consts";
 import { Collision } from "../classes/Collision";
 import soundsManager, { SFX } from "../classes/Sounds";
-import { Direction } from "@/types/global";
+import { DeathCause, Direction, FrameCoord } from "@/types/global";
+import { IcePlacement } from "./IcePlacement";
+import Body from "@/components/object-graphics/Body";
 
-export class BodyPlacement extends Placement {
+export abstract class BodyPlacement extends Placement {
   getCollisionAtNextPosition(direction: Direction) {
     // 取得移動到下一個位置遇到的 placements
     // e.g. lock placement
@@ -33,7 +35,10 @@ export class BodyPlacement extends Placement {
     // 檢查角色是否在有 corner 的冰上，並回傳該 ice corner tile
     const onIceCorner = new Collision(this, this.level).withIceCorner();
     // 根據回傳的 ice corner tile 禁止角色行進方向的對應邊
-    if (onIceCorner?.blocksMovementDirection(direction)) {
+    if (
+      onIceCorner instanceof IcePlacement &&
+      onIceCorner?.blocksMovementDirection(direction)
+    ) {
       return true;
     }
 
@@ -119,7 +124,7 @@ export class BodyPlacement extends Placement {
     return null;
   }
 
-  onAutoMovement(_direction: Direction) {
+  onAutoMovement(_direction: Direction | boolean) {
     return null;
   }
 
@@ -178,8 +183,10 @@ export class BodyPlacement extends Placement {
     const teleport = collision.withTeleport();
     if (teleport) {
       const pos = teleport.teleportsToPositionOnCollide(this);
-      this.x = pos.x;
-      this.y = pos.y;
+      if (pos !== null) {
+        this.x = pos.x;
+        this.y = pos.y;
+      }
       soundsManager.playSfx(SFX.TELEPORT);
     }
 
@@ -192,13 +199,13 @@ export class BodyPlacement extends Placement {
     }
   }
 
-  takesDamage() {
-    return null;
-  }
+  abstract takesDamage(_type?: DeathCause): void 
 
   zIndex() {
     return this.y * Z_INDEX_LAYER_SIZE;
   }
+
+  abstract getFrame(): FrameCoord;
 
   renderComponent() {
     const showShadow = this.skin !== BODY_SKINS.WATER;

@@ -1,6 +1,5 @@
 import { Placement } from "./Placement";
 import Sprite from "../components/object-graphics/Sprite";
-import { TILES } from "../helpers/tiles";
 import {
   BODY_SKINS,
   PLACEMENT_TYPE_HERO,
@@ -16,7 +15,10 @@ export class WaterPlacement extends Placement {
   }
 
   isSolidForBody(body: BodyPlacement) {
-    return body.turnsAroundAtWater ?? false;
+    if ('turnsAroundAtWater' in body) {
+      return (body as { turnsAroundAtWater: boolean }).turnsAroundAtWater;
+    }
+    return false;
   }
 
   // damagesBodyOnCollide(body) {

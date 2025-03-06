@@ -8,9 +8,21 @@ import {
   DIRECTION_UP,
 } from "@/helpers/consts";
 import { BodyPlacement } from "./BodyPlacement";
+import { LevelState } from "@/classes/LevelState";
+import { Direction } from "@/types/global";
+import { FrameCoord } from "@/helpers/types";
+
+export interface GroundEnemyPlacementConfig extends Placement {
+  initialDirection?: Direction;
+}
 
 export class GroundEnemyPlacement extends BodyPlacement {
-  constructor(properties, level) {
+  public tickBetweenMovesInterval: number;
+  public ticksUntilNextMove: number;
+  public turnsAroundAtWater: boolean;
+  public interactsWithGround: boolean; // 新增這行
+  
+  constructor(properties: GroundEnemyPlacementConfig, level: LevelState) {
     super(properties, level);
     this.tickBetweenMovesInterval = 28; // hop! wait 28 frames and hop! wait 28 frames
     this.ticksUntilNextMove = this.tickBetweenMovesInterval;
@@ -26,10 +38,11 @@ export class GroundEnemyPlacement extends BodyPlacement {
       this.ticksUntilNextMove -= 1;
       return;
     }
-    this.internalMoveRequested(this.movingPixelDirection);
+    this.internalMoveRequested(this.movingPixelDirection as Direction);
   }
 
   checkForOverlapWithHero() {
+    if(!this.level.heroRef) return
     const [myX, myY] = this.displayXY();
     const [heroX, heroY] = this.level.heroRef.displayXY();
     const xDiff = Math.abs(myX - heroX); // how far from hero (horizontal)
@@ -39,7 +52,7 @@ export class GroundEnemyPlacement extends BodyPlacement {
     }
   }
 
-  internalMoveRequested(direction) {
+  internalMoveRequested(direction: Direction) {
     //Attempt to start moving
     if (this.movingPixelsRemaining > 0) {
       return;
@@ -58,7 +71,7 @@ export class GroundEnemyPlacement extends BodyPlacement {
     this.updateWalkFrame();
   }
 
-  onAutoMovement(direction) {
+  onAutoMovement(direction:Direction) {
     this.internalMoveRequested(direction);
   }
 
@@ -78,6 +91,15 @@ export class GroundEnemyPlacement extends BodyPlacement {
       return;
     }
   }
+
+  takesDamage(_body: BodyPlacement): string | null {
+    return null;
+  }
+
+  getFrame() {
+    return TILES.ENEMY_LEFT;
+  }
+
 
   renderComponent() {
     const frameCoord =

@@ -13,7 +13,7 @@ interface LevelCompletable {
 interface CollectItems{
   canCollectItems: boolean
 }
-interface InteractsWithGround{
+export interface InteractsWithGround{
   interactsWithGround: boolean
 }
 

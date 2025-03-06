@@ -124,8 +124,8 @@ export abstract class BodyPlacement extends Placement {
     return null;
   }
 
-  onAutoMovement(_direction: Direction | boolean) {
-    return null;
+  onAutoMovement(_direction: Direction | boolean): void | null {
+    return null
   }
 
   handleCollisions() {

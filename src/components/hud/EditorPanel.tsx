@@ -21,6 +21,8 @@ import {
 } from "@/utils/splitAtFirstUnderscore";
 import { Slider } from "../ui/slider";
 import { LevelStateSnapshot } from "@/types/global";
+import { useRecoilState } from "recoil";
+import { selectedPlacementTypeAtom } from "@/atoms/selectedPlacementType";
 
 type EditorPanelProps = {
   level: LevelStateSnapshot;
@@ -29,6 +31,8 @@ type EditorPanelProps = {
 function EditorPanel({ level }: EditorPanelProps) {
   const [selectedCategory, setSelectedCategory] = useState("basics");
   const [selectedTile, setSelectedTile] = useState("");
+  const [placementType, setPlacementType] = useRecoilState(selectedPlacementTypeAtom);
+
   return (
     <main className="flex flex-col p-2 h-screen overflow-scroll">
       <section className="flex-1 flex flex-col gap-2">
@@ -75,6 +79,7 @@ function EditorPanel({ level }: EditorPanelProps) {
                 const tileName = Object.keys(TILES).find(
                   (key) => TILES[key as keyof typeof TILES] === tile
                 ) as string;
+                
                 const hasCorner =
                   tileName === "ICE_BOTTOM_LEFT" ||
                   tileName === "ICE_BOTTOM_RIGHT" ||
@@ -114,6 +119,7 @@ function EditorPanel({ level }: EditorPanelProps) {
                     type: removeTrailingDigit(tileName),
                   });
                 }
+                setPlacementType(removeTrailingDigit(tileName))
               }}
             >
               <div className="relative w-[calc(16px*3)] h-[calc(16px*3)]">

@@ -1,5 +1,3 @@
-
-
 import { Placement } from "./Placement";
 import { TILES } from "../helpers/tiles";
 import Sprite from "../components/object-graphics/Sprite";

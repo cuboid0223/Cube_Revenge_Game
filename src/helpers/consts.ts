@@ -49,15 +49,15 @@ export const PLACEMENT_TYPE_CIABATTA_SPAWN = "CIABATTA_SPAWN";
 export const PLACEMENT_TYPE_SWITCH_DOOR = "SWITCH_DOOR";
 export const PLACEMENT_TYPE_SWITCH = "SWITCH";
 
-export const DIRECTION_LEFT = "LEFT";
-export const DIRECTION_RIGHT = "RIGHT";
-export const DIRECTION_UP = "UP";
-export const DIRECTION_DOWN = "DOWN";
+export const DIRECTION_LEFT = "LEFT" as const;
+export const DIRECTION_RIGHT = "RIGHT" as const;
+export const DIRECTION_UP = "UP" as const;
+export const DIRECTION_DOWN = "DOWN" as const;
 
 export const DEATH_TYPE_CLOCK = "CLOCK";
 
 // bodyPlacement 可以踩過的 placements，用來塗顏色顯示最短路徑
-export const COLORED_TYPES = [
+export const GROUND_PLACEMENT_TYPES = [
   PLACEMENT_TYPE_FIRE,
   PLACEMENT_TYPE_WATER,
   PLACEMENT_TYPE_ICE,
@@ -66,6 +66,9 @@ export const COLORED_TYPES = [
   PLACEMENT_TYPE_SWITCH_DOOR,
   PLACEMENT_TYPE_TELEPORT,
   PLACEMENT_TYPE_THIEF,
+  PLACEMENT_TYPE_GOAL,
+  PLACEMENT_TYPE_GOAL_ENABLED,
+  PLACEMENT_TYPE_WALL
 ];
 
 type DirectionUpdateMapType = {
@@ -110,7 +113,7 @@ export const HERO_RUN_2 = "HERO_RUN_2";
 export const LOCK_KEY_COLORS = {
   BLUE: "BLUE",
   GREEN: "GREEN",
-};
+} as const;
 
 export const LEVEL_THEMES = {
   YELLOW: "YELLOW",

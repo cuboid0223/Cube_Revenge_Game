@@ -6,7 +6,7 @@ import { FrameCoord } from "@/types/global";
 type BodyProps = {
   frameCoord: FrameCoord;
   yTranslate: number;
-  showShadow: boolean
+  showShadow?: boolean
 };
 
 

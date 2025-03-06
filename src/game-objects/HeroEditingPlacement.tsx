@@ -102,9 +102,9 @@ export class HeroEditingPlacement extends BodyPlacement {
   //   this.controllerMoveRequested(direction);
   // }
 
-  // takesDamage(deathType: DeathCause) {
-  //   this.level.setDeathOutcome(deathType);
-  // }
+  takesDamage(deathType: DeathCause) {
+    this.level.setDeathOutcome(deathType);
+  }
 
   zIndex() {
     return this.y * Z_INDEX_LAYER_SIZE + 1;

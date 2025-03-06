@@ -6,8 +6,8 @@ import { FrameCoord } from "@/helpers/types";
 
 type ElevatedSpriteProps = {
   frameCoord: FrameCoord;
-  size: number;
-  pxAboveGround: number
+  size?: number;
+  pxAboveGround?: number
 };
 
 export default function ElevatedSprite({

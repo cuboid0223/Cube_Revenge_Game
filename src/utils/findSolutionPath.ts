@@ -201,7 +201,7 @@ export default function findSolutionPath(gameMap, width, height, placements) {
         newItemMask = 0;
       }
 
-      // 處理 Teleport 與 Conveyor（依原有邏輯處理）
+      // 處理 Teleport 
       if (cellType === PLACEMENT_TYPE_TELEPORT) {
         const teleportTargets = placements.filter(p =>
           p.type === PLACEMENT_TYPE_TELEPORT && (p.x !== nx || p.y !== ny)
@@ -213,6 +213,7 @@ export default function findSolutionPath(gameMap, width, height, placements) {
           console.log(`Teleported to (${nx}, ${ny})`);
         }
       }
+      // 處理 Conveyor
       if (cellType === PLACEMENT_TYPE_CONVEYOR) {
         const conveyor = placements.find(p => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_CONVEYOR);
         if (conveyor) {
@@ -225,7 +226,7 @@ export default function findSolutionPath(gameMap, width, height, placements) {
         }
       }
 
-      // 檢查 corner-block (外部阻擋: 在 非ice 要往 ice corner 走) 
+      // 檢查 corner-block (外部阻擋: 在 非ice 要往 ice corner 阻擋方向走) 
       const cornerIce = placements.find(p =>
         p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE && p.corner
       );
@@ -234,22 +235,20 @@ export default function findSolutionPath(gameMap, width, height, placements) {
         const cornerType = cornerIce.corner;
         const blockedDirections = iceTileCornerBlockedMoves[cornerType];
         if (blockedDirections) {
-          const currentDirKey = getDirectionKey([dx, dy]);
-          console.log(`User at [${x},${y}] to [${dx}, ${dy}](${currentDirKey}), Corner(${cornerType}) at [${nx}, ${ny}]`);
+          const direction = getDirectionKey([dx, dy]);
+          console.log(`User at [${x},${y}] move ${direction}([${dx}, ${dy}]) to  [${nx}, ${ny}](Corner_${cornerType})`);
           if (isCornerSolidForBody(x, y, dx, dy, cornerIce)) {
-            // 非 ice tile 到 ice corner
+            //要往 ice corner 阻擋方向走
             console.log(`skip! isCornerSolidForBody`);
             continue;
           }
-          if (blockedDirections[currentDirKey]) { 
-            // ice tile 到 ice corner 但轉不出去(可能輸出方向有牆)
-            console.log(`轉向遇到牆壁!`);
-            continue;
-          }
+          // if (blockedDirections[direction]) { 
+          //   // ice tile 到 ice corner 但轉不出去(可能輸出方向有牆)
+          //   console.log(`轉向遇到牆壁!`);
+          //   continue;
+          // }
         }
       }
-      // ※ isCornerSolidForBody 可定義在外層（這裡不重複每次定義）
-
       // 處理 Ice 的連續滑行邏輯
       const [finalX, finalY] = handleIceLogic(
         nx, ny, dx, dy, gameMap, placements, (newItemMask & 4) > 0, width, height

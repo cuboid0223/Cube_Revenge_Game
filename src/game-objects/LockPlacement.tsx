@@ -2,15 +2,26 @@ import { Placement } from "./Placement";
 import { LOCK_KEY_COLORS } from "../helpers/consts";
 import { TILES } from "../helpers/tiles";
 import Sprite from "../components/object-graphics/Sprite";
+import { LevelState } from "@/classes/LevelState";
+import { BodyPlacement } from "./BodyPlacement";
+import { FrameCoord } from "@/helpers/types";
+
+interface LockPlacementConfig extends Placement {
+  color: keyof typeof LOCK_KEY_COLORS;
+  collectInFrames: number;
+}
 
 export class LockPlacement extends Placement {
-  constructor(properties, level) {
+  private color;
+  private collectInFrames;
+
+  constructor(properties: LockPlacementConfig, level: LevelState) {
     super(properties, level);
     this.color = properties.color ?? LOCK_KEY_COLORS.BLUE;
     this.collectInFrames = 0;
   }
 
-  isSolidForBody(_body) {
+  isSolidForBody(_body: BodyPlacement) {
     // 是否是實體無法讓角色穿過?
     return true;
   }
@@ -29,7 +40,6 @@ export class LockPlacement extends Placement {
 
   canBeUnlocked() {
     // canBeUnlocked -> 字面意思就是能否被解開?
-
     // if you have right color key
     const requiredKey = `KEY_${this.color}`;
     return this.level.inventory.has(requiredKey);
@@ -45,7 +55,9 @@ export class LockPlacement extends Placement {
 
   renderComponent() {
     let frameCoord =
-      this.color === LOCK_KEY_COLORS.BLUE ? TILES.BLUE_LOCK : TILES.GREEN_LOCK;
+      this.color === LOCK_KEY_COLORS.BLUE
+        ? TILES.BLUE_LOCK
+        : (TILES.GREEN_LOCK as FrameCoord);
     if (this.collectInFrames > 0) {
       frameCoord = TILES.UNLOCKED_LOCK;
     }

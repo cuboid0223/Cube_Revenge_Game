@@ -1,10 +1,11 @@
-import { GroundEnemyPlacement } from "./GroundEnemyPlacement";
+import { GroundEnemyPlacement, GroundEnemyPlacementConfig } from "./GroundEnemyPlacement";
 import { DIRECTION_LEFT } from "../helpers/consts";
 import { TILES } from "../helpers/tiles";
 import Body from "../components/object-graphics/Body";
+import { LevelState } from "@/classes/LevelState";
 
 export class FlyingEnemyPlacement extends GroundEnemyPlacement {
-  constructor(properties, level) {
+  constructor(properties: GroundEnemyPlacementConfig, level: LevelState) {
     super(properties, level);
     this.tickBetweenMovesInterval = 20;
     this.ticksUntilNextMove = this.tickBetweenMovesInterval;

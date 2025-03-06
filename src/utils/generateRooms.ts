@@ -1,4 +1,4 @@
-import { RoomInfo, RoomsGrid, RoomType } from "@/helpers/roomTemplatesMap";
+import { RoomInfo, RoomsGrid } from "@/helpers/roomTemplatesMap";
 /**
  * 產生一個 NxN 的房間網格。
  * 從 (sr, sc) 開始，隨機往上下左右走，直到到達 (gr, gc)。

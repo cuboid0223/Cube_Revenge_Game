@@ -54,3 +54,11 @@ export type PlacementConfig =  {
   }
 
 
+export interface ExtendedPlacementConfig extends PlacementConfig {
+  corner?: string;
+  isRaised?: boolean;
+  direction?: string;
+  initialDirection?: string;
+}
+
+

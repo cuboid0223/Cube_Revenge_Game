@@ -1,3 +1,4 @@
+import { PlacementType } from "@/classes/PlacementFactory";
 import {
   ICE_CORNERS,
   PLACEMENT_TYPE_CIABATTA,
@@ -29,6 +30,7 @@ import {
 } from "@/helpers/consts";
 
 import { Placement } from "@/helpers/types";
+import { ExtendedPlacementConfig } from "@/types/global";
 
 /**
  * 將 2D tileMap (例如 9×9) 轉成:
@@ -99,14 +101,14 @@ export default function tileMapToLevel(
       if (placementTypes?.length !== 0) {
         placementTypes.forEach((p) => {
           const { baseCode, subCode } = splitBaseAndSubCode(p);
-          const placementType = cellToPlacementType[baseCode];
+          const placementType = cellToPlacementType[baseCode] as PlacementType;
           if (placementType) {
             addPlacement(placements, col, row, placementType, subCode);
           }
         });
       } else {
         const { baseCode, subCode } = splitBaseAndSubCode(cell);
-        const placementType = cellToPlacementType[baseCode];
+        const placementType = cellToPlacementType[baseCode] as PlacementType;
 
         if (placementType) {
           addPlacement(placements, col, row, placementType, subCode);
@@ -187,14 +189,11 @@ function transformDefaultRaised(raisedCode: string): boolean {
 }
 
 function addPlacement(
-  placements: Placement[],
+  placements: ExtendedPlacementConfig[],
   col: number,
   row: number,
-  placementType: string,
+  placementType: PlacementType,
   subCode?: string
-  // conveyorDirectionCode?: string,
-  // iceCornerCode?: string,
-  // raisedCode?: string
 ): void {
   // 將 col 與 row 調整為從 1 開始
   const x = col + 1;

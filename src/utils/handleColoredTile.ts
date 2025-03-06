@@ -1,4 +1,4 @@
-import { COLORED_TYPES } from "@/helpers/consts";
+import { GROUND_PLACEMENT_TYPES } from "@/helpers/consts";
 
 /**
  * @param placementType  若有值 => 表示此座標有 placement, 否則就是 empty
@@ -41,7 +41,7 @@ export function handleColoredTile(
   //    - 若無 => empty => 直接上色
   //    - 若有 => 需判斷 type 是否在 COLORED_TYPES
   const isEmpty = !placementType; 
-  const isInColoredTypes = Boolean(placementType && COLORED_TYPES.includes(placementType));
+  const isInColoredTypes = Boolean(placementType && GROUND_PLACEMENT_TYPES.includes(placementType));
 
   const isColored = (isEmpty || isInColoredTypes);
 

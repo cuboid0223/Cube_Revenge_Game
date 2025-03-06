@@ -8,9 +8,13 @@ import {
   DIRECTION_DOWN,
 } from "../helpers/consts";
 import { Collision } from "@/classes/Collision";
+import { Placement } from "./Placement";
+import { LevelState } from "@/classes/LevelState";
+
+
 
 export class RoamingEnemyPlacement extends GroundEnemyPlacement {
-  constructor(properties, level) {
+  constructor(properties:Placement, level: LevelState) {
     super(properties, level);
     this.tickBetweenMovesInterval = 48;
     this.ticksUntilNextMove = this.tickBetweenMovesInterval;

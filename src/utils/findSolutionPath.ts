@@ -1,12 +1,66 @@
-import { DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, DIRECTION_UP, PLACEMENT_TYPE_CONVEYOR, PLACEMENT_TYPE_FIRE, PLACEMENT_TYPE_FIRE_PICKUP, PLACEMENT_TYPE_FLOUR, PLACEMENT_TYPE_GOAL, PLACEMENT_TYPE_GOAL_ENABLED, PLACEMENT_TYPE_HERO, PLACEMENT_TYPE_HERO_SPAWN, PLACEMENT_TYPE_ICE, PLACEMENT_TYPE_ICE_PICKUP, PLACEMENT_TYPE_KEY, PLACEMENT_TYPE_LOCK, PLACEMENT_TYPE_SWITCH, PLACEMENT_TYPE_SWITCH_DOOR, PLACEMENT_TYPE_TELEPORT, PLACEMENT_TYPE_THIEF, PLACEMENT_TYPE_WALL, PLACEMENT_TYPE_WATER, PLACEMENT_TYPE_WATER_PICKUP } from "@/helpers/consts";
-import { Placement } from "@/helpers/types";
+import {
+  DIRECTION_DOWN,
+  DIRECTION_LEFT,
+  DIRECTION_RIGHT,
+  DIRECTION_UP,
+  directionUpdateMap,
+  PLACEMENT_TYPE_CONVEYOR,
+  PLACEMENT_TYPE_FIRE,
+  PLACEMENT_TYPE_FIRE_PICKUP,
+  PLACEMENT_TYPE_FLOUR,
+  PLACEMENT_TYPE_GOAL,
+  PLACEMENT_TYPE_GOAL_ENABLED,
+  PLACEMENT_TYPE_HERO,
+  PLACEMENT_TYPE_HERO_SPAWN,
+  PLACEMENT_TYPE_ICE,
+  PLACEMENT_TYPE_ICE_PICKUP,
+  PLACEMENT_TYPE_KEY,
+  PLACEMENT_TYPE_LOCK,
+  PLACEMENT_TYPE_SWITCH,
+  PLACEMENT_TYPE_SWITCH_DOOR,
+  PLACEMENT_TYPE_TELEPORT,
+  PLACEMENT_TYPE_THIEF,
+  PLACEMENT_TYPE_WALL,
+  PLACEMENT_TYPE_WATER,
+  PLACEMENT_TYPE_WATER_PICKUP,
+} from "@/helpers/consts";
 import PriorityQueue from "./PriorityQueue";
-import { iceTileCornerBlockedMoves, iceTileCornerRedirection } from "@/game-objects/IcePlacement";
-import { getDirectionKey, handleIceLogic, isCornerSolidForBody } from "./handleIceLogic";
-import { LevelStateSnapshot } from "@/types/global";
+import {
+  iceTileCornerBlockedMoves,
+  iceTileCornerRedirection,
+} from "@/game-objects/IcePlacement";
+import {
+  getDirectionKey,
+  handleIceLogic,
+  isCornerSolidForBody,
+} from "./handleIceLogic";
+import { ExtendedPlacementConfig, LevelStateSnapshot, PlacementConfig } from "@/types/global";
+
+function getOutputType(
+  type: string,
+  corner?: string,
+  direction?: string,
+  color?: string
+): string {
+  switch (type) {
+    case PLACEMENT_TYPE_ICE:
+      return corner ? `${type}:${corner}` : type;
+    case PLACEMENT_TYPE_CONVEYOR:
+      return direction ? `${type}:${direction}` : type;
+    case PLACEMENT_TYPE_KEY:
+      return color ? `${type}:${color}` : type;
+    case PLACEMENT_TYPE_LOCK:
+      return color ? `${type}:${color}` : type;
+    default:
+      return type;
+  }
+}
 
 // 簡化地圖為二維矩陣，並記錄所有物件位置
-export function createMap(level: LevelStateSnapshot) {
+export function createMap(level: LevelStateSnapshot): {
+  gameMap: string[][];
+  placements: ExtendedPlacementConfig[];
+} {
   /*
             x (width)
             ------------
@@ -17,29 +71,46 @@ export function createMap(level: LevelStateSnapshot) {
   
   */
   const { tilesWidth: width, tilesHeight: height, placements } = level;
-  const gameMap = Array.from({ length: height }, () => Array(width).fill(null));
+  const gameMap = Array.from({ length: height }, () => Array(width).fill(""));
 
-  placements.forEach(({ x, y, type }) => {
-      const adjustedX = x - 1;
-      const adjustedY = y - 1;
-      if (adjustedX >= 0 && adjustedX < width && adjustedY >= 0 && adjustedY < height) {
-          gameMap[adjustedY][adjustedX] = type;
+  placements.forEach(({ x, y, type,corner,color, direction}) => {
+    const adjustedX = x - 1;
+    const adjustedY = y - 1;
+    if (
+      adjustedX >= 0 &&
+      adjustedX < width &&
+      adjustedY >= 0 &&
+      adjustedY < height
+    ) {
+
+      const outputType = getOutputType(type, corner, direction, color);
+
+      if (gameMap[adjustedY][adjustedX].length !== 0) {
+        // 同個位置有兩個 placements
+        gameMap[adjustedY][
+          adjustedX
+        ] = `${gameMap[adjustedY][adjustedX]}&${outputType}`;
+      } else {
+        gameMap[adjustedY][adjustedX] = outputType;
       }
+    }
   });
 
   return { gameMap, placements };
 }
 
 // 查找所有物件位置
-export function findPositions(placements: Placement[], type: string) {
-  return placements.filter(p => p.type === type).map(p => [p.x, p.y]);
+export function findPositions(placements: PlacementConfig[], type: string) {
+  return placements.filter((p) => p.type === type).map((p) => [p.x, p.y]);
 }
 
 //––––– 事前準備 –––––//
 // 為面粉建立一個 mapping：key = "x,y" ； value = index（從 0 開始）
 // 假設 placements 中面粉數量不多
-function buildFlourMapping(placements: Placement[]) {
-  const flourPositions = placements.filter(p => p.type === PLACEMENT_TYPE_FLOUR);
+function buildFlourMapping(placements: PlacementConfig[]) {
+  const flourPositions = placements.filter(
+    (p) => p.type === PLACEMENT_TYPE_FLOUR
+  );
   const flourMap = new Map();
   flourPositions.forEach((p, index) => {
     flourMap.set(`${p.x},${p.y}`, index);
@@ -48,8 +119,10 @@ function buildFlourMapping(placements: Placement[]) {
 }
 
 // 為 switchDoor 建立固定順序的 mapping：key = "x,y" ； value = index
-function buildSwitchDoorMapping(placements: Placement[]) {
-  const doorPlacements = placements.filter(p => p.type === PLACEMENT_TYPE_SWITCH_DOOR);
+function buildSwitchDoorMapping(placements: PlacementConfig[]) {
+  const doorPlacements = placements.filter(
+    (p) => p.type === PLACEMENT_TYPE_SWITCH_DOOR
+  );
   const doorMap = new Map();
   doorPlacements.forEach((p, index) => {
     doorMap.set(`${p.x},${p.y}`, index);
@@ -59,7 +132,12 @@ function buildSwitchDoorMapping(placements: Placement[]) {
 
 // 將多個物品（火、水、冰、鑰匙）狀態合併成一個 bit mask
 // 我們預設：bit0 = firePickup, bit1 = waterPickup, bit2 = icePickup, bit3 = key
-function buildItemMask(hasFire: boolean, hasWater: boolean, hasIce: boolean, hasKey: boolean) {
+function buildItemMask(
+  hasFire: boolean,
+  hasWater: boolean,
+  hasIce: boolean,
+  hasKey: boolean
+) {
   let mask = 0;
   if (hasFire) mask |= 1;
   if (hasWater) mask |= 2;
@@ -71,21 +149,103 @@ function buildItemMask(hasFire: boolean, hasWater: boolean, hasIce: boolean, has
 // 切換所有 switchDoor 狀態：假設每個門用一個 bit 表示，1 表示「關閉」（不可通行），0 表示「開啟」
 function toggleSwitchDoorMask(doorMask: number, totalDoors: number) {
   // 反轉所有位元，再與 ((1 << totalDoors) - 1) 相與（只保留 totalDoors 個 bit）
-  return (~doorMask) & ((1 << totalDoors) - 1);
+  return ~doorMask & ((1 << totalDoors) - 1);
+}
+
+export interface CompositeCellState {
+  wall: boolean;
+  water: boolean;
+  fire: boolean;
+  ice: boolean;
+  iceCorner?: string;
+  conveyor: boolean;
+  conveyorDir?: string;
+  teleport: boolean;
+  thief: boolean;
+  switch: boolean;
+  switchDoor: boolean;
+  lock: boolean;
+  lockColor?: string;
+  waterPickup: boolean;
+  firePickup: boolean;
+  icePickup: boolean;
+  flour: boolean;
+  key: boolean;
+  keyColor?: string;
+  types: string[];
+}
+
+function combineCellState(cell: string): CompositeCellState {
+  // 拆分 cell 字串，移除空白與空值
+  const types = cell
+    .split("&")
+    .map((s) => s.trim())
+    .filter((s) => s !== "");
+
+  const state: CompositeCellState = {
+    types,
+    wall: types.includes(PLACEMENT_TYPE_WALL),
+    water: types.includes(PLACEMENT_TYPE_WATER),
+    fire: types.includes(PLACEMENT_TYPE_FIRE),
+    ice: types.includes(PLACEMENT_TYPE_ICE),
+    conveyor: types.includes(PLACEMENT_TYPE_CONVEYOR),
+    teleport: types.includes(PLACEMENT_TYPE_TELEPORT),
+    thief: types.includes(PLACEMENT_TYPE_THIEF),
+    switch: types.includes(PLACEMENT_TYPE_SWITCH),
+    switchDoor: types.includes(PLACEMENT_TYPE_SWITCH_DOOR),
+    lock: types.includes(PLACEMENT_TYPE_LOCK),
+
+    waterPickup: types.includes(PLACEMENT_TYPE_WATER_PICKUP),
+    firePickup: types.includes(PLACEMENT_TYPE_FIRE_PICKUP),
+    icePickup: types.includes(PLACEMENT_TYPE_ICE_PICKUP),
+    flour: types.includes(PLACEMENT_TYPE_FLOUR),
+    key: types.includes(PLACEMENT_TYPE_KEY),
+  };
+
+  // 檢查所有拆解出來的 type，若包含 ICE（可能帶有角落資訊）
+  types.forEach((t) => {
+    // 若 t 以 "ICE:" 開頭，則拆分出角落資訊
+    if (t.startsWith(PLACEMENT_TYPE_ICE + ":")) {
+      state.ice = true;
+      const parts = t.split(":");
+      if (parts.length > 1) {
+        state.iceCorner = parts[1]; // 例如 "TOP_LEFT", "TOP_RIGHT" 等
+      }
+    } else if (t === PLACEMENT_TYPE_ICE) {
+      // 普通冰
+      state.ice = true;
+    }
+  });
+
+  return state;
 }
 
 //––––– 主函式 –––––//
-export default function findSolutionPath(gameMap, width, height, placements) {
+type SolutionPathType = [number, number][];
+
+export default function findSolutionPath(
+  gameMap: string[][],
+  width: number,
+  height: number,
+  placements: PlacementConfig[]
+): SolutionPathType {
   console.log("開始路徑搜尋");
-  const startPosition = placements.find(p => p.type === PLACEMENT_TYPE_HERO || p.type === PLACEMENT_TYPE_HERO_SPAWN);
+  console.log(gameMap);
+  const startPosition = placements.find(
+    (p) =>
+      p.type === PLACEMENT_TYPE_HERO || p.type === PLACEMENT_TYPE_HERO_SPAWN
+  );
   if (!startPosition) {
     console.error("找不到 HERO 位置");
-    return null;
+    return [];
   }
-  const goalPosition = placements.find(p => p.type === PLACEMENT_TYPE_GOAL || p.type === PLACEMENT_TYPE_GOAL_ENABLED);
+  const goalPosition = placements.find(
+    (p) =>
+      p.type === PLACEMENT_TYPE_GOAL || p.type === PLACEMENT_TYPE_GOAL_ENABLED
+  );
   if (!goalPosition) {
     console.error("找不到 GOAL 位置");
-    return null;
+    return [];
   }
 
   // 事前準備：面粉 mapping 與 switch door mapping
@@ -98,10 +258,12 @@ export default function findSolutionPath(gameMap, width, height, placements) {
   // 若 door 物件有 isRaised 屬性就採用它，否則預設為 0 (開啟)
   let initDoorMask = 0;
   doorMap.forEach((index, key) => {
-    const door = placements.find(p => p.type === PLACEMENT_TYPE_SWITCH_DOOR && `${p.x},${p.y}` === key);
+    const door = placements.find(
+      (p) => p.type === PLACEMENT_TYPE_SWITCH_DOOR && `${p.x},${p.y}` === key
+    );
     // 假設 isRaised === true 代表門是「關閉」（即阻擋），我們用 1 表示關閉
     if (door && door.hasOwnProperty("isRaised") ? door.isRaised : false) {
-      initDoorMask |= (1 << index);
+      initDoorMask |= 1 << index;
     }
   });
 
@@ -115,16 +277,16 @@ export default function findSolutionPath(gameMap, width, height, placements) {
   //   - path: 走過的路徑陣列
   const queue = new PriorityQueue((a, b) => a[0] - b[0]);
   const initItemMask = buildItemMask(false, false, false, false);
-  const initPath: [number, number][] = [];
+  const initPath: SolutionPathType = [];
   queue.push([
-    0,  // f = g + heuristic（初始先 0）
-    0,  // g = cost so far
+    0, // f = g + heuristic（初始先 0）
+    0, // g = cost so far
     startPosition.x,
     startPosition.y,
     initFlourMask,
     initItemMask,
     initDoorMask,
-    initPath
+    initPath,
   ]);
   const visited = new Set();
 
@@ -133,23 +295,33 @@ export default function findSolutionPath(gameMap, width, height, placements) {
     const newPath = [...path, [x, y]];
 
     // 若所有面粉都已收集：判斷方式是比對 bit mask 是否全 1
-    if (flourMask === (1 << totalFlours) - 1 &&
-        x === goalPosition.x && y === goalPosition.y) {
+    if (
+      flourMask === (1 << totalFlours) - 1 &&
+      x === goalPosition.x &&
+      y === goalPosition.y
+    ) {
       console.log("收集全部面粉並抵達目標，成功！");
+      console.log(newPath);
       return newPath;
     }
 
     // 探索四個方向
-    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
-      let nx = x + dx, ny = y + dy;
+    for (const [dx, dy] of [
+      [-1, 0],
+      [1, 0],
+      [0, -1],
+      [0, 1],
+    ]) {
+      let nx = x + dx,
+        ny = y + dy;
       // 超出邊界
       if (nx < 1 || nx > width || ny < 1 || ny > height) continue;
-
-      const cellType = gameMap[ny - 1][nx - 1];
-      if (cellType === PLACEMENT_TYPE_WALL) continue;
+      let cell = gameMap[ny - 1][nx - 1];
+      const compositeState = combineCellState(cell);
+      if (compositeState.wall) continue;
 
       // 若為 switchDoor，則檢查 doorMask 中對應的位元是否為 1（阻擋）
-      if (cellType === PLACEMENT_TYPE_SWITCH_DOOR) {
+      if (compositeState.switchDoor) {
         const doorKey = `${nx},${ny}`;
         const doorIndex = doorMap.get(doorKey);
         if (doorIndex !== undefined) {
@@ -158,7 +330,7 @@ export default function findSolutionPath(gameMap, width, height, placements) {
       }
 
       // 若為鎖，且 itemMask 中沒取得鑰匙 (bit3)
-      if (cellType === PLACEMENT_TYPE_LOCK && !(itemMask & 8)) continue;
+      if (compositeState.lock && !(itemMask & 8)) continue;
 
       // 先備份各狀態
       let newFlourMask = flourMask;
@@ -169,42 +341,43 @@ export default function findSolutionPath(gameMap, width, height, placements) {
       const flourKey = `${nx},${ny}`;
       if (flourMap.has(flourKey)) {
         const index = flourMap.get(flourKey);
-        newFlourMask |= (1 << index);
+        newFlourMask |= 1 << index;
       }
 
       // 處理障礙物：例如火、水，僅當有相應道具時才能通過
-      if (cellType === PLACEMENT_TYPE_FIRE && !(itemMask & 1)) continue;
-      if (cellType === PLACEMENT_TYPE_WATER && !(itemMask & 2)) continue;
+      if (compositeState.fire && !(itemMask & 1)) continue;
+      if (compositeState.water && !(itemMask & 2)) continue;
 
       // 處理 switch：踩到 switch 時，全部 switchDoor 狀態取反
-      if (cellType === PLACEMENT_TYPE_SWITCH) {
+      if (compositeState.switch) {
         newDoorMask = toggleSwitchDoorMask(newDoorMask, totalDoors);
       }
 
       // 處理拾取道具：火焰、流水、冰、鑰匙等
       // 假設各拾取物件出現在某一位置時，就把對應的 bit 打開
-      if (cellType === PLACEMENT_TYPE_FIRE_PICKUP) {
+      if (compositeState.firePickup) {
         newItemMask |= 1;
       }
-      if (cellType === PLACEMENT_TYPE_WATER_PICKUP) {
+      if (compositeState.waterPickup) {
         newItemMask |= 2;
       }
-      if (cellType === PLACEMENT_TYPE_ICE_PICKUP) {
+      if (compositeState.icePickup) {
         newItemMask |= 4;
       }
-      if (cellType === PLACEMENT_TYPE_KEY) {
+      if (compositeState.key) {
         newItemMask |= 8;
       }
 
       // 處理 Thief：若遇到小偷，重置所有道具
-      if (cellType === PLACEMENT_TYPE_THIEF) {
+      if (compositeState.thief) {
         newItemMask = 0;
       }
 
-      // 處理 Teleport 
-      if (cellType === PLACEMENT_TYPE_TELEPORT) {
-        const teleportTargets = placements.filter(p =>
-          p.type === PLACEMENT_TYPE_TELEPORT && (p.x !== nx || p.y !== ny)
+      // 處理 Teleport
+      if (compositeState.teleport) {
+        const teleportTargets = placements.filter(
+          (p) =>
+            p.type === PLACEMENT_TYPE_TELEPORT && (p.x !== nx || p.y !== ny)
         );
         if (teleportTargets.length > 0) {
           const tp = teleportTargets[0];
@@ -214,8 +387,10 @@ export default function findSolutionPath(gameMap, width, height, placements) {
         }
       }
       // 處理 Conveyor
-      if (cellType === PLACEMENT_TYPE_CONVEYOR) {
-        const conveyor = placements.find(p => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_CONVEYOR);
+      if (compositeState.conveyor) {
+        const conveyor = placements.find(
+          (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_CONVEYOR
+        );
         if (conveyor) {
           const { direction } = conveyor;
           if (direction === "UP") ny -= 1;
@@ -226,52 +401,130 @@ export default function findSolutionPath(gameMap, width, height, placements) {
         }
       }
 
-      // 檢查 corner-block (外部阻擋: 在 非ice 要往 ice corner 阻擋方向走) 
-      const cornerIce = placements.find(p =>
-        p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE && p.corner
-      );
-      if (cornerIce) {
-         // 代表 (nx, ny) 是 corner
-        const cornerType = cornerIce.corner;
-        const blockedDirections = iceTileCornerBlockedMoves[cornerType];
-        if (blockedDirections) {
-          const direction = getDirectionKey([dx, dy]);
-          console.log(`User at [${x},${y}] move ${direction}([${dx}, ${dy}]) to  [${nx}, ${ny}](Corner_${cornerType})`);
-          if (isCornerSolidForBody(x, y, dx, dy, cornerIce)) {
-            //要往 ice corner 阻擋方向走
-            console.log(`skip! isCornerSolidForBody`);
-            continue;
+      // // 檢查 corner-block (外部阻擋: 在 非ice 要往 ice corner 阻擋方向走)
+      // const cornerIce = placements.find(
+      //   (p) =>
+      //     p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE && p.corner
+      // );
+      // if (cornerIce) {
+      //   // 代表 (nx, ny) 是 corner
+      //   const cornerType = cornerIce.corner;
+      //   const blockedDirections = iceTileCornerBlockedMoves[cornerType];
+      //   if (blockedDirections) {
+      //     const direction = getDirectionKey([dx, dy]);
+      //     console.log(
+      //       `User at [${x},${y}] move ${direction}([${dx}, ${dy}]) to  [${nx}, ${ny}](Corner_${cornerType})`
+      //     );
+      //     if (isCornerSolidForBody(x, y, dx, dy, cornerIce)) {
+      //       //要往 ice corner 阻擋方向走
+      //       console.log(`skip! isCornerSolidForBody`);
+      //       continue;
+      //     }
+      //     // if (blockedDirections[direction]) {
+      //     //   // ice tile 到 ice corner 但轉不出去(可能輸出方向有牆)
+      //     //   console.log(`轉向遇到牆壁!`);
+      //     //   continue;
+      //     // }
+      //   }
+      // }
+      // // 處理 Ice 的連續滑行邏輯
+      // const [finalX, finalY] = handleIceLogic(
+      //   nx,
+      //   ny,
+      //   dx,
+      //   dy,
+      //   gameMap,
+      //   placements,
+      //   (newItemMask & 4) > 0,
+      //   width,
+      //   height
+      // );
+      // // 如果 handleIceLogic 回傳跟原位置一樣 => 被 corner 阻擋 /無法前進
+      // if (finalX === x && finalY === y) continue;
+      if (compositeState.ice) {
+        if (compositeState.iceCorner) {
+          // 角落冰邏輯：利用 iceTileCornerRedirection 調整移動方向
+          const possibleRedirects = iceTileCornerRedirection[compositeState.iceCorner];
+          if (possibleRedirects) {
+            console.log(possibleRedirects)
+            const redirDir = possibleRedirects[getDirectionKey([dx, dy]) as keyof typeof possibleRedirects];
+            if (redirDir) {
+              // 取得重定向方向對應的位移量
+              const point = directionUpdateMap[redirDir as keyof typeof directionUpdateMap];
+              // 更新位置
+              nx += point.x;
+              ny += point.y;
+              console.log(`Corner(${compositeState.iceCorner}) at [${nx}, ${ny}] => redirect to [${point.x}, ${point.y}]`);
+              // 若更新後的位置碰到牆壁，回退移動
+              const solidPlacement = placements.find(
+                p => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_WALL
+              );
+              if (solidPlacement) {
+                nx -= point.x;
+                ny -= point.y;
+              }
+              // 跳出 while 迴圈（或根據需求 break）
+              break;
+            }
           }
-          // if (blockedDirections[direction]) { 
-          //   // ice tile 到 ice corner 但轉不出去(可能輸出方向有牆)
-          //   console.log(`轉向遇到牆壁!`);
-          //   continue;
-          // }
+        } else {
+          // 普通冰邏輯：繼續沿著原方向滑動
+          const nextX = nx + dx;
+          const nextY = ny + dy;
+          // 檢查邊界
+          if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
+            break;
+          }
+          // 如果下一格是牆，則停止滑行
+          if (gameMap[nextY - 1][nextX - 1] === PLACEMENT_TYPE_WALL) {
+            break;
+          }
+          // 更新位置：繼續滑動
+          nx = nextX;
+          ny = nextY;
         }
       }
-      // 處理 Ice 的連續滑行邏輯
-      const [finalX, finalY] = handleIceLogic(
-        nx, ny, dx, dy, gameMap, placements, (newItemMask & 4) > 0, width, height
-      );
-      // 如果 handleIceLogic 回傳跟原位置一樣 => 被 corner 阻擋 /無法前進
-      if (finalX === x && finalY === y) continue;
+      
+      
+
 
       // 生成新的 state key：用簡短的字串結合數值資訊
-      const stateKey = `${finalX},${finalY},${newFlourMask},${newItemMask},${newDoorMask}`;
+      const stateKey = `${nx},${ny},${newFlourMask},${newItemMask},${newDoorMask}`;
       if (visited.has(stateKey)) continue;
       visited.add(stateKey);
 
       const newG = g + 1;
-      const newH = heuristicOptimized(finalX, finalY, flourMap, totalFlours, goalPosition);
-      queue.push([newG + newH, newG, finalX, finalY, newFlourMask, newItemMask, newDoorMask, newPath]);
+      const newH = heuristicOptimized(
+        nx,
+        ny,
+        flourMap,
+        totalFlours,
+        goalPosition
+      );
+      queue.push([
+        newG + newH,
+        newG,
+        nx,
+        ny,
+        newFlourMask,
+        newItemMask,
+        newDoorMask,
+        newPath,
+      ]);
     }
   }
   console.log("找不到有效路徑");
-  return null;
+  return [];
 }
 
 // 改進版啟發函數：用 Manhattan 距離估算，這裡可依需要改成 MST 等更精準估算
-function heuristicOptimized(cx, cy, flourMap: Map<string, number>, totalFlours: number, goalPosition) {
+function heuristicOptimized(
+  cx,
+  cy,
+  flourMap: Map<string, number>,
+  totalFlours: number,
+  goalPosition
+) {
   // 找出所有未收集面粉的最小距離，再與目標距離取最小值
   let minDist = Math.abs(goalPosition.x - cx) + Math.abs(goalPosition.y - cy);
   flourMap.forEach((index, key) => {

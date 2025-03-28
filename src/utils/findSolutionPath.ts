@@ -319,7 +319,37 @@ export default function findSolutionPath(
       if (nx < 1 || nx > width || ny < 1 || ny > height) continue;
       let cell = gameMap[ny - 1][nx - 1];
       const compositeState = combineCellState(cell);
+      // 先備份各狀態
+      let newFlourMask = flourMask;
+      let newItemMask = itemMask;
+      let newDoorMask = doorMask;
+
       if (compositeState.wall) continue;
+
+      if (compositeState.ice) {
+        const iceResult = handleIceSliding(
+          gameMap,
+          width,
+          height,
+          dx,
+          dy,
+          nx,
+          ny,
+          newItemMask,
+          doorMap,
+          doorMask
+        );
+        newItemMask = iceResult.itemMask;
+        // console.log(iceResult);
+        if (!iceResult.valid) {
+          // 如果冰面路徑無效，跳過這個移動
+          continue;
+        }
+
+        // 更新位置為最後滑行的位置
+        nx = iceResult.path[iceResult.path.length - 1][0];
+        ny = iceResult.path[iceResult.path.length - 1][1];
+      }
 
       // 若為 switchDoor，則檢查 doorMask 中對應的位元是否為 1（阻擋）
       if (compositeState.switchDoor) {
@@ -329,11 +359,6 @@ export default function findSolutionPath(
           if (doorMask & (1 << doorIndex)) continue;
         }
       }
-
-      // 先備份各狀態
-      let newFlourMask = flourMask;
-      let newItemMask = itemMask;
-      let newDoorMask = doorMask;
 
       // 若為鎖，且 itemMask 中沒取得鑰匙 (bit3)
       if (compositeState.blueLock) {
@@ -410,31 +435,6 @@ export default function findSolutionPath(
           else if (direction === "RIGHT") nx += 1;
           console.log(`Conveyor moved to (${nx}, ${ny})`);
         }
-      }
-
-      if (compositeState.ice) {
-        const iceResult = handleIceSliding(
-          gameMap,
-          width,
-          height,
-          dx,
-          dy,
-          nx,
-          ny,
-          newItemMask,
-          doorMap,
-          doorMask
-        );
-        newItemMask = iceResult.itemMask;
-        // console.log(iceResult);
-        if (!iceResult.valid) {
-          // 如果冰面路徑無效，跳過這個移動
-          continue;
-        }
-
-        // 更新位置為最後滑行的位置
-        nx = iceResult.path[iceResult.path.length - 1][0];
-        ny = iceResult.path[iceResult.path.length - 1][1];
       }
 
       // 生成新的 state key：用簡短的字串結合數值資訊

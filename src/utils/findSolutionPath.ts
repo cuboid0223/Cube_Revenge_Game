@@ -34,7 +34,11 @@ import {
   handleIceLogic,
   isCornerSolidForBody,
 } from "./handleIceLogic";
-import { ExtendedPlacementConfig, LevelStateSnapshot, PlacementConfig } from "@/types/global";
+import {
+  ExtendedPlacementConfig,
+  LevelStateSnapshot,
+  PlacementConfig,
+} from "@/types/global";
 
 function getOutputType(
   type: string,
@@ -73,7 +77,7 @@ export function createMap(level: LevelStateSnapshot): {
   const { tilesWidth: width, tilesHeight: height, placements } = level;
   const gameMap = Array.from({ length: height }, () => Array(width).fill(""));
 
-  placements.forEach(({ x, y, type,corner,color, direction}) => {
+  placements.forEach(({ x, y, type, corner, color, direction }) => {
     const adjustedX = x - 1;
     const adjustedY = y - 1;
     if (
@@ -82,7 +86,6 @@ export function createMap(level: LevelStateSnapshot): {
       adjustedY >= 0 &&
       adjustedY < height
     ) {
-
       const outputType = getOutputType(type, corner, direction, color);
 
       if (gameMap[adjustedY][adjustedX].length !== 0) {
@@ -293,7 +296,7 @@ export default function findSolutionPath(
   while (!queue.isEmpty()) {
     const [f, g, x, y, flourMask, itemMask, doorMask, path] = queue.pop();
     const newPath = [...path, [x, y]];
-
+    console.log(newPath);
     // 若所有面粉都已收集：判斷方式是比對 bit mask 是否全 1
     if (
       flourMask === (1 << totalFlours) - 1 &&
@@ -330,7 +333,10 @@ export default function findSolutionPath(
       }
 
       // 若為鎖，且 itemMask 中沒取得鑰匙 (bit3)
-      if (compositeState.lock && !(itemMask & 8)) continue;
+      if (compositeState.lock) {
+        const hasKey = itemMask & 8;
+        if (!hasKey) continue;
+      }
 
       // 先備份各狀態
       let newFlourMask = flourMask;
@@ -441,52 +447,93 @@ export default function findSolutionPath(
       // );
       // // 如果 handleIceLogic 回傳跟原位置一樣 => 被 corner 阻擋 /無法前進
       // if (finalX === x && finalY === y) continue;
-      if (compositeState.ice) {
-        if (compositeState.iceCorner) {
-          // 角落冰邏輯：利用 iceTileCornerRedirection 調整移動方向
-          const possibleRedirects = iceTileCornerRedirection[compositeState.iceCorner];
-          if (possibleRedirects) {
-            console.log(possibleRedirects)
-            const redirDir = possibleRedirects[getDirectionKey([dx, dy]) as keyof typeof possibleRedirects];
-            if (redirDir) {
-              // 取得重定向方向對應的位移量
-              const point = directionUpdateMap[redirDir as keyof typeof directionUpdateMap];
-              // 更新位置
-              nx += point.x;
-              ny += point.y;
-              console.log(`Corner(${compositeState.iceCorner}) at [${nx}, ${ny}] => redirect to [${point.x}, ${point.y}]`);
-              // 若更新後的位置碰到牆壁，回退移動
-              const solidPlacement = placements.find(
-                p => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_WALL
-              );
-              if (solidPlacement) {
-                nx -= point.x;
-                ny -= point.y;
-              }
-              // 跳出 while 迴圈（或根據需求 break）
-              break;
-            }
-          }
-        } else {
-          // 普通冰邏輯：繼續沿著原方向滑動
-          const nextX = nx + dx;
-          const nextY = ny + dy;
-          // 檢查邊界
-          if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
-            break;
-          }
-          // 如果下一格是牆，則停止滑行
-          if (gameMap[nextY - 1][nextX - 1] === PLACEMENT_TYPE_WALL) {
-            break;
-          }
-          // 更新位置：繼續滑動
-          nx = nextX;
-          ny = nextY;
-        }
-      }
-      
-      
 
+      if (compositeState.ice) {
+        const iceResult = handleIceSliding(
+          gameMap, 
+          width, 
+          height, 
+          dx, 
+          dy, 
+          nx, 
+          ny
+        );
+        console.log(iceResult)
+      
+        if (!iceResult.valid) {
+          // 如果冰面路徑無效，跳過這個移動
+          continue;
+        }
+      
+        // 更新位置為最後滑行的位置
+        nx = iceResult.path[iceResult.path.length - 1][0];
+        ny = iceResult.path[iceResult.path.length - 1][1];
+      }
+
+      // if (compositeState.ice) {
+      //   let isMoving = true
+      //   let movingTrace = []
+      //   movingTrace.push([nx,ny])
+      //   if (compositeState.iceCorner) {
+      //     // 角落冰邏輯：利用 iceTileCornerRedirection 調整移動方向
+      //     const possibleRedirects =
+      //       iceTileCornerRedirection[compositeState.iceCorner];
+      //     if (possibleRedirects) {
+      //       console.log(possibleRedirects);
+      //       const redirDir =
+      //         possibleRedirects[
+      //           getDirectionKey([dx, dy]) as keyof typeof possibleRedirects
+      //         ];
+      //       if (redirDir) {
+      //         // 取得重定向方向對應的位移量
+      //         const point =
+      //           directionUpdateMap[redirDir as keyof typeof directionUpdateMap];
+      //           console.log(
+      //             `Corner(${compositeState.iceCorner}) at [${nx}, ${ny}] => redirect to [${point.x}, ${point.y}]`
+      //           );
+      //         // 更新位置
+      //         nx += point.x;
+      //         ny += point.y;
+
+      //         // 若更新後的位置碰到牆壁，回退移動
+      //         const solidPlacement = placements.find(
+      //           (p) =>
+      //             p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_WALL
+      //         );
+      //         if (solidPlacement) {
+      //           nx -= point.x;
+      //           ny -= point.y;
+      //         }
+      //         // 跳出 while 迴圈（或根據需求 break）
+      //         break;
+      //       }
+      //     }
+      //   } else {
+      //     // 普通冰邏輯：繼續沿著原方向滑動
+      //     let nextX = nx + dx;
+      //     let nextY = ny + dy;
+
+      //     // 檢查邊界
+      //     if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
+      //       isMoving = false
+      //       break;
+      //     }
+      //     // 如果下一格是牆，則停止滑行
+      //     if (gameMap[nextY - 1][nextX - 1] === PLACEMENT_TYPE_WALL) {
+      //       isMoving = false
+      //       break;
+      //     }
+      //     if(gameMap[nextY - 1][nextX - 1] === PLACEMENT_TYPE_ICE){
+      //       nextX = nextX+dx
+      //       nextY = nextY+dy
+      //       movingTrace.push([nx,ny])
+      //     }
+
+      //     // 更新位置：繼續滑動
+      //     nx = nextX;
+      //     ny = nextY;
+      //   }
+      // }
 
       // 生成新的 state key：用簡短的字串結合數值資訊
       const stateKey = `${nx},${ny},${newFlourMask},${newItemMask},${newDoorMask}`;
@@ -513,6 +560,7 @@ export default function findSolutionPath(
       ]);
     }
   }
+  // console.log(visited)
   console.log("找不到有效路徑");
   return [];
 }
@@ -536,3 +584,63 @@ function heuristicOptimized(
   });
   return minDist;
 }
+
+
+function handleIceSliding(
+  gameMap: string[][],
+  width: number, 
+  height: number, 
+  dx: number, 
+  dy: number, 
+  initialX: number, 
+  initialY: number
+): { valid: boolean, path: number[][] } {
+  let nx = initialX;
+  let ny = initialY;
+  const movingTrace: number[][] = [[nx, ny]];
+  
+  while (true) {
+    let nextX = nx + dx;
+    let nextY = ny + dy;
+
+    // 邊界檢查
+    if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
+      break;
+    }
+
+    const nextTile = gameMap[nextY - 1][nextX - 1];
+    const compositeState = combineCellState(nextTile);
+
+    // 遇到牆壁停止
+    if (compositeState.wall) {
+      break;
+    }
+
+    // 如果滑到水，整個路徑無效
+    if (compositeState.water) {
+      return { 
+        valid: false, 
+        path: [] 
+      };
+    }
+
+    // 繼續滑行
+    nx = nextX;
+    ny = nextY;
+    movingTrace.push([nx, ny]);
+
+    // 如果下一格不是冰，停止滑行
+    if (!compositeState.ice) {
+      break;
+    }
+  }
+
+  return {
+    valid: true,
+    path: movingTrace
+  };
+}
+
+
+
+

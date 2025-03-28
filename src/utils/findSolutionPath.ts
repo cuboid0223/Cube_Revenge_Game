@@ -34,6 +34,7 @@ import {
   LevelStateSnapshot,
   PlacementConfig,
 } from "@/types/global";
+import { handleIceSliding } from "./handleIceSliding";
 
 function getOutputType(
   type: string,
@@ -175,7 +176,7 @@ export interface CompositeCellState {
   types: string[];
 }
 
-function combineCellState(cell: string): CompositeCellState {
+export function combineCellState(cell: string): CompositeCellState {
   // 拆分 cell 字串，移除空白與空值
   const types = cell
     .split("&")
@@ -277,7 +278,7 @@ export default function findSolutionPath(
   //   - doorMask: switch door 狀態 bit mask（1=關閉、0=開啟）
   //   - path: 走過的路徑陣列
   const queue = new PriorityQueue((a, b) => a[0] - b[0]);
-  const initItemMask = buildItemMask(false, false, false, false);
+  const initItemMask = buildItemMask(false, false, false, false, false);
   const initPath: SolutionPathType = [];
   queue.push([
     0, // f = g + heuristic（初始先 0）
@@ -337,8 +338,11 @@ export default function findSolutionPath(
       // 若為鎖，且 itemMask 中沒取得鑰匙 (bit3)
       if (compositeState.blueLock) {
         const hasBlueKey = newItemMask & 8;
-        console.log("dadasd", compositeState, hasBlueKey);
         if (!hasBlueKey) continue;
+      }
+      if (compositeState.greenLock) {
+        const hasGreenKey = newItemMask & 9;
+        if (!hasGreenKey) continue;
       }
 
       // 處理障礙物：例如火、水，僅當有相應道具時才能通過
@@ -353,7 +357,6 @@ export default function findSolutionPath(
       // 收集面粉：如果該位置在 flourMap 中，則將對應位元設為 1
       const flourKey = `${nx},${ny}`;
       if (flourMap.has(flourKey)) {
-        console.log(compositeState, flourKey);
         const index = flourMap.get(flourKey);
         newFlourMask |= 1 << index;
       }
@@ -418,11 +421,12 @@ export default function findSolutionPath(
           dy,
           nx,
           ny,
-          newItemMask
+          newItemMask,
+          doorMap,
+          doorMask
         );
         newItemMask = iceResult.itemMask;
-        console.log(iceResult);
-
+        // console.log(iceResult);
         if (!iceResult.valid) {
           // 如果冰面路徑無效，跳過這個移動
           continue;
@@ -481,77 +485,4 @@ function heuristicOptimized(
     if (d < minDist) minDist = d;
   });
   return minDist;
-}
-
-function handleIceSliding(
-  gameMap: string[][],
-  width: number,
-  height: number,
-  dx: number,
-  dy: number,
-  initialX: number,
-  initialY: number,
-  itemMask: number
-): { valid: boolean; path: number[][]; itemMask: number } {
-  let nx = initialX;
-  let ny = initialY;
-  const movingTrace: number[][] = [[nx, ny]];
-
-  while (true) {
-    let nextX = nx + dx;
-    let nextY = ny + dy;
-
-    // 邊界檢查
-    if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
-      break;
-    }
-
-    const nextTile = gameMap[nextY - 1][nextX - 1];
-    const compositeState = combineCellState(nextTile);
-
-    // 遇到牆壁停止
-    if (compositeState.wall) {
-      break;
-    }
-
-    // 如果滑進水，沒有對應 pickup ，整個路徑無效
-    if (compositeState.water && !(itemMask & 2)) {
-      return {
-        valid: false,
-        path: [],
-        itemMask: itemMask,
-      };
-    }
-    // 如果滑進火，沒有對應 pickup ，則整個路徑無效
-    if (compositeState.fire && !(itemMask & 1)) {
-      return {
-        valid: false,
-        path: [],
-        itemMask: itemMask,
-      };
-    }
-    if (compositeState.thief) {
-      return {
-        valid: true,
-        path: movingTrace,
-        itemMask: 0,
-      };
-    }
-
-    // 繼續滑行
-    nx = nextX;
-    ny = nextY;
-    movingTrace.push([nx, ny]);
-
-    // 如果下一格不是冰，停止滑行
-    if (!compositeState.ice) {
-      break;
-    }
-  }
-
-  return {
-    valid: true,
-    path: movingTrace,
-    itemMask: itemMask,
-  };
 }

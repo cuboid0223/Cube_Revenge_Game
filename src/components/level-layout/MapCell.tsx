@@ -12,7 +12,7 @@ type MapCellType = {
 };
 
 export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
-  const { isColored, hslColor, frequency } = handleColoredTile(
+  const { isColored, frequency, index } = handleColoredTile(
     undefined,
     x,
     y,
@@ -25,19 +25,19 @@ export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
         position: "absolute",
         left: x * CELL_SIZE,
         top: y * CELL_SIZE,
-        backgroundColor: hslColor,
+        // backgroundColor: hslColor,
       }}
       onClick={() => {
         if (level.enableEditing) {
           level.addPlacement({
             x: x,
             y: y,
-            ...level.editModePlacement
+            ...level.editModePlacement,
           });
         }
       }}
     >
-      {isColored && (
+      {/* {isColored && (
         <div
           style={{
             width: CELL_SIZE,
@@ -49,9 +49,9 @@ export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
         >
           <pre className="absolute text-xs"> {frequency}</pre>
         </div>
-      )}
+      )} */}
 
-      <Sprite frameCoord={frameCoord} />
+      <Sprite frameCoord={frameCoord} isColored={isColored} index={index} />
     </div>
   );
 }

@@ -14,41 +14,40 @@ export function handleColoredTile(
   x: number,
   y: number,
   solutionPath: [number, number][] | null
-): { isColored: boolean; hslColor: string, frequency:number }{
-
+): {
+  isColored: boolean;
+  frequency: number;
+  index: number[];
+} {
   // 1) 檢查此 (x,y) 是否在 solutionPath 裡
-  if(!solutionPath) return { isColored: false , hslColor: "", frequency: 0}
-  const index = solutionPath.findIndex(([px, py]) => px === x && py === y);
-  if (index < 0) {
-    // 不在路徑上 => 不上色
-    return { isColored: false, hslColor: "",frequency: 0 };
-  }
-  const indices = solutionPath.reduce((acc: number[], [px, py], index) => {
-    if (px === x && py === y) {
-      acc.push(index);
+  if (!solutionPath) return { isColored: false, frequency: 0, index: [] };
+  let index = [] as number[];
+  solutionPath.forEach((item, i) => {
+    if (item[0] === x && item[1] === y) {
+      index.push(i);
     }
-    return acc;
-  }, []);
-  const frequency = indices.length
+  });
+  // const index = solutionPath.findIndex(([px, py]) => px === x && py === y);
+  if (index.length == 0) {
+    // 不在路徑上 => 不上色
+    return { isColored: false, frequency: 0, index: [] };
+  }
 
-  // 2) 若在 path 裡, 計算顏色深淺 (index越大 => 越接近 path 終點 => 顏色越深)
-  const ratio = index * frequency  / (solutionPath.length - 1);
-  const hue = 120 - ratio * 30;          // 色相從 120 (綠) 變到 90 (偏藍或青)
-  const lightness = 90 - ratio * 70;
-  const hslColor = `hsl(${hue}, 100%, ${lightness}%)`;
+  const frequency = index.length;
 
-  // 3) 判斷該座標是否有 placement 
+  // 3) 判斷該座標是否有 placement
   //    - 若無 => empty => 直接上色
   //    - 若有 => 需判斷 type 是否在 COLORED_TYPES
-  const isEmpty = !placementType; 
-  const isInColoredTypes = Boolean(placementType && GROUND_PLACEMENT_TYPES.includes(placementType));
+  const isEmpty = !placementType;
+  const isInColoredTypes = Boolean(
+    placementType && GROUND_PLACEMENT_TYPES.includes(placementType)
+  );
 
-  const isColored = (isEmpty || isInColoredTypes);
+  const isColored = isEmpty || isInColoredTypes;
 
   return {
     isColored,
-    hslColor,
-    frequency
+    frequency,
+    index,
   };
 }
-

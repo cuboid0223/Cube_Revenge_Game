@@ -1,19 +1,5 @@
 import React, { CSSProperties } from "react";
-import { Level } from "@/helpers/types";
-import {
-  CELL_SIZE,
-  GROUND_PLACEMENT_TYPES,
-  PLACEMENT_TYPE_CONVEYOR,
-  PLACEMENT_TYPE_FIRE,
-  PLACEMENT_TYPE_ICE,
-  PLACEMENT_TYPE_SWITCH,
-  PLACEMENT_TYPE_SWITCH_DOOR,
-  PLACEMENT_TYPE_TELEPORT,
-  PLACEMENT_TYPE_THIEF,
-  PLACEMENT_TYPE_WATER,
-} from "@/helpers/consts";
-import { handleColoredTile } from "@/utils/handleColoredTile";
-import { Placement } from "@/game-objects/Placement";
+import { GROUND_PLACEMENT_TYPES } from "@/helpers/consts";
 import { LevelStateSnapshot } from "@/types/global";
 import { selectedPlacementTypeAtom } from "@/atoms/selectedPlacementType";
 import { useRecoilValue } from "recoil";
@@ -50,7 +36,6 @@ export default function LevelPlacementsLayer({ level }: Props) {
               !GROUND_PLACEMENT_TYPES.includes(placement.type);
             if (
               isFloatingPlacementSelected &&
-             
               selectedPlacementType !== placement.type
             ) {
               console.log(

@@ -48,9 +48,9 @@ function getOutputType(
     case PLACEMENT_TYPE_CONVEYOR:
       return direction ? `${type}:${direction}` : type;
     case PLACEMENT_TYPE_KEY:
-      return color ? `${type}:${color}` : type;
+      return color ? `${type}:${color}` : `${type}:BLUE`;
     case PLACEMENT_TYPE_LOCK:
-      return color ? `${type}:${color}` : type;
+      return color ? `${type}:${color}` : `${type}:BLUE`;
     default:
       return type;
   }
@@ -72,7 +72,7 @@ export function createMap(level: LevelStateSnapshot): {
   */
   const { tilesWidth: width, tilesHeight: height, placements } = level;
   const gameMap = Array.from({ length: height }, () => Array(width).fill(""));
-
+  console.log(placements);
   placements.forEach(({ x, y, type, corner, color, direction }) => {
     const adjustedX = x - 1;
     const adjustedY = y - 1;
@@ -291,10 +291,14 @@ export default function findSolutionPath(
     initPath,
   ]);
   const visited = new Set();
-
+  let longestPath = [];
   while (!queue.isEmpty()) {
     const [f, g, x, y, flourMask, itemMask, doorMask, path] = queue.pop();
     const newPath = [...path, [x, y]];
+
+    if (longestPath.length < newPath.length) {
+      longestPath = newPath;
+    }
     // 若所有面粉都已收集：判斷方式是比對 bit mask 是否全 1
     if (
       flourMask === (1 << totalFlours) - 1 &&
@@ -462,7 +466,8 @@ export default function findSolutionPath(
       ]);
     }
   }
-  // console.log(visited)
+
+  console.log(longestPath);
   console.log("找不到有效路徑");
   return [];
 }

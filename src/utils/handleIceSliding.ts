@@ -34,13 +34,21 @@ export function handleIceSliding(
     }
     // 滑到鎖沒鑰匙則停止
     if (compositeState.blueLock && !(itemMask & 8)) {
+      console.log("被停止");
       break;
     }
     if (compositeState.greenLock && !(itemMask & 9)) {
       break;
     }
-    // 滑到升降門升起則停止
+    if (compositeState.blueKey) {
+      console.log("滑到鑰匙");
+      itemMask |= 8;
+    }
+    if (compositeState.greenKey) {
+      itemMask |= 9;
+    }
     if (compositeState.switchDoor) {
+      // 滑到升降門升起則停止
       const doorKey = `${nx},${ny}`;
       const doorIndex = doorMap.get(doorKey);
       if (doorIndex !== undefined) {

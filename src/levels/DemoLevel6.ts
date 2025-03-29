@@ -29,14 +29,12 @@ const DemoLevel6 = {
   tilesWidth: 21,
   tilesHeight: 13,
   placements: [
-    { x: 2, y: 2, type: PLACEMENT_TYPE_HERO_SPAWN },
-    { x: 2, y: 2, type: PLACEMENT_TYPE_HERO_EDITING },
+    { x: 2, y: 2, type: "HERO" },
     { type: "GOAL", x: 19, y: 2 },
     { type: "KEY", x: 2, y: 6, color: "BLUE" },
     { type: "LOCK", x: 8, y: 11, color: "GREEN" },
     { type: "LOCK", x: 9, y: 12, color: "GREEN" },
     { type: "LOCK", x: 10, y: 11, color: "GREEN" },
-    { type: "KEY", x: 10, y: 6, color: "BLUE" },
     { type: "KEY", x: 13, y: 9, color: "BLUE" },
     { type: "FLOUR", x: 10, y: 2 },
     { type: "FLOUR", x: 13, y: 4 },
@@ -145,6 +143,8 @@ const DemoLevel6 = {
     { type: "CONVEYOR", x: 13, y: 9, direction: "DOWN" },
     { type: "LOCK", x: 8, y: 2, color: "GREEN" },
     { type: "LOCK", x: 9, y: 10, color: "GREEN" },
+    { type: "LOCK", x: 8, y: 6, color: "BLUE" },
+    { type: "KEY", x: 10, y: 6, color: "GREEN" },
   ],
 };
 export default DemoLevel6;

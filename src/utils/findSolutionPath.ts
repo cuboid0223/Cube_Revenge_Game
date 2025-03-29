@@ -367,12 +367,12 @@ export default function findSolutionPath(
       // 若為鎖，且 itemMask 中沒取得鑰匙 (bit3)
       if (compositeState.blueLock) {
         const hasBlueKey = newItemMask & 8;
-        console.log(`遇到藍鎖([${nx}${ny}])，有鑰匙 ${hasBlueKey}`)
+        console.log(`遇到藍鎖([${nx}${ny}])，有鑰匙 ${hasBlueKey}`);
         if (!(newItemMask & 8)) continue;
       }
       if (compositeState.greenLock) {
         const hasGreenKey = newItemMask & 16;
-        console.log(`遇到綠鎖([${nx}${ny}])，有鑰匙 ${hasGreenKey}`)
+        console.log(`遇到綠鎖([${nx}${ny}])，有鑰匙 ${hasGreenKey}`);
         if (!(newItemMask & 16)) continue;
       }
 
@@ -419,10 +419,19 @@ export default function findSolutionPath(
       if (compositeState.teleport) {
         const teleportTargets = placements.filter(
           (p) =>
-            p.type === PLACEMENT_TYPE_TELEPORT && (p.x !== nx || p.y !== ny)
+            p.type === PLACEMENT_TYPE_TELEPORT
         );
+        console.log(`遇到傳送門走進去 ${teleportTargets}`);
         if (teleportTargets.length > 0) {
-          const tp = teleportTargets[0];
+          // 計算目前傳送門的 index
+          const currentIndex = teleportTargets.findIndex(
+            (p) => p.x === nx && p.y === ny
+          );
+
+          // 計算下一個傳送門的 index，並處理循環
+          const nextIndex = (currentIndex + 1) % teleportTargets.length;
+          const tp = teleportTargets[nextIndex];
+
           nx = tp.x;
           ny = tp.y;
           console.log(`Teleported to (${nx}, ${ny})`);

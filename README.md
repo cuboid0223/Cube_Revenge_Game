@@ -8,7 +8,7 @@ The hero must collect all the `FLOUR` on the map and reach the goal to clear the
 1. No game engine used; rendering is entirely handled with React.
 
 2. Implements an **A\* algorithm to find the shortest path to complete the game based on game mechanics**.
-   ![image](/public/path.gif)
+   ![image](/public/ice_path.png)
 
 3. **Random level generation is achieved through the Random Walker algorithm**.
    ![image](/public/4.gif)

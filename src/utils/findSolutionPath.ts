@@ -219,6 +219,22 @@ export function combineCellState(cell: string): CompositeCellState {
     }
   });
 
+  types.forEach((t) => {
+    // 若 t 以 "CONVEYOR:" 開頭，則拆分出方向資訊
+    if (t.startsWith(PLACEMENT_TYPE_CONVEYOR + ":")) {
+      state.conveyor = true;
+      const parts = t.split(":");
+      if (parts.length > 1) {
+        state.conveyorDir = parts[1]; // 例如 "TOP_LEFT", "TOP_RIGHT" 等
+      }
+    } else if (t === PLACEMENT_TYPE_CONVEYOR) {
+      // 預設往右
+      state.conveyorDir = "RIGHT";
+    }
+  });
+
+
+
   return state;
 }
 
@@ -367,12 +383,12 @@ export default function findSolutionPath(
       // 若為鎖，且 itemMask 中沒取得鑰匙 (bit3)
       if (compositeState.blueLock) {
         const hasBlueKey = newItemMask & 8;
-        console.log(`遇到藍鎖([${nx}${ny}])，有鑰匙 ${hasBlueKey}`);
+        // console.log(`遇到藍鎖([${nx}${ny}])，有鑰匙 ${hasBlueKey}`);
         if (!(newItemMask & 8)) continue;
       }
       if (compositeState.greenLock) {
         const hasGreenKey = newItemMask & 16;
-        console.log(`遇到綠鎖([${nx}${ny}])，有鑰匙 ${hasGreenKey}`);
+        // console.log(`遇到綠鎖([${nx}${ny}])，有鑰匙 ${hasGreenKey}`);
         if (!(newItemMask & 16)) continue;
       }
 
@@ -421,7 +437,6 @@ export default function findSolutionPath(
           (p) =>
             p.type === PLACEMENT_TYPE_TELEPORT
         );
-        console.log(`遇到傳送門走進去 ${teleportTargets}`);
         if (teleportTargets.length > 0) {
           // 計算目前傳送門的 index
           const currentIndex = teleportTargets.findIndex(
@@ -442,6 +457,7 @@ export default function findSolutionPath(
         const conveyor = placements.find(
           (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_CONVEYOR
         );
+        console.log( conveyor)
         if (conveyor) {
           const { direction } = conveyor;
           if (direction === "UP") ny -= 1;

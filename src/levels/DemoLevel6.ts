@@ -29,7 +29,8 @@ const DemoLevel6 = {
   tilesWidth: 21,
   tilesHeight: 13,
   placements: [
-    { x: 2, y: 2, type: "HERO" },
+    { x: 2, y: 2, type: PLACEMENT_TYPE_HERO_EDITING },
+    { x: 2, y: 2, type: PLACEMENT_TYPE_HERO_SPAWN },
     { type: "GOAL", x: 19, y: 2 },
     { type: "KEY", x: 2, y: 6, color: "BLUE" },
     { type: "LOCK", x: 8, y: 11, color: "GREEN" },

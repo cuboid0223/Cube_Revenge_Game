@@ -24,6 +24,7 @@ export default function LevelPlacementsLayer({ level }: Props) {
       return (
         <div
           key={placement.id}
+          className="z-100"
           style={style}
           onClick={() => {
             if (!level.enableEditing || !placement.canBeDeleted()) {

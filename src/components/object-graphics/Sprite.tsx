@@ -62,7 +62,7 @@ function Sprite({ frameCoord, size = 16, isColored, index }: SpriteProps) {
             return (
               <p
                 key={i} // 確保每個元素有唯一的 `key`
-                className="text-[4px] w-fit px-[1px] text-right text-white opacity-100 bg-yellow-500 rounded-full"
+                className="text-[4px] w-fit h-fit px-[1px] text-right text-white opacity-100 bg-yellow-500 rounded-full"
               >
                 {i + 1}
               </p>

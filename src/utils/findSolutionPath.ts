@@ -143,7 +143,7 @@ function buildItemMask(
   if (hasWater) mask |= 2;
   if (hasIce) mask |= 4;
   if (hasBlueKey) mask |= 8;
-  if (hasGreenKey) mask |= 9;
+  if (hasGreenKey) mask |= 16;
   return mask;
 }
 
@@ -367,11 +367,13 @@ export default function findSolutionPath(
       // 若為鎖，且 itemMask 中沒取得鑰匙 (bit3)
       if (compositeState.blueLock) {
         const hasBlueKey = newItemMask & 8;
-        if (!hasBlueKey) continue;
+        console.log(`遇到藍鎖([${nx}${ny}])，有鑰匙 ${hasBlueKey}`)
+        if (!(newItemMask & 8)) continue;
       }
       if (compositeState.greenLock) {
-        const hasGreenKey = newItemMask & 9;
-        if (!hasGreenKey) continue;
+        const hasGreenKey = newItemMask & 16;
+        console.log(`遇到綠鎖([${nx}${ny}])，有鑰匙 ${hasGreenKey}`)
+        if (!(newItemMask & 16)) continue;
       }
 
       // 處理障礙物：例如火、水，僅當有相應道具時才能通過
@@ -405,7 +407,7 @@ export default function findSolutionPath(
         newItemMask |= 8;
       }
       if (compositeState.greenKey) {
-        newItemMask |= 9;
+        newItemMask |= 16;
       }
 
       // 處理 Thief：若遇到小偷，重置所有道具

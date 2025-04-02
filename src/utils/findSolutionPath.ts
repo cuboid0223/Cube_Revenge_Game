@@ -348,6 +348,7 @@ export default function findSolutionPath(
 
       if (compositeState.ice) {
         const iceResult = handleIceSliding(
+          placements,
           gameMap,
           width,
           height,
@@ -357,7 +358,8 @@ export default function findSolutionPath(
           ny,
           newItemMask,
           doorMap,
-          doorMask
+          doorMask,
+          compositeState.iceCorner
         );
         newItemMask = iceResult.itemMask;
         // console.log(iceResult);

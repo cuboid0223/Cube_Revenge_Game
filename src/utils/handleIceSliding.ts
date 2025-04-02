@@ -180,11 +180,6 @@ export function handleIceSliding(
       }
     }
 
-    // 繼續滑行
-    nx = nextX;
-    ny = nextY;
-    movingTrace.push([nx, ny]);
-
     // 如果滑進 THIEF，itemMask 清空，但整個路徑有效
     if (compositeState.thief) {
       // console.log("踩到冰滑進  THIEF", movingTrace);
@@ -195,6 +190,11 @@ export function handleIceSliding(
         flourMask: flourMask,
       };
     }
+
+    // 繼續滑行
+    nx = nextX;
+    ny = nextY;
+    movingTrace.push([nx, ny]);
 
     // 如果下一格不是冰，停止滑行
     if (!compositeState.ice) {

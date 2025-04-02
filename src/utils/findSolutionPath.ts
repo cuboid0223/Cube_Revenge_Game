@@ -360,7 +360,7 @@ export default function findSolutionPath(
           continue;
         }
       }
-
+      // 若為冰面
       if (compositeState.ice) {
         const iceResult = handleIceSliding(
           placements,
@@ -411,7 +411,7 @@ export default function findSolutionPath(
         if (!(newItemMask & 16)) continue;
       }
 
-      // 處理障礙物：例如火、水，僅當有相應道具時才能通過
+      // 如火、水，僅當有相應道具時才能通過
       if (compositeState.fire && !(newItemMask & 1)) continue;
       if (compositeState.water && !(newItemMask & 2)) continue;
 

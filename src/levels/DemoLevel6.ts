@@ -146,6 +146,7 @@ const DemoLevel6 = {
     { type: "LOCK", x: 9, y: 10, color: "GREEN" },
     { type: "LOCK", x: 8, y: 6, color: "BLUE" },
     { type: "KEY", x: 10, y: 6, color: "GREEN" },
+    { type: "LOCK", x: 20, y: 10, color: "BLUE" },
   ],
 };
 export default DemoLevel6;

@@ -35,20 +35,15 @@ export function handleIceSliding(
 
   while (true) {
     // 取得在滑動過程經過的冰
+    let nextX = nx + dx;
+    let nextY = ny + dy;
     const icePlacementWhileSliding = placements.find(
       (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE
     );
-    let nextX = nx + dx;
-    let nextY = ny + dy;
 
     if (icePlacementWhileSliding?.corner) {
       const corner = icePlacementWhileSliding?.corner;
       const newDirection = iceTileCornerRedirection[corner][entryDirection];
-      // console.log(`在滑動過程遇到的 ${corner}`);
-
-      // console.log(
-      //   `進入 ${corner} 的方向是${entryDirection}，站在 ${corner}[${nx}, ${ny}] 要前往的方向是${entryDirection} [${nextX}, ${nextY}]`
-      // );
 
       if (newDirection) {
         // 處理重定向（如果可以從這個方向進入角落）
@@ -81,6 +76,9 @@ export function handleIceSliding(
         nextY = ny + dy;
         movingTrace.push([nextX, nextY]);
         console.log(`向 ${newDirection} 轉至 [${nx + dx}, ${ny + dy}]`);
+      } else {
+        console.log(`blocked at ${nx + dx} and ${ny + dy}`);
+        break;
       }
     }
 
@@ -185,7 +183,7 @@ export function handleIceSliding(
   };
 }
 
-function getHeroDirection(dx: number, dy: number) {
+export function getHeroDirection(dx: number, dy: number) {
   let entryDirection = "";
   // 根據移動方向確定進入方向
   if (dx > 0) {

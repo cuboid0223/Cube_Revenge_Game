@@ -34,7 +34,7 @@ import {
   LevelStateSnapshot,
   PlacementConfig,
 } from "@/types/global";
-import { handleIceSliding } from "./handleIceSliding";
+import { getHeroDirection, handleIceSliding } from "./handleIceSliding";
 
 function getOutputType(
   type: string,
@@ -343,6 +343,16 @@ export default function findSolutionPath(
       let newDoorMask = doorMask;
 
       if (compositeState.wall) continue;
+      if (compositeState.iceCorner) {
+        const dir = getHeroDirection(dx, dy);
+
+        if (!iceTileCornerBlockedMoves[compositeState.iceCorner][dir]) {
+          console.log(
+            `hero 在 [${x}, ${y}], 往[${dx}, ${dy}] 前進至[${nx}, ${ny}]被擋`
+          );
+          continue;
+        }
+      }
 
       if (compositeState.ice) {
         const iceResult = handleIceSliding(

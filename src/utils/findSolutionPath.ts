@@ -233,8 +233,6 @@ export function combineCellState(cell: string): CompositeCellState {
     }
   });
 
-
-
   return state;
 }
 
@@ -436,8 +434,7 @@ export default function findSolutionPath(
       // 處理 Teleport
       if (compositeState.teleport) {
         const teleportTargets = placements.filter(
-          (p) =>
-            p.type === PLACEMENT_TYPE_TELEPORT
+          (p) => p.type === PLACEMENT_TYPE_TELEPORT
         );
         if (teleportTargets.length > 0) {
           // 計算目前傳送門的 index
@@ -459,14 +456,14 @@ export default function findSolutionPath(
         const conveyor = placements.find(
           (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_CONVEYOR
         );
-        console.log( conveyor)
+
         if (conveyor) {
           const { direction } = conveyor;
           if (direction === "UP") ny -= 1;
           else if (direction === "DOWN") ny += 1;
           else if (direction === "LEFT") nx -= 1;
           else if (direction === "RIGHT") nx += 1;
-          console.log(`Conveyor moved to (${nx}, ${ny})`);
+          // console.log(`Conveyor moved to (${nx}, ${ny})`);
         }
       }
 

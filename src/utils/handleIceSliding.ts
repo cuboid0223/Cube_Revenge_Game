@@ -8,6 +8,7 @@ import {
   DIRECTION_LEFT,
   DIRECTION_RIGHT,
   DIRECTION_UP,
+  PLACEMENT_TYPE_CONVEYOR,
   PLACEMENT_TYPE_ICE,
 } from "@/helpers/consts";
 import { PlacementConfig } from "@/types/global";
@@ -33,46 +34,27 @@ export function handleIceSliding(
   let entryDirection = getHeroDirection(dx, dy);
 
   while (true) {
-     // 取得在滑動過程經過的冰
+    // 取得在滑動過程經過的冰
     const icePlacementWhileSliding = placements.find(
       (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE
     );
-    console.log(icePlacementWhileSliding)
-    // 處理撞到柵欄(corner)
-    // 處理進入角落的情況
+    let nextX = nx + dx;
+    let nextY = ny + dy;
+
     if (icePlacementWhileSliding?.corner) {
-      console.log(`在滑動過程遇到的 ${icePlacementWhileSliding?.corner}`)
-      const corner = icePlacementWhileSliding?.corner
-      // 確定進入方向
-      // 這裡需要注意：我們要看的是「我們從哪個方向進入目標格子」
+      const corner = icePlacementWhileSliding?.corner;
+      const newDirection = iceTileCornerRedirection[corner][entryDirection];
+      // console.log(`在滑動過程遇到的 ${corner}`);
 
-      // 檢查這個進入方向是否被阻擋
-      if (iceTileCornerBlockedMoves[corner][entryDirection]) {
-        // 如果進入被阻擋，停止滑行
-        // nextX = nextX - dx
-        // nextY = nextY - dy
+      // console.log(
+      //   `進入 ${corner} 的方向是${entryDirection}，站在 ${corner}[${nx}, ${ny}] 要前往的方向是${entryDirection} [${nextX}, ${nextY}]`
+      // );
+
+      if (newDirection) {
+        // 處理重定向（如果可以從這個方向進入角落）
         console.log(
-          `HERO 在[${nx}, ${ny}]要往 ${entryDirection} 走到 [${nx + dx}, ${ny + dy}]，但是被 CORNER([${nx}, ${ny}]) 阻擋`
+          `Hero 從 ${entryDirection} 進入 ${corner}[${nx}, ${ny}] 轉向至 ${newDirection} `
         );
-        break;
-      }
-
-      // 處理重定向（如果可以從這個方向進入角落）
-      if (corner && nx === 4 && ny ===9 ) {
-        console.log(
-          `${corner} 在 [${nx}, ${ny}], HERO 前進方向為 ${entryDirection} 走到 [${nx + dx}, ${ny + dy}]`
-        );
-        console.log(`${iceTileCornerRedirection[corner][entryDirection]}`);
-      }
-
-      if (
-        iceTileCornerRedirection[corner] &&
-        iceTileCornerRedirection[corner][entryDirection]
-      ) {
-        // 獲取新的方向
-        const newDirection =
-          iceTileCornerRedirection[corner][entryDirection];
-
         // 根據新方向更新dx和dy
         switch (newDirection) {
           case DIRECTION_RIGHT:
@@ -95,23 +77,18 @@ export function handleIceSliding(
         entryDirection = newDirection;
 
         // 移動到角落位置
-        // nextX = nextX + dx;
-        // nextY = nextY + dy;
-        // movingTrace.push([nextX, nextY]);
+        nextX = nx + dx;
+        nextY = ny + dy;
+        movingTrace.push([nextX, nextY]);
         console.log(`向 ${newDirection} 轉至 [${nx + dx}, ${ny + dy}]`);
-        // 跳過當前迭代的剩餘部分，使用新方向繼續
-        //break;
       }
     }
-
-    let nextX = nx + dx;
-    let nextY = ny + dy;
 
     // 邊界檢查
     if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
       break;
     }
-   
+
     // 處理 ice pickup
     if (hasIcePickup) {
     }
@@ -162,6 +139,22 @@ export function handleIceSliding(
         path: [],
         itemMask: itemMask,
       };
+    }
+
+    // 處理 Conveyor
+    if (compositeState.conveyor) {
+      const conveyor = placements.find(
+        (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_CONVEYOR
+      );
+
+      if (conveyor) {
+        const { direction } = conveyor;
+        if (direction === "UP") ny -= 1;
+        else if (direction === "DOWN") ny += 1;
+        else if (direction === "LEFT") nx -= 1;
+        else if (direction === "RIGHT") nx += 1;
+        // console.log(`Conveyor moved to (${nx}, ${ny})`);
+      }
     }
 
     // 繼續滑行

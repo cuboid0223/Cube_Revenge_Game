@@ -21,28 +21,28 @@ import {
   PLACEMENT_TYPE_TELEPORT,
   PLACEMENT_TYPE_THIEF,
   PLACEMENT_TYPE_CIABATTA,
+  PLACEMENT_TYPE_HERO_EDITING,
+  PLACEMENT_TYPE_HERO_SPAWN,
+  PLACEMENT_TYPE_GOAL_ENABLED,
 } from "../helpers/consts";
 const DemoLevel7 = {
   theme: LEVEL_THEMES.GRAY,
   tilesWidth: 13,
   tilesHeight: 13,
   placements: [
-    { x: 7, y: 4, type: PLACEMENT_TYPE_HERO },
-    { x: 7, y: 10, type: PLACEMENT_TYPE_GOAL },
+    // { x: 7, y: 4, type: PLACEMENT_TYPE_HERO },
+    { x: 7, y: 4, type: PLACEMENT_TYPE_HERO_EDITING },
+    { x: 7, y: 4, type: PLACEMENT_TYPE_HERO_SPAWN },
+    { x: 7, y: 10, type: PLACEMENT_TYPE_GOAL_ENABLED },
 
-    { x: 7, y: 1, type: PLACEMENT_TYPE_CIABATTA },
+    // { x: 7, y: 1, type: PLACEMENT_TYPE_CIABATTA },
 
-    { x: 12, y: 4, type: PLACEMENT_TYPE_KEY, color: "GREEN" },
-    { x: 10, y: 10, type: PLACEMENT_TYPE_LOCK, color: "GREEN" },
-    { x: 2, y: 4, type: PLACEMENT_TYPE_KEY, color: "BLUE" },
-    { x: 4, y: 10, type: PLACEMENT_TYPE_LOCK, color: "BLUE" },
-
-    { x: 5, y: 6, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: true },
-    { x: 6, y: 6, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: true },
-    { x: 7, y: 6, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: true },
-    { x: 7, y: 13, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: true },
-    { x: 8, y: 6, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: true },
-    { x: 9, y: 6, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: true },
+    { x: 5, y: 6, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: false },
+    { x: 6, y: 6, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: false },
+    { x: 7, y: 6, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: false },
+    { x: 7, y: 13, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: false },
+    { x: 8, y: 6, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: false },
+    { x: 9, y: 6, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: false },
     { x: 4, y: 1, type: PLACEMENT_TYPE_SWITCH },
     { x: 10, y: 1, type: PLACEMENT_TYPE_SWITCH },
 
@@ -194,6 +194,10 @@ const DemoLevel7 = {
     { x: 2, y: 12, type: PLACEMENT_TYPE_FLOUR },
     { x: 12, y: 8, type: PLACEMENT_TYPE_FLOUR },
     { x: 12, y: 12, type: PLACEMENT_TYPE_FLOUR },
+    { x: 12, y: 4, type: PLACEMENT_TYPE_KEY, color: "GREEN" },
+    { x: 10, y: 10, type: PLACEMENT_TYPE_LOCK, color: "GREEN" },
+    { x: 2, y: 4, type: PLACEMENT_TYPE_KEY, color: "BLUE" },
+    { x: 4, y: 10, type: PLACEMENT_TYPE_LOCK, color: "BLUE" },
   ],
 };
 

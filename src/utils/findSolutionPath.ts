@@ -34,7 +34,7 @@ import {
   LevelStateSnapshot,
   PlacementConfig,
 } from "@/types/global";
-import { handleIceSliding } from "./handleIceSliding";
+import { getHeroDirection, handleIceSliding } from "./handleIceSliding";
 
 function getOutputType(
   type: string,
@@ -106,7 +106,7 @@ export function findPositions(placements: PlacementConfig[], type: string) {
 //––––– 事前準備 –––––//
 // 為面粉建立一個 mapping：key = "x,y" ； value = index（從 0 開始）
 // 假設 placements 中面粉數量不多
-function buildFlourMapping(placements: PlacementConfig[]) {
+export function buildFlourMapping(placements: PlacementConfig[]) {
   const flourPositions = placements.filter(
     (p) => p.type === PLACEMENT_TYPE_FLOUR
   );
@@ -233,8 +233,6 @@ export function combineCellState(cell: string): CompositeCellState {
     }
   });
 
-
-
   return state;
 }
 
@@ -315,6 +313,11 @@ export default function findSolutionPath(
     if (longestPath.length < newPath.length) {
       longestPath = newPath;
     }
+    if (flourMask === (1 << totalFlours) - 1) {
+      console.log("收集全部面粉！");
+      console.log(newPath);
+      // return newPath;
+    }
     // 若所有面粉都已收集：判斷方式是比對 bit mask 是否全 1
     if (
       flourMask === (1 << totalFlours) - 1 &&
@@ -346,8 +349,21 @@ export default function findSolutionPath(
 
       if (compositeState.wall) continue;
 
+      //  當從非冰面進入到 iceCorner ，先檢查有無被iceCorner 阻擋
+      if (compositeState.iceCorner) {
+        const dir = getHeroDirection(dx, dy);
+
+        if (!iceTileCornerBlockedMoves[compositeState.iceCorner][dir]) {
+          console.log(
+            `hero 在 [${x}, ${y}], 往[${dx}, ${dy}] 前進至[${nx}, ${ny}]被擋`
+          );
+          continue;
+        }
+      }
+      // 若為冰面
       if (compositeState.ice) {
         const iceResult = handleIceSliding(
+          placements,
           gameMap,
           width,
           height,
@@ -357,9 +373,12 @@ export default function findSolutionPath(
           ny,
           newItemMask,
           doorMap,
-          doorMask
+          doorMask,
+          flourMask,
+          compositeState.iceCorner
         );
         newItemMask = iceResult.itemMask;
+        newFlourMask = iceResult.flourMask;
         // console.log(iceResult);
         if (!iceResult.valid) {
           // 如果冰面路徑無效，跳過這個移動
@@ -392,7 +411,7 @@ export default function findSolutionPath(
         if (!(newItemMask & 16)) continue;
       }
 
-      // 處理障礙物：例如火、水，僅當有相應道具時才能通過
+      // 如火、水，僅當有相應道具時才能通過
       if (compositeState.fire && !(newItemMask & 1)) continue;
       if (compositeState.water && !(newItemMask & 2)) continue;
 
@@ -402,12 +421,14 @@ export default function findSolutionPath(
       }
 
       // 收集面粉：如果該位置在 flourMap 中，則將對應位元設為 1
-      const flourKey = `${nx},${ny}`;
-      if (flourMap.has(flourKey)) {
-        const index = flourMap.get(flourKey);
-        newFlourMask |= 1 << index;
-      }
 
+      if (compositeState.flour) {
+        const flourKey = `${nx},${ny}`;
+        if (flourMap.has(flourKey)) {
+          const index = flourMap.get(flourKey);
+          newFlourMask |= 1 << index;
+        }
+      }
       // 處理拾取道具：火焰、流水、冰、鑰匙等
       // 假設各拾取物件出現在某一位置時，就把對應的 bit 打開
       if (compositeState.firePickup) {
@@ -434,8 +455,7 @@ export default function findSolutionPath(
       // 處理 Teleport
       if (compositeState.teleport) {
         const teleportTargets = placements.filter(
-          (p) =>
-            p.type === PLACEMENT_TYPE_TELEPORT
+          (p) => p.type === PLACEMENT_TYPE_TELEPORT
         );
         if (teleportTargets.length > 0) {
           // 計算目前傳送門的 index
@@ -457,14 +477,14 @@ export default function findSolutionPath(
         const conveyor = placements.find(
           (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_CONVEYOR
         );
-        console.log( conveyor)
+
         if (conveyor) {
           const { direction } = conveyor;
           if (direction === "UP") ny -= 1;
           else if (direction === "DOWN") ny += 1;
           else if (direction === "LEFT") nx -= 1;
           else if (direction === "RIGHT") nx += 1;
-          console.log(`Conveyor moved to (${nx}, ${ny})`);
+          // console.log(`Conveyor moved to (${nx}, ${ny})`);
         }
       }
 

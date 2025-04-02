@@ -56,13 +56,19 @@ function Sprite({ frameCoord, size = 16, isColored, index }: SpriteProps) {
 
   return (
     <div className="relative">
-      <div className={`${isColored ? " absolute z-50 h-4 w-4 " : ""}`}>
+      <div
+        className={`${
+          isColored
+            ? " absolute z-50 h-4 w-4 grid grid-flow-col grid-rows-3 grid-cols-2"
+            : ""
+        }`}
+      >
         {isColored &&
           index.map((i) => {
             return (
               <p
                 key={i} // 確保每個元素有唯一的 `key`
-                className="text-[4px] w-fit h-fit px-[1px] text-right text-white opacity-100 bg-yellow-500 rounded-full"
+                className="text-[4px] w-fit h-fit px-[1px] text-center text-white bg-yellow-500 rounded-full"
               >
                 {i + 1}
               </p>

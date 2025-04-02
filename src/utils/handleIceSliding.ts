@@ -39,20 +39,39 @@ export function handleIceSliding(
   const hasIcePickup = itemMask & 4;
   let entryDirection = getHeroDirection(dx, dy);
   const { flourMap, totalFlours } = buildFlourMapping(placements);
+  if (hasIcePickup) {
+    // console.log(`   [${nx}, ${ny}]  [${dx}, ${dy}]`);
+    return {
+      valid: true,
+      path: [
+        [nx, ny],
+        // [nx + dx, ny + dy],
+      ],
+      itemMask: itemMask,
+      flourMask: flourMask,
+    };
+  }
   while (true) {
     // 取得在滑動過程經過的冰
     let nextX = nx + dx;
     let nextY = ny + dy;
+    // 邊界檢查
+    if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
+      break;
+    }
+    const nextTile = gameMap[nextY - 1][nextX - 1];
+    const compositeState = combineCellState(nextTile);
+    const hasIcePickup = !(itemMask & 4);
     const icePlacementWhileSliding = placements.find(
       (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE
     );
 
-    //  當從冰面滑進到 iceCorner ，根據 iceCorner 轉向
     if (icePlacementWhileSliding?.corner) {
+      //  當從冰面滑進到 iceCorner ，根據 iceCorner 轉向
       const corner = icePlacementWhileSliding?.corner;
       const newDirection = iceTileCornerRedirection[corner][entryDirection];
 
-      if (newDirection) {
+      if (newDirection && !hasIcePickup) {
         // 處理重定向（如果可以從這個方向進入角落）
         // console.log(
         //   `Hero 從 ${entryDirection} 進入 ${corner}[${nx}, ${ny}] 轉向至 ${newDirection} `
@@ -88,13 +107,6 @@ export function handleIceSliding(
       }
     }
 
-    // 邊界檢查
-    if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
-      break;
-    }
-
-    const nextTile = gameMap[nextY - 1][nextX - 1];
-    const compositeState = combineCellState(nextTile);
     if (compositeState.flour) {
       console.log(`滑到 flour [${nextX},${nextY}]`);
       const flourKey = `${nextX},${nextY}`;

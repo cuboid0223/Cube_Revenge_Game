@@ -438,6 +438,7 @@ export default function findSolutionPath(
         newItemMask |= 2;
       }
       if (compositeState.icePickup) {
+        console.log("get icePickup");
         newItemMask |= 4;
       }
       if (compositeState.blueKey) {

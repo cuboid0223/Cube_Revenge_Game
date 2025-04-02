@@ -2,7 +2,7 @@ import {
   iceTileCornerBlockedMoves,
   iceTileCornerRedirection,
 } from "@/game-objects/IcePlacement";
-import { combineCellState } from "./findSolutionPath";
+import { buildFlourMapping, combineCellState } from "./findSolutionPath";
 import {
   DIRECTION_DOWN,
   DIRECTION_LEFT,
@@ -25,14 +25,20 @@ export function handleIceSliding(
   itemMask: number,
   doorMap: Map<string, number>,
   doorMask: number,
+  flourMask: number,
   iceCorner?: string
-): { valid: boolean; path: number[][]; itemMask: number } {
+): {
+  valid: boolean;
+  path: number[][];
+  itemMask: number;
+  flourMask: number;
+} {
   let nx = initialX;
   let ny = initialY;
   const movingTrace: number[][] = [[nx, ny]];
   const hasIcePickup = itemMask & 4;
   let entryDirection = getHeroDirection(dx, dy);
-
+  const { flourMap, totalFlours } = buildFlourMapping(placements);
   while (true) {
     // 取得在滑動過程經過的冰
     let nextX = nx + dx;
@@ -41,15 +47,16 @@ export function handleIceSliding(
       (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE
     );
 
+    //  當從冰面滑進到 iceCorner ，根據 iceCorner 轉向
     if (icePlacementWhileSliding?.corner) {
       const corner = icePlacementWhileSliding?.corner;
       const newDirection = iceTileCornerRedirection[corner][entryDirection];
 
       if (newDirection) {
         // 處理重定向（如果可以從這個方向進入角落）
-        console.log(
-          `Hero 從 ${entryDirection} 進入 ${corner}[${nx}, ${ny}] 轉向至 ${newDirection} `
-        );
+        // console.log(
+        //   `Hero 從 ${entryDirection} 進入 ${corner}[${nx}, ${ny}] 轉向至 ${newDirection} `
+        // );
         // 根據新方向更新dx和dy
         switch (newDirection) {
           case DIRECTION_RIGHT:
@@ -75,9 +82,8 @@ export function handleIceSliding(
         nextX = nx + dx;
         nextY = ny + dy;
         movingTrace.push([nextX, nextY]);
-        console.log(`向 ${newDirection} 轉至 [${nx + dx}, ${ny + dy}]`);
+        // console.log(`向 ${newDirection} 轉至 [${nx + dx}, ${ny + dy}]`);
       } else {
-        console.log(`blocked at ${nx + dx} and ${ny + dy}`);
         break;
       }
     }
@@ -87,12 +93,16 @@ export function handleIceSliding(
       break;
     }
 
-    // 處理 ice pickup
-    if (hasIcePickup) {
-    }
-
     const nextTile = gameMap[nextY - 1][nextX - 1];
     const compositeState = combineCellState(nextTile);
+    if (compositeState.flour) {
+      console.log(`滑到 flour [${nextX},${nextY}]`);
+      const flourKey = `${nextX},${nextY}`;
+      if (flourMap.has(flourKey)) {
+        const index = flourMap.get(flourKey);
+        flourMask |= 1 << index;
+      }
+    }
 
     // 遇到牆壁停止
     if (compositeState.wall) {
@@ -100,18 +110,30 @@ export function handleIceSliding(
     }
     // 滑到鎖沒鑰匙則停止
     if (compositeState.blueLock && !(itemMask & 8)) {
-      console.log("被停止");
+      console.log("被blueLock停止");
       break;
     }
-    if (compositeState.greenLock && !(itemMask & 9)) {
+    if (compositeState.greenLock && !(itemMask & 16)) {
+      console.log("被greenLock停止");
       break;
+    }
+
+    if (compositeState.firePickup) {
+      itemMask |= 1;
+    }
+    if (compositeState.waterPickup) {
+      itemMask |= 2;
+    }
+    if (compositeState.icePickup) {
+      itemMask |= 4;
     }
     if (compositeState.blueKey) {
-      console.log("滑到鑰匙");
+      console.log("滑到 blueKey");
       itemMask |= 8;
     }
     if (compositeState.greenKey) {
-      itemMask |= 9;
+      console.log("滑到 greenKey");
+      itemMask |= 16;
     }
     if (compositeState.switchDoor) {
       // 滑到升降門升起則停止
@@ -128,6 +150,7 @@ export function handleIceSliding(
         valid: false,
         path: [],
         itemMask: itemMask,
+        flourMask: flourMask,
       };
     }
     // 如果滑進火，沒有對應 pickup ，則整個路徑無效
@@ -136,21 +159,23 @@ export function handleIceSliding(
         valid: false,
         path: [],
         itemMask: itemMask,
+        flourMask: flourMask,
       };
     }
 
     // 處理 Conveyor
     if (compositeState.conveyor) {
       const conveyor = placements.find(
-        (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_CONVEYOR
+        (p) =>
+          p.x === nextX && p.y === nextY && p.type === PLACEMENT_TYPE_CONVEYOR
       );
 
       if (conveyor) {
         const { direction } = conveyor;
-        if (direction === "UP") ny -= 1;
-        else if (direction === "DOWN") ny += 1;
-        else if (direction === "LEFT") nx -= 1;
-        else if (direction === "RIGHT") nx += 1;
+        if (direction === "UP") nextY -= 1;
+        else if (direction === "DOWN") nextY += 1;
+        else if (direction === "LEFT") nextX -= 1;
+        else if (direction === "RIGHT") nextX += 1;
         // console.log(`Conveyor moved to (${nx}, ${ny})`);
       }
     }
@@ -162,11 +187,12 @@ export function handleIceSliding(
 
     // 如果滑進 THIEF，itemMask 清空，但整個路徑有效
     if (compositeState.thief) {
-      console.log("踩到冰滑進  THIEF", movingTrace);
+      // console.log("踩到冰滑進  THIEF", movingTrace);
       return {
         valid: true,
         path: movingTrace,
         itemMask: 0,
+        flourMask: flourMask,
       };
     }
 
@@ -180,6 +206,7 @@ export function handleIceSliding(
     valid: true,
     path: movingTrace,
     itemMask: itemMask,
+    flourMask: flourMask,
   };
 }
 

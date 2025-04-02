@@ -23,6 +23,7 @@ import {
   PLACEMENT_TYPE_CIABATTA,
   PLACEMENT_TYPE_HERO_EDITING,
   PLACEMENT_TYPE_HERO_SPAWN,
+  PLACEMENT_TYPE_GOAL_ENABLED,
 } from "../helpers/consts";
 const DemoLevel7 = {
   theme: LEVEL_THEMES.GRAY,
@@ -30,13 +31,11 @@ const DemoLevel7 = {
   tilesHeight: 13,
   placements: [
     // { x: 7, y: 4, type: PLACEMENT_TYPE_HERO },
-     {x: 7, y: 4, type: PLACEMENT_TYPE_HERO_EDITING },
-        { x: 7, y: 4, type: PLACEMENT_TYPE_HERO_SPAWN },
-    { x: 7, y: 10, type: PLACEMENT_TYPE_GOAL },
+    { x: 7, y: 4, type: PLACEMENT_TYPE_HERO_EDITING },
+    { x: 7, y: 4, type: PLACEMENT_TYPE_HERO_SPAWN },
+    { x: 7, y: 10, type: PLACEMENT_TYPE_GOAL_ENABLED },
 
     // { x: 7, y: 1, type: PLACEMENT_TYPE_CIABATTA },
-
-   
 
     { x: 5, y: 6, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: false },
     { x: 6, y: 6, type: PLACEMENT_TYPE_SWITCH_DOOR, isRaised: false },

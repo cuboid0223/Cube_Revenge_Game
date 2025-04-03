@@ -46,7 +46,7 @@ export interface LevelStateSnapshot {
   setEditModePlacement: (newPlacement: EditModePlacementType) => void;
   copyPlacementsToClipboard: () => void;
   copyGameMapToClipboard: () => { success: boolean; message: string };
-  updateSolutionPath: () => void;
+  updateSolutionPath: () => [number, number][] | null;
 }
 
 export type PlacementConfig = {

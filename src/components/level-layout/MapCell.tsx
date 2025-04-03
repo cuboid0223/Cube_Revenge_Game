@@ -27,7 +27,7 @@ export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
         position: "absolute",
         left: x * CELL_SIZE,
         top: y * CELL_SIZE,
-        // backgroundColor: hslColor,
+        // backgroundColor: "red",
       }}
       onClick={() => {
         if (level.enableEditing) {
@@ -43,7 +43,12 @@ export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
         }
       }}
     >
-      <Sprite frameCoord={frameCoord} isColored={isColored} index={index} />
+      <Sprite
+        level={level}
+        frameCoord={frameCoord}
+        isColored={isColored}
+        index={index}
+      />
     </div>
   );
 }

@@ -1,5 +1,8 @@
 import React, { CSSProperties } from "react";
-import { GROUND_PLACEMENT_TYPES } from "@/helpers/consts";
+import {
+  FLOATING_PLACEMENT_TYPES,
+  GROUND_PLACEMENT_TYPES,
+} from "@/helpers/consts";
 import { LevelStateSnapshot } from "@/types/global";
 import { selectedPlacementTypeAtom } from "@/atoms/selectedPlacementType";
 import { useRecoilValue } from "recoil";
@@ -18,21 +21,21 @@ export default function LevelPlacementsLayer({ level }: Props) {
       return;
     }
     // 如果選取的是 pickup 類 且點選的 placement 不是 pickup 類 則需要浮在上面
-    const isFloatingPlacementSelected = !GROUND_PLACEMENT_TYPES.includes(
+    const isFloatingPlacementSelected = FLOATING_PLACEMENT_TYPES.includes(
       selectedPlacementType
     );
-    const isFloatingPlacementBeDeleted = !GROUND_PLACEMENT_TYPES.includes(
+    const isGroundPlacementBeClicked = GROUND_PLACEMENT_TYPES.includes(
       placement.type
     );
+    console.log(
+      `選取 ${selectedPlacementType} ,isFloatingPlacementSelected: ${isFloatingPlacementSelected}  , ${placement.type}`
+    );
+    console.log(JSON.stringify(level.editModePlacement));
     if (
       isFloatingPlacementSelected &&
-      !GROUND_PLACEMENT_TYPES.includes(placement.type) &&
+      isGroundPlacementBeClicked &&
       selectedPlacementType !== placement.type
     ) {
-      // console.log(
-      //   `選取 ${selectedPlacementType} ,isFloatingPlacementSelected: ${isFloatingPlacementSelected}  , ${placement.type}`
-      // );
-      // console.log(JSON.stringify(level.editModePlacement));
       level.addPlacement({
         x: placement.x,
         y: placement.y,

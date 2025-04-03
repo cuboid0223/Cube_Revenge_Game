@@ -71,6 +71,15 @@ export const GROUND_PLACEMENT_TYPES = [
   PLACEMENT_TYPE_WALL,
 ];
 
+export const FLOATING_PLACEMENT_TYPES = [
+  PLACEMENT_TYPE_FIRE_PICKUP,
+  PLACEMENT_TYPE_WATER_PICKUP,
+  PLACEMENT_TYPE_ICE_PICKUP,
+  PLACEMENT_TYPE_FLOUR,
+  "GREEN_KEY",
+  "BLUE_KEY",
+];
+
 type DirectionUpdateMapType = {
   [key: string]: { x: number; y: number };
 };

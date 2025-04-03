@@ -23,11 +23,13 @@ export class Camera {
 
   constructor(level: LevelState) {
     this.level = level;
-    const [heroX, heroY] = (this.level.heroRef as HeroPlacement | HeroEditingPlacement)  .displayXY();
+    const [heroX, heroY] = (
+      this.level.heroRef as HeroPlacement | HeroEditingPlacement
+    ).displayXY();
     this.cameraX = heroX;
     this.cameraY = heroY;
     this.transformOffset = -5.5 * CELL_SIZE;
-    this._zoom = .54; 
+    this._zoom = 0.54;
   }
 
   setZoom(newZoom: number) {
@@ -35,16 +37,15 @@ export class Camera {
   }
 
   get transformX() {
-    return -this.cameraX - this.transformOffset ;
+    return -this.cameraX - this.transformOffset;
   }
 
   get transformY() {
-    return -this.cameraY - this.transformOffset ;
+    return -this.cameraY - this.transformOffset;
   }
 
-
-  get zoom(){
-    return  this._zoom;
+  get zoom() {
+    return this._zoom;
   }
 
   static lerp(currentValue: number, destinationValue: number, time: number) {
@@ -54,13 +55,22 @@ export class Camera {
   tick() {
     // Start where the Hero is now
     const hero = this.level.heroRef;
-    if(!hero) return
+    if (!hero) return;
     const [heroX, heroY] = hero.displayXY();
     let cameraDestinationX = heroX;
     let cameraDestinationY = heroY;
 
-    //If moving, put the camera slightly ahead of where Hero is going
-    if (hero.movingPixelsRemaining > 0) {
+    if (this.level.enableEditing) {
+      //  編輯模式下將 CAMERA 固定在地圖中間
+      cameraDestinationX =
+        (Math.floor(this.level.tilesWidth / 2) - 1) * CELL_SIZE;
+      // console.log(this.level.tilesWidth, cameraDestinationX);
+      cameraDestinationY =
+        (Math.floor(this.level.tilesHeight / 2) - 1) * CELL_SIZE;
+    }
+    if (!this.level.enableEditing && hero.movingPixelsRemaining > 0) {
+      //  非編輯模式下將 CAMERA 隨 HERO 移動
+      //If moving, put the camera slightly ahead of where Hero is going
       if (hero.movingPixelDirection === DIRECTION_DOWN) {
         cameraDestinationY += CAMERA_LOOKAHEAD * CELL_SIZE;
       } else if (hero.movingPixelDirection === DIRECTION_UP) {

@@ -1,19 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import { useEffect, useRef } from "react";
 import { CELL_SIZE } from "../../helpers/consts";
 import { useRecoilValue } from "recoil";
 import { spriteSheetImageAtom } from "../../atoms/spriteSheetImageAtom";
 import { FrameCoord } from "@/helpers/types";
+import { LevelStateSnapshot } from "@/types/global";
 
 type SpriteProps = {
+  level: LevelStateSnapshot;
   frameCoord: FrameCoord;
   size?: number;
   isColored: boolean;
   index: number[];
 };
 
-function Sprite({ frameCoord, size = 16, isColored, index }: SpriteProps) {
+function Sprite({
+  level,
+  frameCoord,
+  size = 16,
+  isColored,
+  index,
+}: SpriteProps) {
   const spriteSheetImage = useRecoilValue(spriteSheetImageAtom);
+  const [isMouseHover, setIsMouseHover] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     /** @type {HTMLCanvasElement} */
@@ -54,13 +63,27 @@ function Sprite({ frameCoord, size = 16, isColored, index }: SpriteProps) {
     ctx.drawImage(tempCanvas, 0, 0);
   }, [spriteSheetImage, frameCoord, size, isColored]);
 
+  const handleBackgroundColor = () => {
+    if (!level?.enableEditing) return;
+    setIsMouseHover(true);
+  };
+
+  const clearBackgroundColor = () => {
+    if (!level?.enableEditing) return;
+    setIsMouseHover(false);
+  };
+
   return (
-    <div className="relative">
-      {/* 路徑數字標記 */}
+    <div
+      className={`relative`}
+      onMouseEnter={handleBackgroundColor}
+      onMouseLeave={clearBackgroundColor}
+    >
+      {/* Solution Path 路徑數字標記 */}
       <div
         className={`${
           isColored
-            ? " absolute z-50 h-4 w-4 grid grid-flow-col grid-rows-3 grid-cols-2"
+            ? " absolute z-40 h-4 w-4 grid grid-flow-col grid-rows-3 grid-cols-2"
             : ""
         }`}
       >
@@ -76,6 +99,13 @@ function Sprite({ frameCoord, size = 16, isColored, index }: SpriteProps) {
             );
           })}
       </div>
+
+      {/* 編輯模式下滑鼠移動到 TILE上背景會變色 */}
+      <div
+        className={`${
+          isMouseHover ? "absolute z-50 h-4 w-4 opacity-40 bg-yellow-500" : ""
+        }`}
+      ></div>
       <canvas width={size} height={size} ref={canvasRef} />
     </div>
   );

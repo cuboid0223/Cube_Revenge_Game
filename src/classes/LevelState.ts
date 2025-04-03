@@ -234,6 +234,8 @@ export class LevelState {
       this.tilesHeight,
       this.placements
     );
+
+    return this.solutionPath;
   }
 
   tick() {
@@ -373,7 +375,7 @@ export class LevelState {
       return { success: true, message: "Success to copy gameMap" };
     } catch (e) {
       console.error("Failed to copy gameMap");
-      return { success: false, message: e };
+      return { success: false, message: "Failed to copy gameMap" };
     }
   }
 

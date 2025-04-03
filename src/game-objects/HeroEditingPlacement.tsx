@@ -36,7 +36,7 @@ export class HeroEditingPlacement extends BodyPlacement {
     super(properties, level);
     this.canCollectItems = true;
     this.canCompleteLevel = false;
-    this.interactsWithGround = false;
+    this.interactsWithGround = true;
   }
 
   controllerMoveRequested(direction: Direction) {

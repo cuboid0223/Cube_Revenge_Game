@@ -122,7 +122,12 @@ function EditorPanel({ level }: EditorPanelProps) {
         <section className="flex gap-3 items-center">
           <div className="relative w-[calc(16px*3)] h-[calc(16px*3)]">
             <div className="origin-top-left transform scale-[3]">
-              <Sprite frameCoord={selectedTile} isColored={false} index={[]} />
+              <Sprite
+                level={level}
+                frameCoord={selectedTile}
+                isColored={false}
+                index={[]}
+              />
             </div>
           </div>
           <Button className="flex-1" onClick={clearSelectedObject}>
@@ -156,7 +161,12 @@ function EditorPanel({ level }: EditorPanelProps) {
             >
               <div className="relative w-[calc(16px*3)] h-[calc(16px*3)]">
                 <div className="origin-top-left transform scale-[3]">
-                  <Sprite frameCoord={tile} isColored={false} index={[]} />
+                  <Sprite
+                    level={level}
+                    frameCoord={tile}
+                    isColored={false}
+                    index={[]}
+                  />
                 </div>
               </div>
             </Button>
@@ -171,8 +181,8 @@ function EditorPanel({ level }: EditorPanelProps) {
             variant="default"
             className="w-full"
             onClick={() => {
-              level.updateSolutionPath();
-              if (level.solutionPath && level.solutionPath.length === 0) {
+              const solutionPath = level.updateSolutionPath();
+              if (solutionPath?.length === 0) {
                 toast({
                   title: "沒有路徑",
                   description: "檢查關卡是否無法通關",
@@ -189,7 +199,7 @@ function EditorPanel({ level }: EditorPanelProps) {
             onClick={() => {
               if (level.solutionPath?.length === 0) {
                 toast({
-                  title: "無法啟動自動模式",
+                  title: "TODO: 無法啟動自動模式",
                   description: "沒有路徑產生",
                 });
               }

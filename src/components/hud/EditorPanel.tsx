@@ -27,6 +27,7 @@ import { useRecoilState } from "recoil";
 import { selectedPlacementTypeAtom } from "@/atoms/selectedPlacementType";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
+import { convertGameMapToTileMap } from "@/helpers/convertGameMapToTileMap ";
 
 type EditorPanelProps = {
   level: LevelStateSnapshot;
@@ -306,6 +307,15 @@ function EditorPanel({ level }: EditorPanelProps) {
           }}
         >
           Export & copy GameMap
+        </Button>
+        <Button
+          variant="default"
+          className="w-full"
+          onClick={() => {
+            console.log(convertGameMapToTileMap(level.gameMap));
+          }}
+        >
+          Export & copy TileMap
         </Button>
       </section>
     </main>

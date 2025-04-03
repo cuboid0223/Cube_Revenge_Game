@@ -90,7 +90,6 @@ export class LevelState {
 
   start() {
     const levelData = this.levels![this.id];
-    console.log(this.levels, this.id, levelData);
     this.deathOutcome = null;
     this.theme = levelData.theme;
     this.tilesWidth = levelData.tilesWidth;

@@ -192,11 +192,13 @@ export const THEME_TILES_MAP = {
   },
 } as const;
 
+export type CellKey = keyof typeof PLACEMENT_TYPES_CODE;
 export const PLACEMENT_TYPES_CODE = {
   EMPTY: "0",
-  DEFAULT_HERO_CODE: "h",
+  HERO_EDITING: "",
+  HERO_SPAWN: "h",
   HERO: "H", // "h" 代表該模板房間入被選為出生房間其預設出生位置
-  DEFAULT_GOAL_CODE: "g",
+  GOAL_ENABLED: "g",
   GOAL: "G", //  "g" 代表該模板房間入被選為終點房間其預設終點位置
   WALL: "1", // 1-50, 1-25, 1-75  使用 dash 後面接數字代表該物體出現機率，例如 1-50 代表 WALL 出現機率 50%
 
@@ -205,35 +207,44 @@ export const PLACEMENT_TYPES_CODE = {
   FIRE: "F",
   FIRE_PICKUP: "FP",
   ICE: "I",
-  ICE_BOTTOM_RIGHT: "I_BR",
-  ICE_BOTTOM_LEFT: "I_BL",
-  ICE_TOP_LEFT: "I_TL",
-  ICE_TOP_RIGHT: "I_TR",
+  "ICE:BOTTOM_RIGHT": "I_BR",
+  "ICE:BOTTOM_LEFT": "I_BL",
+  "ICE:TOP_LEFT": "I_TL",
+  "ICE:TOP_RIGHT": "I_TR",
 
   ICE_PICKUP: "IP",
 
   FLOUR: "M",
-  LOCK: "L",
-  KEY: "K",
+  "LOCK:GREEN": "GL",
+  "LOCK:BLUE": "BL",
+  "KEY:GREEN": "GK",
+  "KEY:BLUE": "BK",
   CONVEYOR: "C",
-  // CONVEYOR_RIGHT: "C_R",
-  // CONVEYOR_LEFT: "C_L",
-  // CONVEYOR_UP: "C_U",
-  // CONVEYOR_DOWN: "C_D",
+  "CONVEYOR:RIGHT": "C_R",
+  "CONVEYOR:LEFT": "C_L",
+  "CONVEYOR:UP": "C_U",
+  "CONVEYOR:DOWN": "C_D",
 
   TELEPORT: "T",
   THIEF: "R", // Reset tile
   SWITCH_DOOR: "SD",
-  SWITCH_DOOR_Default_Raised: "SD_1",
-  SWITCH_DOOR_Default_Without_Raised: "SD_0",
+  SWITCH_DOOR_1: "SD_1",
+  SWITCH_DOOR_0: "SD_0",
   SWITCH: "S",
 
-  GROUND_ENEMY: "GE",
+  "GROUND_ENEMY:RIGHT": "GE_R",
+  "GROUND_ENEMY:LEFT": "GE_L",
+  "GROUND_ENEMY:UP": "GE_U",
+  "GROUND_ENEMY:DOWN": "GE_D",
   // 預設 ENEMY 是水平(左右)移動 也可以設置  GE_D (DOWN)或是 GE_U (UP) 垂直走
   FLYING_ENEMY: "FE", // 同理 GROUND_ENEMY ，FE_D, FE_U
+  "FLYING_ENEMY:RIGHT": "FE_R",
+  "FLYING_ENEMY:LEFT": "FE_L",
+  "FLYING_ENEMY:UP": "FE_U",
+  "FLYING_ENEMY:DOWN": "FE_D",
   ROAMING_ENEMY: "RE", // ROAMING_ENEMY 是隨機行走的
   CIABATTA: "BOSS",
-};
+} as const;
 
 // 可以踩在腳下的 placements
 export const BOTTOM_PLACEMENTS = [

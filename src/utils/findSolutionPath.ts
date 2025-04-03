@@ -4,18 +4,32 @@ import {
   DIRECTION_RIGHT,
   DIRECTION_UP,
   directionUpdateMap,
+  PLACEMENT_TYPE_CIABATTA,
+  PLACEMENT_TYPE_CIABATTA_SPAWN,
   PLACEMENT_TYPE_CONVEYOR,
+  PLACEMENT_TYPE_ENEMY_DOWN_SPAWN,
+  PLACEMENT_TYPE_ENEMY_FLYING_DOWN_SPAWN,
+  PLACEMENT_TYPE_ENEMY_FLYING_LEFT_SPAWN,
+  PLACEMENT_TYPE_ENEMY_FLYING_RIGHT_SPAWN,
+  PLACEMENT_TYPE_ENEMY_FLYING_UP_SPAWN,
+  PLACEMENT_TYPE_ENEMY_LEFT_SPAWN,
+  PLACEMENT_TYPE_ENEMY_RIGHT_SPAWN,
+  PLACEMENT_TYPE_ENEMY_ROAMING_SPAWN,
+  PLACEMENT_TYPE_ENEMY_UP_SPAWN,
   PLACEMENT_TYPE_FIRE,
   PLACEMENT_TYPE_FIRE_PICKUP,
   PLACEMENT_TYPE_FLOUR,
+  PLACEMENT_TYPE_FLYING_ENEMY,
   PLACEMENT_TYPE_GOAL,
   PLACEMENT_TYPE_GOAL_ENABLED,
+  PLACEMENT_TYPE_GROUND_ENEMY,
   PLACEMENT_TYPE_HERO,
   PLACEMENT_TYPE_HERO_SPAWN,
   PLACEMENT_TYPE_ICE,
   PLACEMENT_TYPE_ICE_PICKUP,
   PLACEMENT_TYPE_KEY,
   PLACEMENT_TYPE_LOCK,
+  PLACEMENT_TYPE_ROAMING_ENEMY,
   PLACEMENT_TYPE_SWITCH,
   PLACEMENT_TYPE_SWITCH_DOOR,
   PLACEMENT_TYPE_TELEPORT,
@@ -23,6 +37,7 @@ import {
   PLACEMENT_TYPE_WALL,
   PLACEMENT_TYPE_WATER,
   PLACEMENT_TYPE_WATER_PICKUP,
+  PLACEMENT_TYPES_CODE,
 } from "@/helpers/consts";
 import PriorityQueue from "./PriorityQueue";
 import {
@@ -40,7 +55,8 @@ function getOutputType(
   type: string,
   corner?: string,
   direction?: string,
-  color?: string
+  color?: string,
+  isRaised?: boolean
 ): string {
   // 將OBJECT轉換成字串
   // eg. {type: 'ICE', x: 15, y: 5, corner:"TOP_LEFT"} -> "ICE:TOP_LEFT"
@@ -53,6 +69,28 @@ function getOutputType(
       return color ? `${type}:${color}` : `${type}:BLUE`;
     case PLACEMENT_TYPE_LOCK:
       return color ? `${type}:${color}` : `${type}:BLUE`;
+    case PLACEMENT_TYPE_SWITCH_DOOR:
+      return isRaised ? `${type}_1` : `${type}_0`;
+    case PLACEMENT_TYPE_ENEMY_LEFT_SPAWN:
+      return "GROUND_ENEMY:LEFT";
+    case PLACEMENT_TYPE_ENEMY_RIGHT_SPAWN:
+      return "GROUND_ENEMY:RIGHT";
+    case PLACEMENT_TYPE_ENEMY_UP_SPAWN:
+      return "GROUND_ENEMY:UP";
+    case PLACEMENT_TYPE_ENEMY_DOWN_SPAWN:
+      return "GROUND_ENEMY:DOWN";
+    case PLACEMENT_TYPE_ENEMY_FLYING_LEFT_SPAWN:
+      return "FLYING_ENEMY:LEFT";
+    case PLACEMENT_TYPE_ENEMY_FLYING_RIGHT_SPAWN:
+      return "FLYING_ENEMY:RIGHT";
+    case PLACEMENT_TYPE_ENEMY_FLYING_UP_SPAWN:
+      return "FLYING_ENEMY:UP";
+    case PLACEMENT_TYPE_ENEMY_FLYING_DOWN_SPAWN:
+      return "FLYING_ENEMY:DOWN";
+    case PLACEMENT_TYPE_ENEMY_ROAMING_SPAWN:
+      return PLACEMENT_TYPE_ROAMING_ENEMY;
+    case PLACEMENT_TYPE_CIABATTA_SPAWN:
+      return PLACEMENT_TYPE_CIABATTA;
     default:
       return type;
   }
@@ -75,7 +113,7 @@ export function createMap(level: LevelStateSnapshot): {
   const { tilesWidth: width, tilesHeight: height, placements } = level;
   const gameMap = Array.from({ length: height }, () => Array(width).fill(""));
   console.log(placements);
-  placements.forEach(({ x, y, type, corner, color, direction }) => {
+  placements.forEach(({ x, y, type, corner, color, direction, isRaised }) => {
     const adjustedX = x - 1;
     const adjustedY = y - 1;
     if (
@@ -84,7 +122,13 @@ export function createMap(level: LevelStateSnapshot): {
       adjustedY >= 0 &&
       adjustedY < height
     ) {
-      const outputType = getOutputType(type, corner, direction, color);
+      const outputType = getOutputType(
+        type,
+        corner,
+        direction,
+        color,
+        isRaised
+      );
 
       if (gameMap[adjustedY][adjustedX].length !== 0) {
         // 同個位置有兩個 placements
@@ -251,7 +295,6 @@ export default function findSolutionPath(
   placements: PlacementConfig[]
 ): SolutionPathType {
   console.log("開始路徑搜尋");
-  console.log(gameMap);
   const startPosition = placements.find(
     (p) =>
       p.type === PLACEMENT_TYPE_HERO || p.type === PLACEMENT_TYPE_HERO_SPAWN
@@ -318,18 +361,14 @@ export default function findSolutionPath(
     if (longestPath.length < newPath.length) {
       longestPath = newPath;
     }
-    if (flourMask === (1 << totalFlours) - 1) {
-      console.log("收集全部面粉！");
-      console.log(newPath);
-      // return newPath;
-    }
+
     // 若所有面粉都已收集：判斷方式是比對 bit mask 是否全 1
     if (
       flourMask === (1 << totalFlours) - 1 &&
       x === goalPosition.x &&
       y === goalPosition.y
     ) {
-      console.log("收集全部面粉並抵達目標，成功！");
+      // console.log("收集全部面粉並抵達目標，成功！");
       console.log(newPath);
       return newPath;
     }

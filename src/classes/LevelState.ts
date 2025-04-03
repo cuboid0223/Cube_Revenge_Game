@@ -38,6 +38,7 @@ import { IcePlacement } from "@/game-objects/IcePlacement";
 import { LockPlacement } from "@/game-objects/LockPlacement";
 import { HeroPlacement } from "@/game-objects/HeroPlacement";
 import { HeroEditingPlacement } from "@/game-objects/HeroEditingPlacement";
+import { KeyPlacement } from "@/game-objects/KeyPlacement";
 
 type OnEmitType = (level: LevelStateSnapshot) => void;
 
@@ -174,7 +175,8 @@ export class LevelState {
         p instanceof SwitchableDoorPlacement ||
         p instanceof ConveyorPlacement ||
         p instanceof IcePlacement ||
-        p instanceof LockPlacement
+        p instanceof LockPlacement ||
+        p instanceof KeyPlacement
       ) {
         const extendedProps: Partial<
           Record<"isRaised" | "direction" | "color" | "corner", unknown>

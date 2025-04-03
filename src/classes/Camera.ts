@@ -62,11 +62,9 @@ export class Camera {
 
     if (this.level.enableEditing) {
       //  編輯模式下將 CAMERA 固定在地圖中間
-      cameraDestinationX =
-        (Math.floor(this.level.tilesWidth / 2) - 1) * CELL_SIZE;
+      cameraDestinationX = Math.floor(this.level.tilesWidth / 2.5) * CELL_SIZE;
       // console.log(this.level.tilesWidth, cameraDestinationX);
-      cameraDestinationY =
-        (Math.floor(this.level.tilesHeight / 2) - 1) * CELL_SIZE;
+      cameraDestinationY = Math.floor(this.level.tilesHeight / 2.5) * CELL_SIZE;
     }
     if (!this.level.enableEditing && hero.movingPixelsRemaining > 0) {
       //  非編輯模式下將 CAMERA 隨 HERO 移動

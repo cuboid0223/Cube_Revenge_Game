@@ -10,9 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Sprite from "@/components/object-graphics/Sprite";
-import {
-  SELECTED_CATEGORY_MAP,
-} from "@/helpers/consts";
+import { SELECTED_CATEGORY_MAP } from "@/helpers/consts";
 import { TILES } from "@/helpers/tiles";
 import { removeTrailingDigit } from "@/utils/removeTrailingDigit";
 import {
@@ -20,21 +18,84 @@ import {
   splitAtSecondUnderscore,
 } from "@/utils/splitAtFirstUnderscore";
 import { Slider } from "../ui/slider";
-import { LevelStateSnapshot } from "@/types/global";
+import { FrameCoord, LevelStateSnapshot } from "@/types/global";
 import { useRecoilState } from "recoil";
 import { selectedPlacementTypeAtom } from "@/atoms/selectedPlacementType";
+import { useToast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
 
 type EditorPanelProps = {
   level: LevelStateSnapshot;
 };
 
 function EditorPanel({ level }: EditorPanelProps) {
+  const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState("basics");
-  const [selectedTile, setSelectedTile] = useState("");
-  const [placementType, setPlacementType] = useRecoilState(selectedPlacementTypeAtom);
+  const [selectedTile, setSelectedTile] = useState<FrameCoord>("0x2");
+  const [placementType, setPlacementType] = useRecoilState(
+    selectedPlacementTypeAtom
+  );
+
+  const handleZoomChange = (values: number[]) => {
+    level.setZoom(values[0]);
+  };
+
+  const handleSelectedTile = (tile: FrameCoord) => {
+    setSelectedTile(tile as FrameCoord);
+    const tileName = Object.keys(TILES).find(
+      (key) => TILES[key as keyof typeof TILES] === tile
+    ) as string;
+
+    const HAS_CORNER =
+      tileName === "ICE_BOTTOM_LEFT" ||
+      tileName === "ICE_BOTTOM_RIGHT" ||
+      tileName === "ICE_TOP_LEFT" ||
+      tileName === "ICE_TOP_RIGHT";
+    const HAS_DIRECTION =
+      tileName === "CONVEYOR_UP" ||
+      tileName === "CONVEYOR_DOWN" ||
+      tileName === "CONVEYOR_LEFT" ||
+      tileName === "CONVEYOR_RIGHT";
+    const IS_SWITCHDOOR =
+      tileName === "SWITCH_DOOR_OUTLINE" || tileName === "SWITCH_DOOR_SOLID";
+    const isLock = tileName === "BLUE_LOCK" || tileName === "GREEN_LOCK";
+    const isKey = tileName === "BLUE_KEY" || tileName === "GREEN_KEY";
+    // removeTrailingDigit() -> "WATER1" -> "WATER"
+    if (HAS_CORNER) {
+      const [type, corner] = splitAtFirstUnderscore(tileName);
+      level.setEditModePlacement({ type, corner });
+    } else if (HAS_DIRECTION) {
+      const [type, direction] = splitAtFirstUnderscore(tileName);
+      level.setEditModePlacement({ type, direction });
+    } else if (IS_SWITCHDOOR) {
+      const [type, subStr] = splitAtSecondUnderscore(tileName);
+
+      level.setEditModePlacement({
+        type,
+        isRaised: subStr === "SOLID",
+      });
+    } else if (isLock || isKey) {
+      const [color, type] = splitAtFirstUnderscore(tileName);
+      level.setEditModePlacement({ type, color });
+    } else {
+      level.setEditModePlacement({
+        type: removeTrailingDigit(tileName),
+      });
+    }
+    setPlacementType(removeTrailingDigit(tileName));
+  };
+
+  const handleDefaultObject = () => {
+    // 還原成預設選取物件(WALL) 方便使用者刪除物件
+    setSelectedTile("0x2");
+    toast({
+      title: "已還原成預設物件 (WALL)",
+      description: "可以在關卡內點選並刪除物件",
+    });
+  };
 
   return (
-    <main className="flex flex-col p-2 h-screen overflow-scroll">
+    <main className="flex flex-col p-2 h-screen overflow-scroll gap-2">
       <section className="flex-1 flex flex-col gap-2">
         {/* Level title input */}
         {/* <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -47,10 +108,20 @@ function EditorPanel({ level }: EditorPanelProps) {
           defaultValue={[0.54]}
           max={1}
           step={0.01}
-          onValueChange={(values) => {
-            level.setZoom(values[0]);
-          }}
+          onValueChange={handleZoomChange}
         />
+        {/* Selected object */}
+        <Label htmlFor="selectedObject">SELECTED OBJECT</Label>
+        <section className="flex gap-3 items-center">
+          <div className="relative w-[calc(16px*3)] h-[calc(16px*3)]">
+            <div className="origin-top-left transform scale-[3]">
+              <Sprite frameCoord={selectedTile} isColored={false} index={[]} />
+            </div>
+          </div>
+          <Button className="flex-1" onClick={handleDefaultObject}>
+            Clear Selected Object
+          </Button>
+        </section>
 
         {/* object category select */}
         <Label htmlFor="objectCategory">OBJECT CATEGORY</Label>
@@ -72,77 +143,60 @@ function EditorPanel({ level }: EditorPanelProps) {
               value={tile}
               key={index}
               className={`w-fit h-fit p-1 ${
-                tile === selectedTile && "p-1 bg-blue-700"
+                tile === selectedTile ? "p-1 bg-yellow-400" : "opacity-50"
               } `}
-              onClick={() => {
-                setSelectedTile(tile);
-                const tileName = Object.keys(TILES).find(
-                  (key) => TILES[key as keyof typeof TILES] === tile
-                ) as string;
-                
-                const hasCorner =
-                  tileName === "ICE_BOTTOM_LEFT" ||
-                  tileName === "ICE_BOTTOM_RIGHT" ||
-                  tileName === "ICE_TOP_LEFT" ||
-                  tileName === "ICE_TOP_RIGHT";
-                const hasDirection =
-                  tileName === "CONVEYOR_UP" ||
-                  tileName === "CONVEYOR_DOWN" ||
-                  tileName === "CONVEYOR_LEFT" ||
-                  tileName === "CONVEYOR_RIGHT";
-                const isSwitchDoor =
-                  tileName === "SWITCH_DOOR_OUTLINE" ||
-                  tileName === "SWITCH_DOOR_SOLID";
-                const isLock =
-                  tileName === "BLUE_LOCK" || tileName === "GREEN_LOCK";
-                const isKey =
-                  tileName === "BLUE_KEY" || tileName === "GREEN_KEY";
-                // removeTrailingDigit() -> "WATER1" -> "WATER"
-                if (hasCorner) {
-                  const [type, corner] = splitAtFirstUnderscore(tileName);
-                  level.setEditModePlacement({ type, corner });
-                } else if (hasDirection) {
-                  const [type, direction] = splitAtFirstUnderscore(tileName);
-                  level.setEditModePlacement({ type, direction });
-                } else if (isSwitchDoor) {
-                  const [type, subStr] = splitAtSecondUnderscore(tileName);
-
-                  level.setEditModePlacement({
-                    type,
-                    isRaised: subStr === "SOLID",
-                  });
-                } else if (isLock || isKey) {
-                  const [color, type] = splitAtFirstUnderscore(tileName);
-                  level.setEditModePlacement({ type, color });
-                } else {
-                  level.setEditModePlacement({
-                    type: removeTrailingDigit(tileName),
-                  });
-                }
-                setPlacementType(removeTrailingDigit(tileName))
-              }}
+              onClick={() => handleSelectedTile(tile as FrameCoord)}
             >
               <div className="relative w-[calc(16px*3)] h-[calc(16px*3)]">
                 <div className="origin-top-left transform scale-[3]">
-                  <Sprite frameCoord={tile} />
+                  <Sprite frameCoord={tile} isColored={false} index={[]} />
                 </div>
               </div>
             </Button>
           ))}
         </div>
       </section>
-
+      <Separator />
       <section className="flex flex-col gap-3">
-         {/* solution path button */}
-         <Button
-          variant="default"
-          className="w-full"
-          onClick={() => {
-            level.updateSolutionPath()
-          }}
-        >
-          Solution Path
-        </Button>
+        {/* solution path button */}
+        <div className="grid grid-cols-2 gap-1">
+          <Button
+            variant="default"
+            className="w-full"
+            onClick={() => {
+              level.updateSolutionPath();
+              if (level.solutionPath && level.solutionPath.length === 0) {
+                toast({
+                  title: "沒有路徑",
+                  description: "檢查關卡是否無法通關",
+                });
+              }
+            }}
+          >
+            Solution Path
+          </Button>
+          <Button
+            variant={
+              level.solutionPath && level.solutionPath.length === 0
+                ? "ghost"
+                : "secondary"
+            }
+            className="w-full"
+            onClick={() => {
+              level.updateSolutionPath();
+              if (level.solutionPath && level.solutionPath.length === 0) {
+                toast({
+                  title: "沒有路徑",
+                  description: "檢查關卡是否無法通關",
+                });
+              }
+            }}
+          >
+            Auto Move
+          </Button>
+        </div>
+        <Separator />
+
         {/* change theme button */}
         <Button
           variant="default"
@@ -210,6 +264,10 @@ function EditorPanel({ level }: EditorPanelProps) {
           className="w-full"
           onClick={() => {
             level.copyPlacementsToClipboard();
+            toast({
+              title: "複製成功",
+              description: "按下 F12 可以查看輸出結果",
+            });
           }}
         >
           Export & copy

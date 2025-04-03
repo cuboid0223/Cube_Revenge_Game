@@ -36,7 +36,6 @@ export default function EditPage() {
     let levelState: LevelState;
 
     if (savedLevelJson) {
-      
       const savedData = JSON.parse(savedLevelJson);
       console.log(savedData);
       // 從 localStorage 的資料中還原 LevelState
@@ -45,19 +44,22 @@ export default function EditPage() {
         (newState) => {
           setLevel(newState);
         },
-        {DefaultLevel: savedData}
-        
+        { DefaultLevel: savedData }
       );
     } else {
       // 沒有儲存資料，就建立新的 LevelState
-      levelState = new LevelState("DefaultLevel", (newState) => {
-        setLevel(newState);
-      },editLevels);
+      levelState = new LevelState(
+        "DefaultLevel",
+        (newState) => {
+          setLevel(newState);
+        },
+        editLevels
+      );
     }
 
     // 取得初始狀態
     setLevel(levelState.getState());
-    levelState.setEditingMode(true)
+    levelState.setEditingMode(true);
 
     // 當元件卸載時，清理 LevelState
     return () => {
@@ -71,13 +73,13 @@ export default function EditPage() {
 
   return (
     <ResizablePanelGroup direction="horizontal">
-      <ResizablePanel>
+      <ResizablePanel minSize={15} maxSize={60} defaultSize={20}>
         {/* edit panel */}
         <EditorPanel level={level} />
       </ResizablePanel>
-      <ResizableHandle />
+      <ResizableHandle className="w-2" withHandle />
 
-      <ResizablePanel className="relative h-screen">
+      <ResizablePanel className="relative h-screen" defaultSize={80}>
         <RenderLevel level={level} />
       </ResizablePanel>
     </ResizablePanelGroup>

@@ -56,6 +56,7 @@ function Sprite({ frameCoord, size = 16, isColored, index }: SpriteProps) {
 
   return (
     <div className="relative">
+      {/* 路徑數字標記 */}
       <div
         className={`${
           isColored
@@ -67,7 +68,7 @@ function Sprite({ frameCoord, size = 16, isColored, index }: SpriteProps) {
           index.map((i) => {
             return (
               <p
-                key={i} // 確保每個元素有唯一的 `key`
+                key={i}
                 className="text-[4px] w-fit h-fit px-[1px] text-center text-white bg-yellow-500 rounded-full"
               >
                 {i + 1}

@@ -3,6 +3,7 @@ import { CELL_SIZE } from "../../helpers/consts";
 import { handleColoredTile } from "@/utils/handleColoredTile";
 import { FrameCoord } from "@/helpers/types";
 import { LevelStateSnapshot } from "@/types/global";
+import { useToast } from "@/hooks/use-toast";
 
 type MapCellType = {
   level: LevelStateSnapshot;
@@ -12,6 +13,7 @@ type MapCellType = {
 };
 
 export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
+  const { toast } = useToast();
   const { isColored, frequency, index } = handleColoredTile(
     undefined,
     x,
@@ -34,23 +36,13 @@ export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
             y: y,
             ...level.editModePlacement,
           });
+          toast({
+            title: `新增 ${level.editModePlacement.type}`,
+            description: `新增 ${level.editModePlacement.type} 至 [${x}, ${y}]`,
+          });
         }
       }}
     >
-      {/* {isColored && (
-        <div
-          style={{
-            width: CELL_SIZE,
-            height: CELL_SIZE,
-            // backgroundColor: hslColor
-            border: "1px solid white",
-          }}
-          className={`overflow-hidden`}
-        >
-          <pre className="absolute text-xs"> {frequency}</pre>
-        </div>
-      )} */}
-
       <Sprite frameCoord={frameCoord} isColored={isColored} index={index} />
     </div>
   );

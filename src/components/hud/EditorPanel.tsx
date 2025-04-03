@@ -10,7 +10,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Sprite from "@/components/object-graphics/Sprite";
-import { SELECTED_CATEGORY_MAP } from "@/helpers/consts";
+import {
+  LEVEL_THEMES,
+  SELECTED_CATEGORY_MAP,
+  THEME_TILES_MAP,
+} from "@/helpers/consts";
 import { TILES } from "@/helpers/tiles";
 import { removeTrailingDigit } from "@/utils/removeTrailingDigit";
 import {
@@ -31,7 +35,9 @@ type EditorPanelProps = {
 function EditorPanel({ level }: EditorPanelProps) {
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState("basics");
-  const [selectedTile, setSelectedTile] = useState<FrameCoord>("0x2");
+  const [selectedTile, setSelectedTile] = useState<FrameCoord>(
+    THEME_TILES_MAP[LEVEL_THEMES.YELLOW]["WALL"]
+  );
   const [placementType, setPlacementType] = useRecoilState(
     selectedPlacementTypeAtom
   );
@@ -85,9 +91,10 @@ function EditorPanel({ level }: EditorPanelProps) {
     setPlacementType(removeTrailingDigit(tileName));
   };
 
-  const handleDefaultObject = () => {
+  const clearSelectedObject = () => {
     // 還原成預設選取物件(WALL) 方便使用者刪除物件
-    setSelectedTile("0x2");
+    setSelectedTile(THEME_TILES_MAP[LEVEL_THEMES.YELLOW]["WALL"]);
+    handleSelectedTile(THEME_TILES_MAP[LEVEL_THEMES.YELLOW]["WALL"]);
     toast({
       title: "已還原成預設物件 (WALL)",
       description: "可以在關卡內點選並刪除物件",
@@ -118,7 +125,7 @@ function EditorPanel({ level }: EditorPanelProps) {
               <Sprite frameCoord={selectedTile} isColored={false} index={[]} />
             </div>
           </div>
-          <Button className="flex-1" onClick={handleDefaultObject}>
+          <Button className="flex-1" onClick={clearSelectedObject}>
             Clear Selected Object
           </Button>
         </section>
@@ -176,18 +183,14 @@ function EditorPanel({ level }: EditorPanelProps) {
             Solution Path
           </Button>
           <Button
-            variant={
-              level.solutionPath && level.solutionPath.length === 0
-                ? "ghost"
-                : "secondary"
-            }
+            variant={level.solutionPath?.length === 0 ? "ghost" : "secondary"}
             className="w-full"
+            // disabled={level.solutionPath?.length === 0}
             onClick={() => {
-              level.updateSolutionPath();
-              if (level.solutionPath && level.solutionPath.length === 0) {
+              if (level.solutionPath?.length === 0) {
                 toast({
-                  title: "沒有路徑",
-                  description: "檢查關卡是否無法通關",
+                  title: "無法啟動自動模式",
+                  description: "沒有路徑產生",
                 });
               }
             }}
@@ -196,27 +199,28 @@ function EditorPanel({ level }: EditorPanelProps) {
           </Button>
         </div>
         <Separator />
+        <div className="flex gap-1">
+          {/* change theme button */}
+          <Button
+            variant="default"
+            className="w-full"
+            onClick={() => {
+              level.changeTheme();
+            }}
+          >
+            Change Theme
+          </Button>
+          {/* clear map button */}
+          <Button
+            variant="destructive"
+            onClick={() => {
+              level.clearPlacements();
+            }}
+          >
+            Clear Map
+          </Button>
+        </div>
 
-        {/* change theme button */}
-        <Button
-          variant="default"
-          className="w-full"
-          onClick={() => {
-            level.changeTheme();
-          }}
-        >
-          Change Theme
-        </Button>
-        {/* clear map button */}
-        <Button
-          variant="destructive"
-          className="w-full"
-          onClick={() => {
-            level.clearPlacements();
-          }}
-        >
-          Clear Map
-        </Button>
         {/* map width height editor */}
         <div className="flex justify-around items-center">
           <Button
@@ -259,18 +263,39 @@ function EditorPanel({ level }: EditorPanelProps) {
         </div>
 
         {/* export button */}
+        <Separator />
         <Button
           variant="default"
           className="w-full"
           onClick={() => {
             level.copyPlacementsToClipboard();
             toast({
-              title: "複製成功",
+              title: "複製 Placements 成功",
               description: "按下 F12 可以查看輸出結果",
             });
           }}
         >
-          Export & copy
+          Export & copy JSON
+        </Button>
+        <Button
+          variant="default"
+          className="w-full"
+          onClick={() => {
+            const { success, message } = level.copyGameMapToClipboard();
+            if (success) {
+              toast({
+                title: "複製 GAME MAP 成功",
+                description: message,
+              });
+            } else {
+              toast({
+                title: "複製 GAME MAP 失敗",
+                description: message,
+              });
+            }
+          }}
+        >
+          Export & copy GameMap
         </Button>
       </section>
     </main>

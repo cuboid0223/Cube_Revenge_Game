@@ -68,7 +68,7 @@ export class LevelState {
   animatedFrames!: LevelAnimatedFrames;
   solutionPath!: [number, number][] | null;
   deathOutcome!: PlacementType | null;
-  gameMap!: number[][];
+  gameMap!: string[][];
   enableEditing: boolean;
 
   constructor(
@@ -117,8 +117,8 @@ export class LevelState {
     this.startGameLoop();
   }
 
-  setEditingMode(enableEditing: boolean){
-    this.enableEditing = enableEditing
+  setEditingMode(enableEditing: boolean) {
+    this.enableEditing = enableEditing;
   }
 
   addPlacement(config: PlacementConfig) {
@@ -365,6 +365,18 @@ export class LevelState {
     );
   }
 
+  copyGameMapToClipboard() {
+    try {
+      navigator.clipboard.writeText(JSON.stringify(this.gameMap));
+      console.log("gameMap copied to clipboard");
+      console.log(this.gameMap);
+      return { success: true, message: "Success to copy gameMap" };
+    } catch (e) {
+      console.error("Failed to copy gameMap");
+      return { success: false, message: e };
+    }
+  }
+
   setEditModePlacement(newPlacement: EditModePlacementType) {
     this.editModePlacement = newPlacement;
   }
@@ -402,7 +414,8 @@ export class LevelState {
         this.start();
       },
       enableEditing: true,
-     
+      gameMap: this.gameMap,
+
       editModePlacement: this.editModePlacement,
       setEditingMode: this.setEditingMode.bind(this),
       setZoom: this.setZoom.bind(this),
@@ -414,6 +427,7 @@ export class LevelState {
       updateTilesHeight: this.updateTilesHeight.bind(this),
       setEditModePlacement: this.setEditModePlacement.bind(this),
       copyPlacementsToClipboard: this.copyPlacementsToClipboard.bind(this),
+      copyGameMapToClipboard: this.copyGameMapToClipboard.bind(this),
       updateSolutionPath: this.updateSolutionPath.bind(this),
     };
   }

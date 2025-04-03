@@ -114,8 +114,6 @@ export default function tileMapToLevel(
           addPlacement(placements, col, row, placementType, subCode);
         }
       }
-
-      // 其他符號可在此處理，例如 pushBlock 等...
     });
   });
 
@@ -132,7 +130,7 @@ export default function tileMapToLevel(
  * 將 code 部分拆分為基本 code 與下底線後的子 code (subCode)。
  * 範例：
  *   "I_TL" 會拆成 { baseCode: "I", subCode: "TL" }
- *   若沒有底線，例如 "1"，則回傳 { baseCode: "1" }。
+ *   若沒有底線，例如 "I"，則回傳 { baseCode: "I" }。
  *
  * @param codePart - 不含機率的字串，例如 "I_TL"
  * @returns 物件包含 baseCode 與（如果存在）subCode
@@ -163,7 +161,7 @@ function transformIceCorner(corner: string): string {
     return iceCornerMap[corner];
   }
 
-  console.log(`沒有 ice corner 叫做 ${corner}，只有 I_BR, I_BL, I_TL, I_TR`);
+  console.error(`沒有 ice corner 叫做 ${corner}，只有 I_BR, I_BL, I_TL, I_TR`);
   return "";
 }
 
@@ -180,7 +178,7 @@ function transformDirection(direction: string): string {
     return directionMap[direction];
   }
 
-  console.log(`沒有 direction 叫做 ${direction}，只有 C_R, C_U, C_L, C_D`);
+  console.error(`沒有 direction 叫做 ${direction}，只有 C_R, C_U, C_L, C_D`);
   return DIRECTION_RIGHT;
 }
 

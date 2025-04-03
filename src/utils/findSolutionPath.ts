@@ -42,6 +42,8 @@ function getOutputType(
   direction?: string,
   color?: string
 ): string {
+  // 將OBJECT轉換成字串
+  // eg. {type: 'ICE', x: 15, y: 5, corner:"TOP_LEFT"} -> "ICE:TOP_LEFT"
   switch (type) {
     case PLACEMENT_TYPE_ICE:
       return corner ? `${type}:${corner}` : type;
@@ -98,7 +100,7 @@ export function createMap(level: LevelStateSnapshot): {
   return { gameMap, placements };
 }
 
-// 查找所有物件位置
+// 查找指定物件所有位置
 export function findPositions(placements: PlacementConfig[], type: string) {
   return placements.filter((p) => p.type === type).map((p) => [p.x, p.y]);
 }
@@ -130,7 +132,7 @@ function buildSwitchDoorMapping(placements: PlacementConfig[]) {
 }
 
 // 將多個物品（火、水、冰、鑰匙）狀態合併成一個 bit mask
-// 我們預設：bit0 = firePickup, bit1 = waterPickup, bit2 = icePickup, bit3 = key
+// 預設：bit0 = firePickup, bit1 = waterPickup, bit2 = icePickup, bit3 = blueKey,bit4 = greenKey
 function buildItemMask(
   hasFire: boolean,
   hasWater: boolean,
@@ -177,6 +179,9 @@ export interface CompositeCellState {
 }
 
 export function combineCellState(cell: string): CompositeCellState {
+  // 同一個位置可能有兩個物件透過 "&" 區隔
+  // eg. ICE&FLOUR 或是 ICE:TOP_LEFT&FIRE_PICKUP
+
   // 拆分 cell 字串，移除空白與空值
   const types = cell
     .split("&")

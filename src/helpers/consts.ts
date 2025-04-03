@@ -68,7 +68,7 @@ export const GROUND_PLACEMENT_TYPES = [
   PLACEMENT_TYPE_THIEF,
   PLACEMENT_TYPE_GOAL,
   PLACEMENT_TYPE_GOAL_ENABLED,
-  PLACEMENT_TYPE_WALL
+  PLACEMENT_TYPE_WALL,
 ];
 
 type DirectionUpdateMapType = {
@@ -181,7 +181,7 @@ export const THEME_TILES_MAP = {
     BOTTOM: "13x2",
     WALL: "12x2",
   },
-};
+} as const;
 
 export const PLACEMENT_TYPES_CODE = {
   EMPTY: "0",

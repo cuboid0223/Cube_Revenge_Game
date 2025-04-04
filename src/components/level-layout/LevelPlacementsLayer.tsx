@@ -16,10 +16,11 @@ export default function LevelPlacementsLayer({ level }: Props) {
   const { toast } = useToast();
   const selectedPlacementType = useRecoilValue(selectedPlacementTypeAtom);
 
-  const handleEditObject = (placement: Placement) => {
+  const handleEditMap = (placement: Placement) => {
     if (!level.enableEditing || !placement.canBeDeleted()) {
       return;
     }
+    level.clearSolutionPath();
     // 如果選取的是 pickup 類 且點選的 placement 不是 pickup 類 則需要浮在上面
     const isFloatingPlacementSelected = FLOATING_PLACEMENT_TYPES.includes(
       level.editModePlacement.type
@@ -28,9 +29,12 @@ export default function LevelPlacementsLayer({ level }: Props) {
       placement.type
     );
     console.log(
-      `選取 ${JSON.stringify(level.editModePlacement)} ,isFloatingPlacementSelected: ${isFloatingPlacementSelected}  , ${placement.type}`
+      `選取 ${JSON.stringify(
+        level.editModePlacement
+      )} ,isFloatingPlacementSelected: ${isFloatingPlacementSelected}  , ${
+        placement.type
+      }`
     );
-    console.log(JSON.stringify(level.editModePlacement));
     if (
       isFloatingPlacementSelected &&
       isGroundPlacementBeClicked &&
@@ -42,8 +46,8 @@ export default function LevelPlacementsLayer({ level }: Props) {
         ...level.editModePlacement,
       });
       toast({
-        title: `新增 ${ level.editModePlacement.type}`,
-        description: `新增 ${ level.editModePlacement.type} 至 ${placement.type}([${placement.x}, ${placement.y}])上方`,
+        title: `新增 ${level.editModePlacement.type}`,
+        description: `新增 ${level.editModePlacement.type} 至 ${placement.type}([${placement.x}, ${placement.y}])上方`,
       });
     } else {
       level.deletePlacement(placement);
@@ -70,9 +74,9 @@ export default function LevelPlacementsLayer({ level }: Props) {
       return (
         <div
           key={placement.id}
-          className="z-10"
+          // className="z-10"
           style={style}
-          onClick={() => handleEditObject(placement)}
+          onClick={() => handleEditMap(placement)}
         >
           {/* <Sprite frameCoord={placement.frameCoord} /> */}
           {placement.renderComponent()}

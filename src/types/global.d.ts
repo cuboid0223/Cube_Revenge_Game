@@ -47,6 +47,7 @@ export interface LevelStateSnapshot {
   copyPlacementsToClipboard: () => void;
   copyGameMapToClipboard: () => { success: boolean; message: string };
   updateSolutionPath: () => [number, number][] | null;
+  clearSolutionPath: () => [number, number][];
 }
 
 export type PlacementConfig = {

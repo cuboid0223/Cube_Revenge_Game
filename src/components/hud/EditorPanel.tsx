@@ -100,7 +100,7 @@ function EditorPanel({ level }: EditorPanelProps) {
       title: "已還原成預設物件 (WALL)",
       description: "可以在關卡內點選並刪除物件",
     });
-    level.solutionPath = []
+    level.solutionPath = [];
   };
 
   return (
@@ -199,15 +199,16 @@ function EditorPanel({ level }: EditorPanelProps) {
             className="w-full"
             // disabled={level.solutionPath?.length === 0}
             onClick={() => {
+              level.clearSolutionPath();
               if (level.solutionPath?.length === 0) {
                 toast({
-                  title: "TODO: 無法啟動自動模式",
-                  description: "沒有路徑產生",
+                  title: "清除路徑",
+                  description: "",
                 });
               }
             }}
           >
-            Auto Move
+            Clear Path
           </Button>
         </div>
         <Separator />
@@ -316,7 +317,7 @@ function EditorPanel({ level }: EditorPanelProps) {
             console.log(convertGameMapToTileMap(level.gameMap));
           }}
         >
-          Export & copy TileMap
+          Export TileMap
         </Button>
       </section>
     </main>

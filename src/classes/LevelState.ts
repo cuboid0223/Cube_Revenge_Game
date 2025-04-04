@@ -239,6 +239,11 @@ export class LevelState {
     return this.solutionPath;
   }
 
+  clearSolutionPath() {
+    this.solutionPath = [];
+    return this.solutionPath;
+  }
+
   tick() {
     if (this.directionControls.direction) {
       (this.heroRef as HeroPlacement)?.controllerMoveRequested(
@@ -432,6 +437,7 @@ export class LevelState {
       copyPlacementsToClipboard: this.copyPlacementsToClipboard.bind(this),
       copyGameMapToClipboard: this.copyGameMapToClipboard.bind(this),
       updateSolutionPath: this.updateSolutionPath.bind(this),
+      clearSolutionPath: this.clearSolutionPath.bind(this),
     };
   }
 

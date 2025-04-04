@@ -33,6 +33,8 @@ export function handleIceSliding(
   itemMask: number;
   flourMask: number;
 } {
+  let x = initialX - dx
+  let y = initialY - dy
   let nx = initialX;
   let ny = initialY;
   const movingTrace: number[][] = [[nx, ny]];
@@ -51,6 +53,17 @@ export function handleIceSliding(
       flourMask: flourMask,
     };
   }
+
+        // if (compositeState.iceCorner) {
+      //   const dir = getHeroDirection(dx, dy);
+
+      //   if (!iceTileCornerBlockedMoves[compositeState.iceCorner][dir]) {
+      //     console.log(
+      //       `hero 在 [${x}, ${y}], 往[${dx}, ${dy}] 前進至[${nx}, ${ny}]被擋`
+      //     );
+      //     continue;
+      //   }
+      // }
   while (true) {
     // 取得在滑動過程經過的冰
     let nextX = nx + dx;
@@ -73,9 +86,9 @@ export function handleIceSliding(
 
       if (newDirection && !hasIcePickup) {
         // 處理重定向（如果可以從這個方向進入角落）
-        // console.log(
-        //   `Hero 從 ${entryDirection} 進入 ${corner}[${nx}, ${ny}] 轉向至 ${newDirection} `
-        // );
+        console.log(
+          `Hero 從 ${entryDirection} 進入 ${corner}[${nx}, ${ny}] 轉向至 ${newDirection} `
+        );
         // 根據新方向更新dx和dy
         switch (newDirection) {
           case DIRECTION_RIGHT:
@@ -103,6 +116,17 @@ export function handleIceSliding(
         movingTrace.push([nextX, nextY]);
         // console.log(`向 ${newDirection} 轉至 [${nx + dx}, ${ny + dy}]`);
       } else {
+        break;
+      }
+    }
+
+    if (compositeState.iceCorner) {
+      const dir = getHeroDirection(dx, dy);
+
+      if (!iceTileCornerBlockedMoves[compositeState.iceCorner][dir]) {
+        console.log(
+          `hero 在 [${x}, ${y}], 往[${dx}, ${dy}] 前進至[${nx}, ${ny}]被擋`
+        );
         break;
       }
     }

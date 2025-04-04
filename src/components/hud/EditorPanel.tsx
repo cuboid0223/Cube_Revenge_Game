@@ -100,6 +100,7 @@ function EditorPanel({ level }: EditorPanelProps) {
       title: "已還原成預設物件 (WALL)",
       description: "可以在關卡內點選並刪除物件",
     });
+    level.solutionPath = []
   };
 
   return (

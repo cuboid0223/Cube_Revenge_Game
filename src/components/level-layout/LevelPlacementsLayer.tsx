@@ -22,13 +22,13 @@ export default function LevelPlacementsLayer({ level }: Props) {
     }
     // 如果選取的是 pickup 類 且點選的 placement 不是 pickup 類 則需要浮在上面
     const isFloatingPlacementSelected = FLOATING_PLACEMENT_TYPES.includes(
-      selectedPlacementType
+      level.editModePlacement.type
     );
     const isGroundPlacementBeClicked = GROUND_PLACEMENT_TYPES.includes(
       placement.type
     );
     console.log(
-      `選取 ${selectedPlacementType} ,isFloatingPlacementSelected: ${isFloatingPlacementSelected}  , ${placement.type}`
+      `選取 ${JSON.stringify(level.editModePlacement)} ,isFloatingPlacementSelected: ${isFloatingPlacementSelected}  , ${placement.type}`
     );
     console.log(JSON.stringify(level.editModePlacement));
     if (
@@ -42,8 +42,8 @@ export default function LevelPlacementsLayer({ level }: Props) {
         ...level.editModePlacement,
       });
       toast({
-        title: `新增 ${selectedPlacementType}`,
-        description: `新增 ${selectedPlacementType} 至 ${placement.type}([${placement.x}, ${placement.y}])上方`,
+        title: `新增 ${ level.editModePlacement.type}`,
+        description: `新增 ${ level.editModePlacement.type} 至 ${placement.type}([${placement.x}, ${placement.y}])上方`,
       });
     } else {
       level.deletePlacement(placement);

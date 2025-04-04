@@ -270,7 +270,6 @@ export class LevelState {
   }
 
   copyPlacementsToClipboard() {
-    // 這裡
     const keys = ["type", "x", "y", "isRaised", "direction", "color", "corner"];
     const overrideMapping: Record<
       string,
@@ -375,6 +374,7 @@ export class LevelState {
 
   copyGameMapToClipboard() {
     try {
+      this.gameMap = createMap(this.getState()).gameMap;
       navigator.clipboard.writeText(JSON.stringify(this.gameMap));
       console.log("gameMap copied to clipboard");
       console.log(this.gameMap);

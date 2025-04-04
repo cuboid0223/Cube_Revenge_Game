@@ -394,16 +394,16 @@ export default function findSolutionPath(
       if (compositeState.wall) continue;
 
       //  當從非冰面進入到 iceCorner ，先檢查有無被iceCorner 阻擋
-      if (compositeState.iceCorner) {
-        const dir = getHeroDirection(dx, dy);
+      // if (compositeState.iceCorner) {
+      //   const dir = getHeroDirection(dx, dy);
 
-        if (!iceTileCornerBlockedMoves[compositeState.iceCorner][dir]) {
-          console.log(
-            `hero 在 [${x}, ${y}], 往[${dx}, ${dy}] 前進至[${nx}, ${ny}]被擋`
-          );
-          continue;
-        }
-      }
+      //   if (!iceTileCornerBlockedMoves[compositeState.iceCorner][dir]) {
+      //     console.log(
+      //       `hero 在 [${x}, ${y}], 往[${dx}, ${dy}] 前進至[${nx}, ${ny}]被擋`
+      //     );
+      //     continue;
+      //   }
+      // }
       // 若為冰面
       if (compositeState.ice) {
         const iceResult = handleIceSliding(

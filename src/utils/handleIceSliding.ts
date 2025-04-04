@@ -33,8 +33,6 @@ export function handleIceSliding(
   itemMask: number;
   flourMask: number;
 } {
-  let x = initialX - dx;
-  let y = initialY - dy;
   let nx = initialX;
   let ny = initialY;
   const movingTrace: number[][] = [[nx, ny]];
@@ -42,7 +40,6 @@ export function handleIceSliding(
   let entryDirection = getHeroDirection(dx, dy);
   const { flourMap, totalFlours } = buildFlourMapping(placements);
   if (hasIcePickup) {
-    // console.log(`   [${nx}, ${ny}]  [${dx}, ${dy}]`);
     return {
       valid: true,
       path: [
@@ -54,24 +51,13 @@ export function handleIceSliding(
     };
   }
 
-  // if (compositeState.iceCorner) {
-  //   const dir = getHeroDirection(dx, dy);
-
-  //   if (!iceTileCornerBlockedMoves[compositeState.iceCorner][dir]) {
-  //     console.log(
-  //       `hero 在 [${x}, ${y}], 往[${dx}, ${dy}] 前進至[${nx}, ${ny}]被擋`
-  //     );
-  //     continue;
-  //   }
-  // }
   while (true) {
     // 取得在滑動過程經過的冰
     let nextX = nx + dx;
     let nextY = ny + dy;
     // 邊界檢查
-    if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
-      break;
-    }
+    if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) break;
+
     const nextTile = gameMap[nextY - 1][nextX - 1];
     const compositeState = combineCellState(nextTile);
     const hasIcePickup = !(itemMask & 4);
@@ -79,22 +65,12 @@ export function handleIceSliding(
       (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE
     );
 
-    // if (compositeState.iceCorner) {
-    //   if (
-    //     !iceTileCornerBlockedMoves[compositeState.iceCorner][entryDirection]
-    //   ) {
-    //     console.log(
-    //       `hero 在 [${nx}, ${ny}], 往[${dx}, ${dy}] 前進至[${nextX}, ${nextY}]被擋`
-    //     );
-    //     // movingTrace.push([nx, ny]);
-    //     break;
-    //   }
-    // }
     if (icePlacementWhileSliding?.corner) {
       //  當從冰面滑進到 iceCorner ，根據 iceCorner 轉向
       const corner = icePlacementWhileSliding?.corner;
-      const newDirection = iceTileCornerRedirection[corner][entryDirection];
-
+      let newDirection = iceTileCornerRedirection[corner][entryDirection];
+      const blockDirection = iceTileCornerBlockedMoves[corner][newDirection];
+      console.log(corner, entryDirection, newDirection);
       if (newDirection) {
         // 處理重定向（如果可以從這個方向進入角落）
         console.log(
@@ -126,22 +102,35 @@ export function handleIceSliding(
         // 移動到角落位置
         nextX = nx + dx;
         nextY = ny + dy;
-
+        console.log(`push [${nextX}, ${nextY}]`);
         movingTrace.push([nextX, nextY]);
-        console.log(`向 ${newDirection} 轉至 [${nx + dx}, ${ny + dy}]`);
+        // continue;
+        // if (nextX === 4 && nextY === 4) {
+        //   console.log(
+        //     `[${nx - dx}, ${ny - dy}])  向 ${entryDirection}到 [${nx}, ${ny}]`
+        //   );
+        // }
+        // console.log(`向 ${newDirection} 轉至 [${nx + dx}, ${ny + dy}]`);
       } else {
+        console.log("被擋");
+        console.log(movingTrace);
         console.log(
-          `沒有 newDirection,Hero ([${nx - dx}, ${
+          `Hero ([${nx - dx}, ${
             ny - dy
-          }])進入 ${corner}([${nx}, ${ny}])往 ${entryDirection} 至[${nextX}, ${nextY}]`
+          }])進入 ${corner}([${nx}, ${ny}])往 ${entryDirection} 被擋`
         );
         movingTrace.push([nx - dx, ny - dy]);
-        break;
+        return {
+          valid: true,
+          path: movingTrace,
+          itemMask: itemMask,
+          flourMask: flourMask,
+        };
       }
     }
 
     if (compositeState.flour) {
-      console.log(`滑到 flour [${nextX},${nextY}]`);
+      // console.log(`滑到 flour [${nextX},${nextY}]`);
       const flourKey = `${nextX},${nextY}`;
       if (flourMap.has(flourKey)) {
         const index = flourMap.get(flourKey);
@@ -150,36 +139,23 @@ export function handleIceSliding(
     }
 
     // 遇到牆壁停止
-    if (compositeState.wall) {
-      break;
-    }
-    // 滑到鎖沒鑰匙則停止
-    if (compositeState.blueLock && !(itemMask & 8)) {
-      console.log("被blueLock停止");
-      break;
-    }
-    if (compositeState.greenLock && !(itemMask & 16)) {
-      console.log("被greenLock停止");
-      break;
-    }
+    if (compositeState.wall) break;
 
-    if (compositeState.firePickup) {
-      itemMask |= 1;
-    }
-    if (compositeState.waterPickup) {
-      itemMask |= 2;
-    }
-    if (compositeState.icePickup) {
-      itemMask |= 4;
-    }
-    if (compositeState.blueKey) {
-      console.log("滑到 blueKey");
-      itemMask |= 8;
-    }
-    if (compositeState.greenKey) {
-      console.log("滑到 greenKey");
-      itemMask |= 16;
-    }
+    // 滑到鎖沒鑰匙則停止
+    if (compositeState.blueLock && !(itemMask & 8)) break;
+
+    if (compositeState.greenLock && !(itemMask & 16)) break;
+
+    if (compositeState.firePickup) itemMask |= 1;
+
+    if (compositeState.waterPickup) itemMask |= 2;
+
+    if (compositeState.icePickup) itemMask |= 4;
+
+    if (compositeState.blueKey) itemMask |= 8;
+
+    if (compositeState.greenKey) itemMask |= 16;
+
     if (compositeState.switchDoor) {
       // 滑到升降門升起則停止
       const doorKey = `${nx},${ny}`;
@@ -237,7 +213,10 @@ export function handleIceSliding(
     }
 
     // 繼續滑行
-    console.log(`[${nx}, ${ny}] -> [${nextX}, ${nextY}]`);
+    console.log(
+      `[${nx - dx}, ${ny - dy}] -> [${nx}, ${ny}] -> [${nextX}, ${nextY}]`
+    );
+
     nx = nextX;
     ny = nextY;
     movingTrace.push([nx, ny]);

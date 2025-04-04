@@ -55,9 +55,6 @@ export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
             ...level.editModePlacement,
           });
 
-          console.log(level.placements);
-          console.log(isValidPlacementCombination(level, x, y));
-
           // 新增完成後給予反饋
           toast({
             title: `新增 ${level.editModePlacement.type}`,

@@ -393,17 +393,6 @@ export default function findSolutionPath(
 
       if (compositeState.wall) continue;
 
-      //  當從非冰面進入到 iceCorner ，先檢查有無被iceCorner 阻擋
-      // if (compositeState.iceCorner) {
-      //   const dir = getHeroDirection(dx, dy);
-
-      //   if (!iceTileCornerBlockedMoves[compositeState.iceCorner][dir]) {
-      //     console.log(
-      //       `hero 在 [${x}, ${y}], 往[${dx}, ${dy}] 前進至[${nx}, ${ny}]被擋`
-      //     );
-      //     continue;
-      //   }
-      // }
       // 若為冰面
       if (compositeState.ice) {
         const iceResult = handleIceSliding(
@@ -423,7 +412,7 @@ export default function findSolutionPath(
         );
         newItemMask = iceResult.itemMask;
         newFlourMask = iceResult.flourMask;
-        // console.log(iceResult);
+        console.log(iceResult.path);
         if (!iceResult.valid) {
           // 如果冰面路徑無效，跳過這個移動
           continue;
@@ -432,6 +421,7 @@ export default function findSolutionPath(
         // 更新位置為最後滑行的位置
         nx = iceResult.path[iceResult.path.length - 1][0];
         ny = iceResult.path[iceResult.path.length - 1][1];
+        if (nx === 5 && ny === 4) console.log("first");
       }
 
       // 若為 switchDoor，則檢查 doorMask 中對應的位元是否為 1（阻擋）
@@ -534,6 +524,11 @@ export default function findSolutionPath(
       }
 
       // 生成新的 state key：用簡短的字串結合數值資訊
+      if (nx === 5 && ny === 4) {
+        console.log(
+          `${nx},${ny},${newFlourMask},${newItemMask},${newDoorMask}`
+        );
+      }
       const stateKey = `${nx},${ny},${newFlourMask},${newItemMask},${newDoorMask}`;
       if (visited.has(stateKey)) continue;
       visited.add(stateKey);

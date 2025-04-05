@@ -421,7 +421,7 @@ export default function findSolutionPath(
         // 更新位置為最後滑行的位置
         nx = iceResult.path[iceResult.path.length - 1][0];
         ny = iceResult.path[iceResult.path.length - 1][1];
-        if (nx === 5 && ny === 4) console.log("first");
+       
       }
 
       // 若為 switchDoor，則檢查 doorMask 中對應的位元是否為 1（阻擋）

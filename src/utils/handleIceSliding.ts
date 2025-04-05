@@ -50,6 +50,7 @@ export function handleIceSliding(
       flourMask: flourMask,
     };
   }
+  let icePlacementsWhileSliding = [];
 
   while (true) {
     // 取得在滑動過程經過的冰
@@ -58,76 +59,61 @@ export function handleIceSliding(
     // 邊界檢查
     if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) break;
 
-    const nextTile = gameMap[nextY - 1][nextX - 1];
-    const compositeState = combineCellState(nextTile);
+    let nextTile = gameMap[nextY - 1][nextX - 1];
+    let compositeState = combineCellState(nextTile);
     const hasIcePickup = !(itemMask & 4);
     const icePlacementWhileSliding = placements.find(
       (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE
     );
+    icePlacementsWhileSliding.push(icePlacementWhileSliding);
+    console.log(icePlacementsWhileSliding);
 
-    if (icePlacementWhileSliding?.corner) {
-      //  當從冰面滑進到 iceCorner ，根據 iceCorner 轉向
-      const corner = icePlacementWhileSliding?.corner;
-      let newDirection = iceTileCornerRedirection[corner][entryDirection];
-      const blockDirection = iceTileCornerBlockedMoves[corner][newDirection];
-      console.log(corner, entryDirection, newDirection);
-      if (newDirection) {
-        // 處理重定向（如果可以從這個方向進入角落）
-        console.log(
-          `Hero從 ([${nx - dx}, ${
-            ny - dy
-          }]) ${entryDirection} 進入 ${corner}[${nx}, ${ny}] 轉向至 ${newDirection} `
-        );
-        // 根據新方向更新dx和dy
-        switch (newDirection) {
-          case DIRECTION_RIGHT:
-            dx = 1;
-            dy = 0;
-            break;
-          case DIRECTION_LEFT:
-            dx = -1;
-            dy = 0;
-            break;
-          case DIRECTION_DOWN:
-            dx = 0;
-            dy = 1;
-            break;
-          case DIRECTION_UP:
-            dx = 0;
-            dy = -1;
-            break;
-        }
-        entryDirection = newDirection;
-
-        // 移動到角落位置
-        nextX = nx + dx;
-        nextY = ny + dy;
-        console.log(`push [${nextX}, ${nextY}]`);
-        movingTrace.push([nextX, nextY]);
-        // continue;
-        // if (nextX === 4 && nextY === 4) {
-        //   console.log(
-        //     `[${nx - dx}, ${ny - dy}])  向 ${entryDirection}到 [${nx}, ${ny}]`
-        //   );
-        // }
-        // console.log(`向 ${newDirection} 轉至 [${nx + dx}, ${ny + dy}]`);
-      } else {
-        console.log("被擋");
-        console.log(movingTrace);
-        console.log(
-          `Hero ([${nx - dx}, ${
-            ny - dy
-          }])進入 ${corner}([${nx}, ${ny}])往 ${entryDirection} 被擋`
-        );
-        movingTrace.push([nx - dx, ny - dy]);
-        return {
-          valid: true,
-          path: movingTrace,
-          itemMask: itemMask,
-          flourMask: flourMask,
-        };
-      }
+    // 如果連續遇到 iceCorner 則持續處理轉向
+  while (compositeState.iceCorner) {
+    const corner = compositeState.iceCorner;
+    let newDirection = iceTileCornerRedirection[corner][entryDirection];
+    if (!newDirection) {
+      // 如果轉向無效則退回原位，結束滑行
+      movingTrace.push([nx, ny]);
+      return {
+        valid: true,
+        path: movingTrace,
+        itemMask: itemMask,
+        flourMask: flourMask,
+      };
     }
+
+    // 根據新的方向更新 dx, dy 與 entryDirection
+    switch (newDirection) {
+      case DIRECTION_RIGHT:
+        dx = 1;
+        dy = 0;
+        break;
+      case DIRECTION_LEFT:
+        dx = -1;
+        dy = 0;
+        break;
+      case DIRECTION_DOWN:
+        dx = 0;
+        dy = 1;
+        break;
+      case DIRECTION_UP:
+        dx = 0;
+        dy = -1;
+        break;
+    }
+    entryDirection = newDirection;
+    
+    // 移動到角落位置（加入轉向後的那一步）
+    nextX = nextX + dx;
+    nextY = nextY + dy;
+    movingTrace.push([nextX, nextY]);
+    
+    // 更新 compositeState 以檢查下一格是否仍為 iceCorner
+    if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) break;
+    nextTile = gameMap[nextY - 1][nextX - 1];
+    compositeState = combineCellState(nextTile);
+  }
 
     if (compositeState.flour) {
       // console.log(`滑到 flour [${nextX},${nextY}]`);
@@ -167,6 +153,7 @@ export function handleIceSliding(
 
     // 如果滑進水，沒有對應 pickup ，整個路徑無效
     if (compositeState.water && !(itemMask & 2)) {
+      console.log("滑進水裡");
       return {
         valid: false,
         path: [],
@@ -213,9 +200,9 @@ export function handleIceSliding(
     }
 
     // 繼續滑行
-    console.log(
-      `[${nx - dx}, ${ny - dy}] -> [${nx}, ${ny}] -> [${nextX}, ${nextY}]`
-    );
+    // console.log(
+    //   `[${nx - dx}, ${ny - dy}] -> [${nx}, ${ny}] -> [${nextX}, ${nextY}]`
+    // );
 
     nx = nextX;
     ny = nextY;

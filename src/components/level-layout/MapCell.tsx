@@ -5,6 +5,7 @@ import { FrameCoord } from "@/helpers/types";
 import { LevelStateSnapshot } from "@/types/global";
 import { useToast } from "@/hooks/use-toast";
 import { isValidPlacementCombination } from "@/utils/isValidPlacementCombination";
+import { usePathname } from 'next/navigation'
 
 type MapCellType = {
   level: LevelStateSnapshot;
@@ -14,6 +15,8 @@ type MapCellType = {
 };
 
 export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
+  const pathname = usePathname()
+  const isEditPage = pathname === '/edit'
   const { toast } = useToast();
   const { isColored, frequency, index } = handleColoredTile(
     undefined,
@@ -31,7 +34,7 @@ export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
         // backgroundColor: "red",
       }}
       onClick={() => {
-        if (level.enableEditing && isValidPlacementCombination(level, x, y)) {
+        if (isEditPage && isValidPlacementCombination(level, x, y)) {
           // 檢查該位置是否已經有相同類型的 placement
           const existingPlacement = level.placements.some(
             (p) =>
@@ -62,10 +65,12 @@ export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
           });
         } else {
           // 如果條件不符合，顯示錯誤
-          toast({
-            title: `新增 ${level.editModePlacement.type} 至 [${x}, ${y}] 失敗`,
-            description: `同位置只能剛好由一個浮動元素及一個地面元素組成。`,
-          });
+          if(isEditPage){
+            toast({
+              title: `新增 ${level.editModePlacement.type} 至 [${x}, ${y}] 失敗`,
+              description: `同位置只能剛好由一個浮動元素及一個地面元素組成。`,
+            });
+          }
         }
       }}
     >

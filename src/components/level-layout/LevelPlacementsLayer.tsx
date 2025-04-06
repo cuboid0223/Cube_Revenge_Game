@@ -8,16 +8,19 @@ import { selectedPlacementTypeAtom } from "@/atoms/selectedPlacementType";
 import { useRecoilValue } from "recoil";
 import { Placement } from "@/game-objects/Placement";
 import { useToast } from "@/hooks/use-toast";
+import { usePathname } from "next/navigation";
 
 type Props = {
   level: LevelStateSnapshot;
 };
 export default function LevelPlacementsLayer({ level }: Props) {
+  const pathname = usePathname()
+  const isEditPage = pathname === '/edit'
   const { toast } = useToast();
   const selectedPlacementType = useRecoilValue(selectedPlacementTypeAtom);
 
   const handleEditMap = (placement: Placement) => {
-    if (!level.enableEditing || !placement.canBeDeleted()) {
+    if (!isEditPage || !placement.canBeDeleted()) {
       return;
     }
     level.clearSolutionPath();

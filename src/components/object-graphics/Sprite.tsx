@@ -5,6 +5,7 @@ import { useRecoilValue } from "recoil";
 import { spriteSheetImageAtom } from "../../atoms/spriteSheetImageAtom";
 import { FrameCoord } from "@/helpers/types";
 import { LevelStateSnapshot } from "@/types/global";
+import { usePathname } from "next/navigation";
 
 type SpriteProps = {
   level: LevelStateSnapshot;
@@ -21,6 +22,8 @@ function Sprite({
   isColored,
   index,
 }: SpriteProps) {
+  const pathname = usePathname()
+    const isEditPage = pathname === '/edit'
   const spriteSheetImage = useRecoilValue(spriteSheetImageAtom);
   const [isMouseHover, setIsMouseHover] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -103,7 +106,7 @@ function Sprite({
       {/* 編輯模式下滑鼠移動到 TILE上背景會變色 */}
       <div
         className={`${
-          isMouseHover ? "absolute z-50 h-4 w-4 opacity-40 bg-yellow-500" : ""
+          isMouseHover && isEditPage ? "absolute z-50 h-4 w-4 opacity-40 bg-yellow-500" : ""
         }`}
       ></div>
       <canvas width={size} height={size} ref={canvasRef} />

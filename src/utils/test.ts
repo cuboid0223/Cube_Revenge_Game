@@ -40,7 +40,7 @@ export function handleIceSliding(
   let entryDirection = getHeroDirection(dx, dy);
   const { flourMap, totalFlours } = buildFlourMapping(placements);
 
-  // 如果有hasIcePickup，則不滑動（僅返回起始位置）
+  // 如果有冰錐，則不滑動（僅返回起始位置）
   if (hasIcePickup) {
     return {
       valid: true,
@@ -69,20 +69,20 @@ export function handleIceSliding(
     }
     visited.add(stateKey);
 
-    // 獲取下一格的狀態
-    let nextTile = gameMap[nextY - 1][nextX - 1];
-    let compositeState = combineCellState(nextTile);
 
+        // 獲取下一格的狀態
+        const nextTile = gameMap[nextY - 1][nextX - 1];
+        const compositeState = combineCellState(nextTile);
+    
     // 從 placements 中尋找當前位置是否有冰角
-    let icePlacementWhileSliding = placements.find(
+    const icePlacementWhileSliding = placements.find(
       (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE
     );
 
     // 處理冰角轉向邏輯
     if (icePlacementWhileSliding?.corner) {
       const corner = icePlacementWhileSliding.corner;
-      const newDirection =
-        corner && iceTileCornerRedirection[corner][entryDirection];
+      const newDirection = iceTileCornerRedirection[corner][entryDirection];
 
       if (newDirection) {
         // 根據新方向更新 dx 和 dy
@@ -108,16 +108,11 @@ export function handleIceSliding(
         entryDirection = newDirection;
         nextX = nx + dx;
         nextY = ny + dy;
-
+       
         // 邊界檢查（轉向後）
-        if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
-          break;
-        }
-        movingTrace.push([nextX, nextY]);
-
-        nextTile = gameMap[nextY - 1][nextX - 1];
-        compositeState = combineCellState(nextTile);
-      } else {
+        if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) break;
+        movingTrace.push([nextX, nextY]);  
+    } else {
         console.log(`Hero 在 [${nx},${ny}] 往 ${entryDirection} 被角落阻擋`);
         movingTrace.push([nx - dx, ny - dy]);
         return {
@@ -128,6 +123,7 @@ export function handleIceSliding(
         };
       }
     }
+
 
     // 撿到 FLOUR
     if (compositeState.flour) {

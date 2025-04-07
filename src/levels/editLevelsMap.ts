@@ -1,3 +1,4 @@
+import { BugLevel1 } from "./BugLevel1";
 import DefaultLevel from "./DefaultLevel";
 // import DemoLevel4 from "./DemoLevel4";
 // import DemoLevel5 from "./DemoLevel5";
@@ -6,7 +7,7 @@ import DefaultLevel from "./DefaultLevel";
 
 // 編輯關卡的預設關卡 layout
 const editLevels = {
-  DefaultLevel: DefaultLevel,
+  DefaultLevel: BugLevel1,
 };
 
 export default editLevels;

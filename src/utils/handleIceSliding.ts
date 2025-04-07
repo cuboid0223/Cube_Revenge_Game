@@ -40,20 +40,42 @@ export function handleIceSliding(
   let entryDirection = getHeroDirection(dx, dy);
   const { flourMap, totalFlours } = buildFlourMapping(placements);
   if (hasIcePickup) {
+    // TODO: corner 不可跨越
     return {
       valid: true,
-      path: [
-        [nx, ny],
-        // [nx + dx, ny + dy],
-      ],
+      path: movingTrace,
       itemMask: itemMask,
       flourMask: flourMask,
     };
   }
-  // let icePlacementsWhileSliding = [];
+
+  let currentTile = gameMap[ny - 1][nx - 1];
+  let compositeState = combineCellState(currentTile);
+  let visited = new Set<string>();
+
+  // 首先檢查起始 tile 是否有 iceCorner（轉向觸發）
+  // 換句話講就是踩到的第一個冰面就有 CORNER
+  if (compositeState.iceCorner) {
+    const result = processIceCorner(
+      compositeState.iceCorner,
+      entryDirection,
+    
+    );
+    if (!result) {
+      console.log(`Hero 在 [${nx},${ny}] 被角落阻擋`);
+      return { valid: true, path: movingTrace, itemMask, flourMask };
+    }
+    // 更新位置至此角落 tile（觸發 CORNER 轉向，不再依照普通 ICE 往前滑行）
+    entryDirection = result.newDir;
+    dx = result.newDx;
+    dy = result.newDy;
+
+    // 清除角落標記，避免重複觸發
+    // compositeState.iceCorner = undefined;
+  }
 
   while (true) {
-    // 取得在滑動過程經過的冰
+    // 計算下一格座標
     let nextX = nx + dx;
     let nextY = ny + dy;
     // 邊界檢查
@@ -62,79 +84,41 @@ export function handleIceSliding(
     let nextTile = gameMap[nextY - 1][nextX - 1];
     let compositeState = combineCellState(nextTile);
 
+    // 檢查循環狀態
+    const key = stateKey(nx, ny, dx, dy, itemMask);
+    if (visited.has(key)) {
+      console.error("檢測到無窮迴圈");
+      break;
+    }
+    visited.add(key);
 
-
-
-
-    // const hasIcePickup = !(itemMask & 4);
-    // const icePlacementWhileSliding = placements.find(
-    //   (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE
-    // );
-    // icePlacementsWhileSliding.push(icePlacementWhileSliding);
-    // console.log(icePlacementsWhileSliding);
-
-    // 如果連續遇到 iceCorner 則持續處理轉向
+    // 若下一格有 iceCorner，表示需要轉向
+    // 若下一格具有 iceCorner，將其僅作為轉向觸發點
+    // 如果下一格有角落，處理角落轉向，並連續滑行多步
     while (compositeState.iceCorner) {
-      const corner = compositeState.iceCorner;
-      let newDirection = iceTileCornerRedirection[corner][entryDirection];
-      if (!newDirection || !iceTileCornerBlockedMoves[corner][entryDirection]) {
-        // 如果轉向無效則退回原位，結束滑行
-        console.log(`${iceTileCornerBlockedMoves[corner][entryDirection]}, Hero 在 [${nx},${ny}] 往 [${nextX},${nextY}] 移動被擋`);
-        // movingTrace.push([nx, ny]);
-        // if(nx === 9 && ny === 8) console.log("first")
-        return {
-          valid: true,
-          path: movingTrace,
-          itemMask: itemMask,
-          flourMask: flourMask,
-        };
-      }
-
-      // 根據新的方向更新 dx, dy 與 entryDirection
-      switch (newDirection) {
-        case DIRECTION_RIGHT:
-          dx = 1;
-          dy = 0;
-          break;
-        case DIRECTION_LEFT:
-          dx = -1;
-          dy = 0;
-          break;
-        case DIRECTION_DOWN:
-          dx = 0;
-          dy = 1;
-          break;
-        case DIRECTION_UP:
-          dx = 0;
-          dy = -1;
-          break;
-      }
-      console.log(
-        `Hero 在 [${nx},${ny}] 往${entryDirection} 進入 ${corner}([${nextX},${nextY}]) 轉向至 ${newDirection}([${
-          nextX + dx
-        },${nextY + dy}]) `
+      const result = processIceCorner(
+        compositeState.iceCorner,
+        entryDirection,
+       
       );
-      entryDirection = newDirection;
-
-      // 移動到角落位置（加入轉向後的那一步）
-      nx = nextX
-      ny = nextY
+      if (!result) {
+        console.log(`Hero 在 [${nx},${ny}] 往 [${nextX},${nextY}] 被角落阻擋`);
+        return { valid: true, path: movingTrace, itemMask, flourMask };
+      }
+      entryDirection = result.newDirection;
+      dx = result.newDx;
+      dy = result.newDy;
+      // 更新位置到角落 tile
+      nx = nextX;
+      ny = nextY;
       movingTrace.push([nx, ny]);
-     
-      nextX = nextX + dx;
-      nextY = nextY + dy;
-      // movingTrace.push([nextX, nextY]);
-
-      // 更新 compositeState 以檢查下一格是否仍為 iceCorner
-      if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
-        // nextX = nx
-        // nextY = ny
-        break
-      };
-      nextTile = gameMap[nextY - 1][nextX - 1];
-      compositeState = combineCellState(nextTile);
+      compositeState = combineCellState(gameMap[ny - 1][nx - 1]);
+      // 更新下一步
+      nextX = nx + dx;
+      nextY = ny + dy;
     }
 
+    // 撿到 FLOUR
     if (compositeState.flour) {
       // console.log(`滑到 flour [${nextX},${nextY}]`);
       const flourKey = `${nextX},${nextY}`;
@@ -211,6 +195,7 @@ export function handleIceSliding(
     // 如果滑進 THIEF，itemMask 清空，但整個路徑有效
     if (compositeState.thief) {
       // console.log("踩到冰滑進  THIEF", movingTrace);
+      movingTrace.push([nextX, nextY])
       return {
         valid: true,
         path: movingTrace,
@@ -219,16 +204,10 @@ export function handleIceSliding(
       };
     }
 
-    // 繼續滑行
-    // console.log(
-    //   `[${nx - dx}, ${ny - dy}] -> [${nx}, ${ny}] -> [${nextX}, ${nextY}]`
-    // );
-
     nx = nextX;
     ny = nextY;
-    // if(nx === 9 && ny === 8) console.log("first")
     movingTrace.push([nx, ny]);
-
+    compositeState = combineCellState(gameMap[ny - 1][nx - 1]);
     // 如果下一格不是冰，停止滑行
     if (!compositeState.ice) {
       break;
@@ -261,4 +240,26 @@ export function getHeroDirection(dx: number, dy: number) {
   }
 
   return entryDirection;
+}
+
+function processIceCorner(
+  corner: string,
+  entryDirection: string,
+) {
+  const newDirection = iceTileCornerRedirection[corner][entryDirection];
+    if (!newDirection || iceTileCornerBlockedMoves[corner][entryDirection]) {
+      return null;
+    }
+    let newDx = 0, newDy = 0;
+    switch (newDirection) {
+      case DIRECTION_RIGHT: newDx = 1; break;
+      case DIRECTION_LEFT: newDx = -1; break;
+      case DIRECTION_DOWN: newDy = 1; break;
+      case DIRECTION_UP: newDy = -1; break;
+    }
+    return { newDirection, newDx, newDy };
+}
+
+function stateKey(x: number, y: number, dx: number, dy: number, mask: number) {
+  return `${x},${y},${dx},${dy},${mask}`;
 }

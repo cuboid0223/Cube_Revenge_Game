@@ -412,7 +412,7 @@ export default function findSolutionPath(
         );
         newItemMask = iceResult.itemMask;
         newFlourMask = iceResult.flourMask;
-        console.log(iceResult.path);
+        console.log("iceResult.path : ", iceResult.path);
         if (!iceResult.valid) {
           // 如果冰面路徑無效，跳過這個移動
           continue;

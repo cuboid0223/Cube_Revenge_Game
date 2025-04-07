@@ -204,6 +204,7 @@ export function handleIceSliding(
     // 如果滑進 THIEF，itemMask 清空，但整個路徑有效
     if (compositeState.thief) {
       // console.log("踩到冰滑進  THIEF", movingTrace);
+      movingTrace.push([nextX, nextY])
       return {
         valid: true,
         path: movingTrace,

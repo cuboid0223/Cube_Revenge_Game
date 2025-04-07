@@ -524,11 +524,7 @@ export default function findSolutionPath(
       }
 
       // 生成新的 state key：用簡短的字串結合數值資訊
-      if (nx === 5 && ny === 4) {
-        console.log(
-          `${nx},${ny},${newFlourMask},${newItemMask},${newDoorMask}`
-        );
-      }
+
       const stateKey = `${nx},${ny},${newFlourMask},${newItemMask},${newDoorMask}`;
       if (visited.has(stateKey)) continue;
       visited.add(stateKey);

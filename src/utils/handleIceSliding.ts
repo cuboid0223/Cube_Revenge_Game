@@ -141,17 +141,14 @@ export function handleIceSliding(
           flourMask: flourMask,
         };
       }
-      // entryDirection = result.newDirection;
-      // dx = result.newDx;
-      // dy = result.newDy;
       // 更新位置到角落 tile
       nx = nextX;
       ny = nextY;
-      // movingTrace.push([nx, ny]);
+      movingTrace.push([nx, ny]);
       compositeState = combineCellState(gameMap[ny - 1][nx - 1]);
       // 更新下一步
-      nextX = nx + dx;
-      nextY = ny + dy;
+      // nextX = nx + dx;
+      // nextY = ny + dy;
     }
 
     // 撿到 FLOUR

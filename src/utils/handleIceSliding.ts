@@ -2,7 +2,12 @@ import {
   iceTileCornerBlockedMoves,
   iceTileCornerRedirection,
 } from "@/game-objects/IcePlacement";
-import { buildFlourMapping, combineCellState } from "./findSolutionPath";
+import {
+  buildFlourMapping,
+  combineCellState,
+  getHeroDirection,
+  getPlacementAt,
+} from "./findSolutionPath";
 import {
   DIRECTION_DOWN,
   DIRECTION_LEFT,
@@ -35,14 +40,24 @@ export function handleIceSliding(
 } {
   let nx = initialX;
   let ny = initialY;
-  const movingTrace: number[][] = [[nx, ny]];
+  let movingTrace: number[][] = [[nx, ny]];
   const hasIcePickup = itemMask & 4;
   let entryDirection = getHeroDirection(dx, dy);
   const { flourMap, totalFlours } = buildFlourMapping(placements);
 
   // 如果有hasIcePickup，則不滑動（僅返回起始位置）
   if (hasIcePickup) {
-    // TODO: corner 不可跨越
+    // 處理冰角阻擋
+    movingTrace = handleIceCornerBlocking(
+      placements,
+      nx,
+      ny,
+      dx,
+      dy,
+      entryDirection,
+      movingTrace
+    );
+
     return {
       valid: true,
       path: movingTrace,
@@ -75,8 +90,11 @@ export function handleIceSliding(
     let compositeState = combineCellState(nextTile);
 
     // 從 placements 中尋找當前位置是否有冰角
-    let icePlacementWhileSliding = placements.find(
-      (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE
+    let icePlacementWhileSliding = getPlacementAt(
+      placements,
+      PLACEMENT_TYPE_ICE,
+      nx,
+      ny
     );
 
     // 處理冰角轉向邏輯
@@ -117,10 +135,6 @@ export function handleIceSliding(
         if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
           break;
         }
-        // movingTrace.push([nextX, nextY]);
-
-        // nextTile = gameMap[nextY - 1][nextX - 1];
-        // compositeState = combineCellState(nextTile);
         // 更新位置至角落 tile
         nx = nextX;
         ny = nextY;
@@ -146,9 +160,6 @@ export function handleIceSliding(
       ny = nextY;
       movingTrace.push([nx, ny]);
       compositeState = combineCellState(gameMap[ny - 1][nx - 1]);
-      // 更新下一步
-      // nextX = nx + dx;
-      // nextY = ny + dy;
     }
 
     // 撿到 FLOUR
@@ -250,50 +261,36 @@ export function handleIceSliding(
   };
 }
 
-export function getHeroDirection(dx: number, dy: number) {
-  let entryDirection = "";
-  // 根據移動方向確定進入方向
-  if (dx > 0) {
-    // 向右移動，從左側進入
-    entryDirection = DIRECTION_RIGHT;
-  } else if (dx < 0) {
-    // 向左移動，從右側進入
-    entryDirection = DIRECTION_LEFT;
-  } else if (dy > 0) {
-    // 向下移動，從上方進入
-    entryDirection = DIRECTION_DOWN;
-  } else if (dy < 0) {
-    // 向上移動，從下方進入
-    entryDirection = DIRECTION_UP;
+// 處理冰角邏輯，將其封裝為一個函數，避免重複程式碼
+function handleIceCornerBlocking(
+  placements: PlacementConfig[],
+  nx: number,
+  ny: number,
+  dx: number,
+  dy: number,
+  entryDirection: string,
+  movingTrace: number[][]
+) {
+  // 從 placements 中尋找當前位置是否有冰角
+  const icePlacement = getPlacementAt(placements, PLACEMENT_TYPE_ICE, nx, ny);
+
+  if (icePlacement?.corner) {
+    const isBlocked =
+      iceTileCornerBlockedMoves[icePlacement.corner][entryDirection];
+
+    // 記錄是否被角落阻擋
+    const action = isBlocked
+      ? `進入角落${icePlacement.corner}`
+      : `被角落${icePlacement.corner}阻擋`;
+
+    console.log(
+      `Hero  在 [${nx - dx},${
+        ny - dy
+      }] 往 ${entryDirection} ${action} [${nx},${ny}]`
+    );
+
+    movingTrace.push([nx - dx, ny - dy]); // 推送回退位置
   }
 
-  return entryDirection;
-}
-
-function processIceCorner(corner: string, entryDirection: string) {
-  const newDirection = iceTileCornerRedirection[corner][entryDirection];
-  if (!newDirection || iceTileCornerBlockedMoves[corner][entryDirection]) {
-    return null;
-  }
-  let newDx = 0,
-    newDy = 0;
-  switch (newDirection) {
-    case DIRECTION_RIGHT:
-      newDx = 1;
-      break;
-    case DIRECTION_LEFT:
-      newDx = -1;
-      break;
-    case DIRECTION_DOWN:
-      newDy = 1;
-      break;
-    case DIRECTION_UP:
-      newDy = -1;
-      break;
-  }
-  return { newDirection, newDx, newDy };
-}
-
-function stateKey(x: number, y: number, dx: number, dy: number, mask: number) {
-  return `${x},${y},${dx},${dy},${mask}`;
+  return movingTrace;
 }

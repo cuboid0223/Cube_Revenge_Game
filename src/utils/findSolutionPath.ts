@@ -49,7 +49,7 @@ import {
   LevelStateSnapshot,
   PlacementConfig,
 } from "@/types/global";
-import { getHeroDirection, handleIceSliding } from "./handleIceSliding";
+import { handleIceSliding } from "./handleIceSliding";
 
 function getOutputType(
   type: string,
@@ -147,6 +147,35 @@ export function createMap(level: LevelStateSnapshot): {
 // 查找指定物件所有位置
 export function findPositions(placements: PlacementConfig[], type: string) {
   return placements.filter((p) => p.type === type).map((p) => [p.x, p.y]);
+}
+
+export function getPlacementAt(
+  placements: PlacementConfig[],
+  type: string,
+  x: number,
+  y: number
+): PlacementConfig | undefined {
+  return placements.find((p) => p.x === x && p.y === y && p.type === type);
+}
+
+export function getHeroDirection(dx: number, dy: number) {
+  let entryDirection = "";
+  // 根據移動方向確定進入方向
+  if (dx > 0) {
+    // 向右移動，從左側進入
+    entryDirection = DIRECTION_RIGHT;
+  } else if (dx < 0) {
+    // 向左移動，從右側進入
+    entryDirection = DIRECTION_LEFT;
+  } else if (dy > 0) {
+    // 向下移動，從上方進入
+    entryDirection = DIRECTION_DOWN;
+  } else if (dy < 0) {
+    // 向上移動，從下方進入
+    entryDirection = DIRECTION_UP;
+  }
+
+  return entryDirection;
 }
 
 //––––– 事前準備 –––––//
@@ -412,7 +441,7 @@ export default function findSolutionPath(
         );
         newItemMask = iceResult.itemMask;
         newFlourMask = iceResult.flourMask;
-        console.log("iceResult.path : ", iceResult.path);
+        console.log(iceResult.path);
         if (!iceResult.valid) {
           // 如果冰面路徑無效，跳過這個移動
           continue;
@@ -421,7 +450,6 @@ export default function findSolutionPath(
         // 更新位置為最後滑行的位置
         nx = iceResult.path[iceResult.path.length - 1][0];
         ny = iceResult.path[iceResult.path.length - 1][1];
-       
       }
 
       // 若為 switchDoor，則檢查 doorMask 中對應的位元是否為 1（阻擋）

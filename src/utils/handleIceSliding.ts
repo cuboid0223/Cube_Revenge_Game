@@ -51,7 +51,6 @@ export function handleIceSliding(
     };
   }
 
-
   // 使用訪問集合來檢測迴圈
   let visited = new Set<string>();
 
@@ -62,7 +61,6 @@ export function handleIceSliding(
 
     // 邊界檢查
     if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) break;
-
 
     // 檢查是否存在無窮迴圈
     const stateKey = `${nx},${ny},${dx},${dy},${itemMask}`;
@@ -82,7 +80,7 @@ export function handleIceSliding(
     );
 
     // 處理冰角轉向邏輯
-    if (icePlacementWhileSliding?.corner) {
+    while (icePlacementWhileSliding?.corner) {
       const corner = icePlacementWhileSliding.corner;
       const newDirection =
         corner && iceTileCornerRedirection[corner][entryDirection];
@@ -111,17 +109,30 @@ export function handleIceSliding(
         entryDirection = newDirection;
         nextX = nx + dx;
         nextY = ny + dy;
+        console.log(
+          `Hero 在 ${corner} [${nx},${ny}] 往 ${entryDirection}  轉向至  [${nextX},${nextY}]`
+        );
 
         // 邊界檢查（轉向後）
         if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
           break;
         }
-        movingTrace.push([nextX, nextY]);
+        // movingTrace.push([nextX, nextY]);
 
-        nextTile = gameMap[nextY - 1][nextX - 1];
-        compositeState = combineCellState(nextTile);
+        // nextTile = gameMap[nextY - 1][nextX - 1];
+        // compositeState = combineCellState(nextTile);
+        // 更新位置至角落 tile
+        nx = nextX;
+        ny = nextY;
+
+        // 更新冰角資訊，這一步很關鍵，確保檢查新位置是否存在角落
+        icePlacementWhileSliding = placements.find(
+          (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE
+        );
       } else {
-        console.log(`Hero 在 [${nx},${ny}] 往 ${entryDirection} 被角落阻擋`);
+        console.log(
+          `Hero 在 [${nx},${ny}] 往 ${entryDirection} 被角落${corner}阻擋`
+        );
         movingTrace.push([nx - dx, ny - dy]);
         return {
           valid: true,
@@ -129,15 +140,14 @@ export function handleIceSliding(
           itemMask: itemMask,
           flourMask: flourMask,
         };
-
       }
-      entryDirection = result.newDirection;
-      dx = result.newDx;
-      dy = result.newDy;
+      // entryDirection = result.newDirection;
+      // dx = result.newDx;
+      // dy = result.newDy;
       // 更新位置到角落 tile
       nx = nextX;
       ny = nextY;
-      movingTrace.push([nx, ny]);
+      // movingTrace.push([nx, ny]);
       compositeState = combineCellState(gameMap[ny - 1][nx - 1]);
       // 更新下一步
       nextX = nx + dx;
@@ -215,12 +225,8 @@ export function handleIceSliding(
 
     // 如果滑進 THIEF，itemMask 清空，但整個路徑有效
     if (compositeState.thief) {
-<<<<<<< HEAD
-      // console.log("踩到冰滑進  THIEF", movingTrace);
-      movingTrace.push([nextX, nextY])
-=======
       movingTrace.push([nextX, nextY]);
->>>>>>> temp-branch
+
       return {
         valid: true,
         path: movingTrace,
@@ -229,10 +235,6 @@ export function handleIceSliding(
       };
     }
 
-<<<<<<< HEAD
-=======
-    // 更新位置
->>>>>>> temp-branch
     nx = nextX;
     ny = nextY;
     movingTrace.push([nx, ny]);
@@ -271,22 +273,28 @@ export function getHeroDirection(dx: number, dy: number) {
   return entryDirection;
 }
 
-function processIceCorner(
-  corner: string,
-  entryDirection: string,
-) {
+function processIceCorner(corner: string, entryDirection: string) {
   const newDirection = iceTileCornerRedirection[corner][entryDirection];
-    if (!newDirection || iceTileCornerBlockedMoves[corner][entryDirection]) {
-      return null;
-    }
-    let newDx = 0, newDy = 0;
-    switch (newDirection) {
-      case DIRECTION_RIGHT: newDx = 1; break;
-      case DIRECTION_LEFT: newDx = -1; break;
-      case DIRECTION_DOWN: newDy = 1; break;
-      case DIRECTION_UP: newDy = -1; break;
-    }
-    return { newDirection, newDx, newDy };
+  if (!newDirection || iceTileCornerBlockedMoves[corner][entryDirection]) {
+    return null;
+  }
+  let newDx = 0,
+    newDy = 0;
+  switch (newDirection) {
+    case DIRECTION_RIGHT:
+      newDx = 1;
+      break;
+    case DIRECTION_LEFT:
+      newDx = -1;
+      break;
+    case DIRECTION_DOWN:
+      newDy = 1;
+      break;
+    case DIRECTION_UP:
+      newDy = -1;
+      break;
+  }
+  return { newDirection, newDx, newDy };
 }
 
 function stateKey(x: number, y: number, dx: number, dy: number, mask: number) {

@@ -35,7 +35,7 @@ type EditorPanelProps = {
 
 function EditorPanel({ level }: EditorPanelProps) {
   const { toast } = useToast();
-  const [selectedCategory, setSelectedCategory] = useState("basics");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedTile, setSelectedTile] = useState<FrameCoord>(
     THEME_TILES_MAP[LEVEL_THEMES.YELLOW]["WALL"]
   );
@@ -141,13 +141,14 @@ function EditorPanel({ level }: EditorPanelProps) {
         <Label htmlFor="objectCategory">OBJECT CATEGORY</Label>
         <Select onValueChange={(value) => setSelectedCategory(value)}>
           <SelectTrigger>
-            <SelectValue placeholder="Basics" />
+            <SelectValue placeholder="All Object" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="basics">Basics</SelectItem>
             <SelectItem value="tiles">Tiles</SelectItem>
             <SelectItem value="pickups">Pickups</SelectItem>
             <SelectItem value="enemies">Enemies</SelectItem>
+            <SelectItem value="all">All</SelectItem>
           </SelectContent>
         </Select>
         <div className="flex flex-wrap gap-2 mt-4">

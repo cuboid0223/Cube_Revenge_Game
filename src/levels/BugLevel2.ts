@@ -1,3 +1,8 @@
+import {
+  PLACEMENT_TYPE_HERO_EDITING,
+  PLACEMENT_TYPE_HERO_SPAWN,
+} from "@/helpers/consts";
+
 export const BugLevel2 = {
   theme: "YELLOW",
   tilesWidth: 10,
@@ -215,7 +220,12 @@ export const BugLevel2 = {
     {
       x: 2,
       y: 8,
-      type: "HERO",
+      type: PLACEMENT_TYPE_HERO_SPAWN,
+    },
+    {
+      x: 2,
+      y: 8,
+      type: PLACEMENT_TYPE_HERO_EDITING,
     },
     {
       x: 5,

@@ -70,12 +70,21 @@ export function handleIceSliding(
   let visited = new Set<string>();
 
   while (true) {
+    // 從 placements 中尋找當前位置是否有冰角
+    let icePlacementWhileSliding = getPlacementAt(
+      placements,
+      PLACEMENT_TYPE_ICE,
+      nx,
+      ny
+    );
     // 計算下一格座標
     let nextX = nx + dx;
     let nextY = ny + dy;
 
-    // 邊界檢查
-    if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) break;
+    if (nextX === 3 && nextY === 0) console.log("fuck");
+    if (nextX < 1 || nextX > width || nextY < 1 || nextY > height)
+      // 邊界檢查
+      break;
 
     // 檢查是否存在無窮迴圈
     const stateKey = `${nx},${ny},${dx},${dy},${itemMask}`;
@@ -89,17 +98,10 @@ export function handleIceSliding(
     let nextTile = gameMap[nextY - 1][nextX - 1];
     let compositeState = combineCellState(nextTile);
 
-    // 從 placements 中尋找當前位置是否有冰角
-    let icePlacementWhileSliding = getPlacementAt(
-      placements,
-      PLACEMENT_TYPE_ICE,
-      nx,
-      ny
-    );
-
     // 處理冰角轉向邏輯
-    while (icePlacementWhileSliding?.corner) {
+    if (icePlacementWhileSliding?.corner) {
       const corner = icePlacementWhileSliding.corner;
+      if (nextX === 3 && nextY === 1) console.log(`got you ${corner}`);
       const newDirection =
         corner && iceTileCornerRedirection[corner][entryDirection];
 
@@ -128,7 +130,7 @@ export function handleIceSliding(
         nextX = nx + dx;
         nextY = ny + dy;
         console.log(
-          `Hero 在 ${corner} [${nx},${ny}] 往 ${entryDirection}  轉向至  [${nextX},${nextY}]`
+          `Hero 在 ${corner} [${nx},${ny}]  轉向至  [${nextX},${nextY}] 往 ${entryDirection} `
         );
 
         // 邊界檢查（轉向後）
@@ -145,9 +147,12 @@ export function handleIceSliding(
         );
       } else {
         console.log(
-          `Hero 在 [${nx},${ny}] 往 ${entryDirection} 被角落${corner}阻擋`
+          `Hero 在 [${nx},${ny}] 往 ${entryDirection} 被角落${corner}[${nextX},${nextY}]阻擋`
         );
         movingTrace.push([nx - dx, ny - dy]);
+        // if (!iceTileCornerBlockedMoves[corner][entryDirection]) {
+        //   movingTrace.push([nx - dx, ny - dy]);
+        // }
         return {
           valid: true,
           path: movingTrace,

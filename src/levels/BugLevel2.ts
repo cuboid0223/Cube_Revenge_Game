@@ -1,4 +1,5 @@
 import {
+  PLACEMENT_TYPE_GOAL_ENABLED,
   PLACEMENT_TYPE_HERO_EDITING,
   PLACEMENT_TYPE_HERO_SPAWN,
 } from "@/helpers/consts";
@@ -230,7 +231,7 @@ export const BugLevel2 = {
     {
       x: 5,
       y: 8,
-      type: "GOAL",
+      type: PLACEMENT_TYPE_GOAL_ENABLED,
     },
     {
       type: "WALL",

@@ -70,38 +70,17 @@ export function handleIceSliding(
   let visited = new Set<string>();
 
   while (true) {
-    // 從 placements 中尋找當前位置是否有冰角
+    // 優先處理當前位置的冰角轉向邏輯
     let icePlacementWhileSliding = getPlacementAt(
       placements,
       PLACEMENT_TYPE_ICE,
       nx,
       ny
     );
-    // 計算下一格座標
-    let nextX = nx + dx;
-    let nextY = ny + dy;
-
-    if (nextX === 3 && nextY === 0) console.log("fuck");
-    if (nextX < 1 || nextX > width || nextY < 1 || nextY > height)
-      // 邊界檢查
-      break;
-
-    // 檢查是否存在無窮迴圈
-    const stateKey = `${nx},${ny},${dx},${dy},${itemMask}`;
-    if (visited.has(stateKey)) {
-      console.error("檢測到無窮迴圈");
-      break;
-    }
-    visited.add(stateKey);
-
-    // 獲取下一格的狀態
-    let nextTile = gameMap[nextY - 1][nextX - 1];
-    let compositeState = combineCellState(nextTile);
 
     // 處理冰角轉向邏輯
     if (icePlacementWhileSliding?.corner) {
       const corner = icePlacementWhileSliding.corner;
-      if (nextX === 3 && nextY === 1) console.log(`got you ${corner}`);
       const newDirection =
         corner && iceTileCornerRedirection[corner][entryDirection];
 
@@ -127,32 +106,14 @@ export function handleIceSliding(
         }
 
         entryDirection = newDirection;
-        nextX = nx + dx;
-        nextY = ny + dy;
         console.log(
-          `Hero 在 ${corner} [${nx},${ny}]  轉向至  [${nextX},${nextY}] 往 ${entryDirection} `
-        );
-
-        // 邊界檢查（轉向後）
-        if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) {
-          break;
-        }
-        // 更新位置至角落 tile
-        nx = nextX;
-        ny = nextY;
-
-        // 更新冰角資訊，這一步很關鍵，確保檢查新位置是否存在角落
-        icePlacementWhileSliding = placements.find(
-          (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_ICE
+          `Hero 在 ${corner} [${nx},${ny}] 轉向至往 ${entryDirection}`
         );
       } else {
         console.log(
-          `Hero 在 [${nx},${ny}] 往 ${entryDirection} 被角落${corner}[${nextX},${nextY}]阻擋`
+          `Hero 在 [${nx},${ny}] 往 ${entryDirection} 被角落${corner}阻擋`
         );
         movingTrace.push([nx - dx, ny - dy]);
-        // if (!iceTileCornerBlockedMoves[corner][entryDirection]) {
-        //   movingTrace.push([nx - dx, ny - dy]);
-        // }
         return {
           valid: true,
           path: movingTrace,
@@ -160,12 +121,26 @@ export function handleIceSliding(
           flourMask: flourMask,
         };
       }
-      // 更新位置到角落 tile
-      nx = nextX;
-      ny = nextY;
-      movingTrace.push([nx, ny]);
-      compositeState = combineCellState(gameMap[ny - 1][nx - 1]);
     }
+
+    // 計算下一格座標
+    let nextX = nx + dx;
+    let nextY = ny + dy;
+
+    // 邊界檢查（現在放在冰角處理後）
+    if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) break;
+
+    // 檢查是否存在無窮迴圈
+    const stateKey = `${nx},${ny},${dx},${dy},${itemMask}`;
+    if (visited.has(stateKey)) {
+      console.error("檢測到無窮迴圈");
+      break;
+    }
+    visited.add(stateKey);
+
+    // 獲取下一格的狀態
+    let nextTile = gameMap[nextY - 1][nextX - 1];
+    let compositeState = combineCellState(nextTile);
 
     // 撿到 FLOUR
     if (compositeState.flour) {

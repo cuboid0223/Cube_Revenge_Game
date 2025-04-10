@@ -13,6 +13,7 @@ import {
   DIRECTION_LEFT,
   DIRECTION_RIGHT,
   DIRECTION_UP,
+  directionUpdateMap,
   PLACEMENT_TYPE_CONVEYOR,
   PLACEMENT_TYPE_ICE,
 } from "@/helpers/consts";
@@ -44,6 +45,8 @@ export function handleIceSliding(
   const hasIcePickup = itemMask & 4;
   let entryDirection = getHeroDirection(dx, dy);
   const { flourMap, totalFlours } = buildFlourMapping(placements);
+  const currentTile = gameMap[ny - 1][nx - 1];
+  let compositeState = combineCellState(currentTile);
 
   // 如果有hasIcePickup，則不滑動（僅返回起始位置）
   if (hasIcePickup) {
@@ -71,16 +74,16 @@ export function handleIceSliding(
 
   while (true) {
     // 優先處理當前位置的冰角轉向邏輯
-    let icePlacementWhileSliding = getPlacementAt(
-      placements,
-      PLACEMENT_TYPE_ICE,
-      nx,
-      ny
-    );
+    // let icePlacementWhileSliding = getPlacementAt(
+    //   placements,
+    //   PLACEMENT_TYPE_ICE,
+    //   nx,
+    //   ny
+    // );
 
     // 處理冰角轉向邏輯
-    if (icePlacementWhileSliding?.corner) {
-      const corner = icePlacementWhileSliding.corner;
+    if (compositeState?.iceCorner) {
+      const corner = compositeState.iceCorner;
       const newDirection =
         corner && iceTileCornerRedirection[corner][entryDirection];
 
@@ -106,9 +109,10 @@ export function handleIceSliding(
         }
 
         entryDirection = newDirection;
-        console.log(
-          `Hero 在 ${corner} [${nx},${ny}] 轉向至往 ${entryDirection}`
-        );
+
+        // console.log(
+        //   `Hero 在 ${corner} [${nx},${ny}] 轉向至往 ${entryDirection}`
+        // );
       } else {
         console.log(
           `Hero 在 [${nx},${ny}] 往 ${entryDirection} 被角落${corner}阻擋`
@@ -133,14 +137,14 @@ export function handleIceSliding(
     // 檢查是否存在無窮迴圈
     const stateKey = `${nx},${ny},${dx},${dy},${itemMask}`;
     if (visited.has(stateKey)) {
-      console.error("檢測到無窮迴圈");
+      console.error(`檢測到無窮迴圈 ${stateKey}`);
       break;
     }
     visited.add(stateKey);
 
     // 獲取下一格的狀態
     let nextTile = gameMap[nextY - 1][nextX - 1];
-    let compositeState = combineCellState(nextTile);
+    compositeState = combineCellState(nextTile);
 
     // 撿到 FLOUR
     if (compositeState.flour) {
@@ -197,24 +201,23 @@ export function handleIceSliding(
 
     // 處理 Conveyor
     if (compositeState.conveyor) {
-      const conveyor = placements.find(
-        (p) =>
-          p.x === nextX && p.y === nextY && p.type === PLACEMENT_TYPE_CONVEYOR
-      );
+      const direction = compositeState.conveyorDir as string;
 
-      if (conveyor) {
-        const { direction } = conveyor;
-        if (direction === "UP") nextY -= 1;
-        else if (direction === "DOWN") nextY += 1;
-        else if (direction === "LEFT") nextX -= 1;
-        else if (direction === "RIGHT") nextX += 1;
-      }
+      if (direction === "UP") nextY -= 1;
+      else if (direction === "DOWN") nextY += 1;
+      else if (direction === "LEFT") nextX -= 1;
+      else if (direction === "RIGHT") nextX += 1;
+
+      dx = directionUpdateMap[direction].x;
+      dy = directionUpdateMap[direction].y;
     }
 
     // 如果滑進 THIEF，itemMask 清空，但整個路徑有效
     if (compositeState.thief) {
       movingTrace.push([nextX, nextY]);
-
+      console.log(
+        `step on thief while sliding form [${nx},${ny}] to [${nextX},${nextY}]`
+      );
       return {
         valid: true,
         path: movingTrace,
@@ -227,6 +230,7 @@ export function handleIceSliding(
     ny = nextY;
     movingTrace.push([nx, ny]);
     compositeState = combineCellState(gameMap[ny - 1][nx - 1]);
+
     // 如果下一格不是冰，停止滑行
     if (!compositeState.ice) {
       break;

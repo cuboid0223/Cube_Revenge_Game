@@ -403,7 +403,7 @@ export default function findSolutionPath(
     }
 
     // 探索四個方向
-    for (const [dx, dy] of [
+    for (let [dx, dy] of [
       [-1, 0],
       [1, 0],
       [0, -1],
@@ -414,13 +414,31 @@ export default function findSolutionPath(
       // 超出邊界
       if (nx < 1 || nx > width || ny < 1 || ny > height) continue;
       let cell = gameMap[ny - 1][nx - 1];
-      const compositeState = combineCellState(cell);
+      let compositeState = combineCellState(cell);
       // 先備份各狀態
       let newFlourMask = flourMask;
       let newItemMask = itemMask;
       let newDoorMask = doorMask;
 
       if (compositeState.wall) continue;
+
+      // 處理 Conveyor
+      // note1: 需放在處理ICE之前，確保走到conveyor 被移到 ICE 能正常
+      // note2
+      if (compositeState.conveyor) {
+        const direction = compositeState.conveyorDir as string;
+        console.log(`from [${nx}, ${ny}] `);
+        if (direction === "UP") ny -= 1;
+        else if (direction === "DOWN") ny += 1;
+        else if (direction === "LEFT") nx -= 1;
+        else if (direction === "RIGHT") nx += 1;
+        console.log(`to [${nx}, ${ny}] `);
+        // const newCell = gameMap[ny - 1][nx - 1];
+        // compositeState = combineCellState(newCell);
+
+        dx = directionUpdateMap[direction].x;
+        dy = directionUpdateMap[direction].y;
+      }
 
       // 若為冰面
       if (compositeState.ice) {
@@ -439,17 +457,20 @@ export default function findSolutionPath(
           flourMask,
           compositeState.iceCorner
         );
-        newItemMask = iceResult.itemMask;
-        newFlourMask = iceResult.flourMask;
-        console.log(iceResult.path);
+
         if (!iceResult.valid) {
           // 如果冰面路徑無效，跳過這個移動
           continue;
         }
+        newItemMask = iceResult.itemMask;
+        newFlourMask = iceResult.flourMask;
+
+        console.log(iceResult.path);
 
         // 更新位置為最後滑行的位置
         nx = iceResult.path[iceResult.path.length - 1][0];
         ny = iceResult.path[iceResult.path.length - 1][1];
+        compositeState = combineCellState(gameMap[ny - 1][nx - 1]);
       }
 
       // 若為 switchDoor，則檢查 doorMask 中對應的位元是否為 1（阻擋）
@@ -475,7 +496,15 @@ export default function findSolutionPath(
 
       // 如火、水，僅當有相應道具時才能通過
       if (compositeState.fire && !(newItemMask & 1)) continue;
-      if (compositeState.water && !(newItemMask & 2)) continue;
+      if (compositeState.water) {
+        if (nx === 1 && ny === 9 && x === 1 && y === 10) {
+          console.log(`step on water without water pickup${newItemMask}   }`);
+        }
+      }
+
+      if (compositeState.water && !(newItemMask & 2)) {
+        continue;
+      }
 
       // 處理 switch：踩到 switch 時，全部 switchDoor 狀態取反
       if (compositeState.switch) {
@@ -500,7 +529,6 @@ export default function findSolutionPath(
         newItemMask |= 2;
       }
       if (compositeState.icePickup) {
-        console.log("get icePickup");
         newItemMask |= 4;
       }
       if (compositeState.blueKey) {
@@ -508,11 +536,6 @@ export default function findSolutionPath(
       }
       if (compositeState.greenKey) {
         newItemMask |= 16;
-      }
-
-      // 處理 Thief：若遇到小偷，重置所有道具
-      if (compositeState.thief) {
-        newItemMask = 0;
       }
 
       // 處理 Teleport
@@ -532,23 +555,13 @@ export default function findSolutionPath(
 
           nx = tp.x;
           ny = tp.y;
-          console.log(`Teleported to (${nx}, ${ny})`);
+          // console.log(`Teleported to (${nx}, ${ny})`);
         }
       }
-      // 處理 Conveyor
-      if (compositeState.conveyor) {
-        const conveyor = placements.find(
-          (p) => p.x === nx && p.y === ny && p.type === PLACEMENT_TYPE_CONVEYOR
-        );
 
-        if (conveyor) {
-          const { direction } = conveyor;
-          if (direction === "UP") ny -= 1;
-          else if (direction === "DOWN") ny += 1;
-          else if (direction === "LEFT") nx -= 1;
-          else if (direction === "RIGHT") nx += 1;
-          // console.log(`Conveyor moved to (${nx}, ${ny})`);
-        }
+      // 處理 Thief：若遇到小偷，重置所有道具
+      if (compositeState.thief) {
+        newItemMask = 0;
       }
 
       // 生成新的 state key：用簡短的字串結合數值資訊

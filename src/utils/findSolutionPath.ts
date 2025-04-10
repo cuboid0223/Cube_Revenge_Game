@@ -424,18 +424,12 @@ export default function findSolutionPath(
 
       // 處理 Conveyor
       // note1: 需放在處理ICE之前，確保走到conveyor 被移到 ICE 能正常
-      // note2
       if (compositeState.conveyor) {
         const direction = compositeState.conveyorDir as string;
-        console.log(`from [${nx}, ${ny}] `);
         if (direction === "UP") ny -= 1;
         else if (direction === "DOWN") ny += 1;
         else if (direction === "LEFT") nx -= 1;
         else if (direction === "RIGHT") nx += 1;
-        console.log(`to [${nx}, ${ny}] `);
-        // const newCell = gameMap[ny - 1][nx - 1];
-        // compositeState = combineCellState(newCell);
-
         dx = directionUpdateMap[direction].x;
         dy = directionUpdateMap[direction].y;
       }
@@ -465,7 +459,7 @@ export default function findSolutionPath(
         newItemMask = iceResult.itemMask;
         newFlourMask = iceResult.flourMask;
 
-        console.log(iceResult.path);
+        // console.log(iceResult.path);
 
         // 更新位置為最後滑行的位置
         nx = iceResult.path[iceResult.path.length - 1][0];
@@ -496,15 +490,8 @@ export default function findSolutionPath(
 
       // 如火、水，僅當有相應道具時才能通過
       if (compositeState.fire && !(newItemMask & 1)) continue;
-      if (compositeState.water) {
-        if (nx === 1 && ny === 9 && x === 1 && y === 10) {
-          console.log(`step on water without water pickup${newItemMask}   }`);
-        }
-      }
 
-      if (compositeState.water && !(newItemMask & 2)) {
-        continue;
-      }
+      if (compositeState.water && !(newItemMask & 2)) continue;
 
       // 處理 switch：踩到 switch 時，全部 switchDoor 狀態取反
       if (compositeState.switch) {
@@ -522,21 +509,15 @@ export default function findSolutionPath(
       }
       // 處理拾取道具：火焰、流水、冰、鑰匙等
       // 假設各拾取物件出現在某一位置時，就把對應的 bit 打開
-      if (compositeState.firePickup) {
-        newItemMask |= 1;
-      }
-      if (compositeState.waterPickup) {
-        newItemMask |= 2;
-      }
-      if (compositeState.icePickup) {
-        newItemMask |= 4;
-      }
-      if (compositeState.blueKey) {
-        newItemMask |= 8;
-      }
-      if (compositeState.greenKey) {
-        newItemMask |= 16;
-      }
+      if (compositeState.firePickup) newItemMask |= 1;
+
+      if (compositeState.waterPickup) newItemMask |= 2;
+
+      if (compositeState.icePickup) newItemMask |= 4;
+
+      if (compositeState.blueKey) newItemMask |= 8;
+
+      if (compositeState.greenKey) newItemMask |= 16;
 
       // 處理 Teleport
       if (compositeState.teleport) {

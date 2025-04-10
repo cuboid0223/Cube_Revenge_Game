@@ -73,14 +73,6 @@ export function handleIceSliding(
   let visited = new Set<string>();
 
   while (true) {
-    // 優先處理當前位置的冰角轉向邏輯
-    // let icePlacementWhileSliding = getPlacementAt(
-    //   placements,
-    //   PLACEMENT_TYPE_ICE,
-    //   nx,
-    //   ny
-    // );
-
     // 處理冰角轉向邏輯
     if (compositeState?.iceCorner) {
       const corner = compositeState.iceCorner;
@@ -114,9 +106,9 @@ export function handleIceSliding(
         //   `Hero 在 ${corner} [${nx},${ny}] 轉向至往 ${entryDirection}`
         // );
       } else {
-        console.log(
-          `Hero 在 [${nx},${ny}] 往 ${entryDirection} 被角落${corner}阻擋`
-        );
+        // console.log(
+        //   `Hero 在 [${nx},${ny}] 往 ${entryDirection} 被角落${corner}阻擋`
+        // );
         movingTrace.push([nx - dx, ny - dy]);
         return {
           valid: true,
@@ -180,7 +172,7 @@ export function handleIceSliding(
 
     // 危險區域檢查
     if (compositeState.water && !(itemMask & 2)) {
-      console.log("滑進水裡");
+      // console.log("滑進水裡");
       return {
         valid: false,
         path: [],
@@ -190,7 +182,7 @@ export function handleIceSliding(
     }
 
     if (compositeState.fire && !(itemMask & 1)) {
-      console.log("滑進火裡");
+      // console.log("滑進火裡");
       return {
         valid: false,
         path: [],
@@ -215,9 +207,6 @@ export function handleIceSliding(
     // 如果滑進 THIEF，itemMask 清空，但整個路徑有效
     if (compositeState.thief) {
       movingTrace.push([nextX, nextY]);
-      console.log(
-        `step on thief while sliding form [${nx},${ny}] to [${nextX},${nextY}]`
-      );
       return {
         valid: true,
         path: movingTrace,
@@ -267,11 +256,11 @@ function handleIceCornerBlocking(
       ? `進入角落${icePlacement.corner}`
       : `被角落${icePlacement.corner}阻擋`;
 
-    console.log(
-      `Hero  在 [${nx - dx},${
-        ny - dy
-      }] 往 ${entryDirection} ${action} [${nx},${ny}]`
-    );
+    // console.log(
+    //   `Hero  在 [${nx - dx},${
+    //     ny - dy
+    //   }] 往 ${entryDirection} ${action} [${nx},${ny}]`
+    // );
 
     movingTrace.push([nx - dx, ny - dy]); // 推送回退位置
   }

@@ -8,13 +8,17 @@ import soundsManager from "@/classes/Sounds";
 import { LevelState } from "@/classes/LevelState";
 import { currentLevelIdAtom } from "@/atoms/currentLevelIdAtom";
 import levels from "@/levels/levelsMap";
-import { LevelStateSnapshot } from "@/types/global";
+import { ExtendedPlacementConfig, LevelStateSnapshot } from "@/types/global";
 import { createMap } from "@/utils/findSolutionPath";
 import DemoLevel6 from "@/levels/DemoLevel6";
 import DemoLevel5 from "@/levels/DemoLevel5";
 import DemoLevel4 from "@/levels/DemoLevel4";
 import { testTypeScript, testWasm } from "@/utils/measurePerformance";
-// import * as wasm_js from "../../public/pkg/findSolutionPath.js";
+import DemoLevel7 from "@/levels/DemoLevel7";
+import { encodeGameMap, encodePlacements } from "@/utils/encodeObject";
+import DemoLevel2 from "@/levels/DemoLevel2";
+import generateMap from "@/utils/generateMap";
+import { generateBSPLevel } from "@/utils/test";
 
 soundsManager.init();
 
@@ -33,111 +37,88 @@ export default function Home() {
   const [level, setLevel] = useState<LevelStateSnapshot | null>(null);
   const currentLevelId = useRecoilValue(currentLevelIdAtom);
 
-  useEffect(() => {
-    async function loadWasm() {
-      try {
-        // Use dynamic import with a URL object
-        const wasmModule = await import("../../public/wasm/findSolutionPath");
+  // useEffect(() => {
+  //   async function loadWasm() {
+  //     try {
+  //       // Use dynamic import with a URL object
+  //       const wasmModule = await import("../../public/wasm/findSolutionPath");
+  //       const { findSolutionPathSimple } = wasmModule;
 
-        // Access your WASM functions
-        const { findSolutionPathSimple } = wasmModule;
-        const placements = level?.placements;
-        const gameMap = level?.gameMap;
-        if (!gameMap || !placements) return;
-        const encodedMap = gameMap?.map((row) => row.join(",")).join("|");
-        const encodedPlacements = placements
-          ?.map((p) => {
-            // 基本字段
-            let parts = [p.x, p.y, p.type];
+  //       const width = level?.tilesWidth;
+  //       const height = level?.tilesHeight;
+  //       const placements = level?.placements;
+  //       const gameMap = level?.gameMap;
 
-            // 添加可选字段
-            if (p.direction) parts.push(p.direction);
-            else parts.push("");
+  //       if (!gameMap || !placements) return;
+  //       const encodedMap = encodeGameMap(gameMap);
+  //       const encodedPlacements = encodePlacements(placements);
 
-            if (p.isRaised !== undefined) parts.push(String(p.isRaised));
-            else parts.push("");
+  //       try {
+  //         const solution = findSolutionPathSimple(
+  //           encodedMap,
+  //           width,
+  //           height,
+  //           encodedPlacements
+  //         );
+  //         level.solutionPath = solution;
 
-            if (p.color) parts.push(p.color);
-            // 其他字段根据需要添加...
+  //         console.log("WASM 找到解决方案:", solution);
+  //       } catch (error) {
+  //         console.error("呼叫 WASM 失敗:", error);
+  //         // 添加调试信息
+  //         console.log("encodedMap:", encodedMap);
+  //         console.log("encodedPlacements:", encodedPlacements);
+  //       }
+  //     } catch (err) {
+  //       console.error("Failed to load WASM module:", err);
+  //     } finally {
+  //       // setLoading(false);
+  //     }
+  //   }
 
-            return parts.join(",");
-          })
-          .join("|");
+  //   loadWasm();
+  // }, [
+  //   level?.gameMap,
+  //   level?.placements,
+  //   level?.tilesHeight,
+  //   level?.tilesWidth,
+  // ]);
 
-        // 调用函数
-        try {
-          const width = gameMap[0].length;
-          const height = gameMap?.length;
-          const solution = findSolutionPathSimple(
-            encodedMap,
-            width,
-            height,
-            encodedPlacements
-          );
+  // 用來測試 WASM 跟 TS 的效能差異
+  // useEffect(() => {
+  //   const testCases = [DemoLevel7, DemoLevel6, DemoLevel5, DemoLevel4];
+  //   testCases.forEach((testCase, i) => {
+  //     console.log(`測試地圖: ${i + 1}`);
+  //     const { gameMap } = createMap(testCase);
+  //     const encodedMap = encodeGameMap(gameMap);
+  //     const encodedPlacements = encodePlacements(
+  //       testCase.placements as ExtendedPlacementConfig[]
+  //     );
+  //     console.log(encodedMap);
+  //     console.log(encodedPlacements);
 
-          console.log("找到解决方案:", solution);
-        } catch (error) {
-          console.error("调用失败:", error);
-          // 添加调试信息
-          console.log("编码后的地图:", encodedMap);
-          console.log("编码后的放置数据:", encodedPlacements);
-        }
-      } catch (err) {
-        console.error("Failed to load WASM module:", err);
-        // setError("Failed to load WASM module");
-      } finally {
-        // setLoading(false);
-      }
-    }
+  //     const tsResults = testTypeScript(
+  //       gameMap,
+  //       testCase.tilesWidth,
+  //       testCase.tilesHeight,
+  //       testCase.placements,
+  //       10
+  //     );
+  //     const wasmResults = testWasm(
+  //       encodedMap,
+  //       testCase.tilesWidth,
+  //       testCase.tilesHeight,
+  //       encodedPlacements,
+  //       10
+  //     );
 
-    loadWasm();
-  }, [level?.gameMap, level?.placements]);
-
-  useEffect(() => {
-    const testCases = [DemoLevel6, DemoLevel5, DemoLevel4];
-    testCases.forEach((testCase, i) => {
-      console.log(`測試案例: ${i + 1}`);
-      const { gameMap } = createMap(testCase);
-      const encodedMap = gameMap?.map((row) => row.join(",")).join("|");
-      const encodedPlacements = testCase.placements
-        ?.map((p) => {
-          // 基本字段
-          let parts = [p.x, p.y, p.type];
-
-          // 添加可选字段
-          if (p.direction) parts.push(p.direction);
-          else parts.push("");
-
-          if (p.isRaised !== undefined) parts.push(String(p.isRaised));
-          else parts.push("");
-
-          if (p.color) parts.push(p.color);
-          // 其他字段根据需要添加...
-
-          return parts.join(",");
-        })
-        .join("|");
-
-      // const tsResults = testTypeScript(
-      //   gameMap,
-      //   testCase.tilesWidth,
-      //   testCase.tilesHeight,
-      //   testCase.placements
-      // );
-      const wasmResults = testWasm(
-        encodedMap,
-        testCase.tilesWidth,
-        testCase.tilesHeight,
-        encodedPlacements
-      );
-
-      console.log(`WASM 平均執行時間: ${wasmResults.average.toFixed(2)}ms`);
-      // console.log(`TypeScript 平均執行時間: ${tsResults.average.toFixed(2)}ms`);
-      // console.log(
-      //   `效能提升比例: ${(tsResults.average / wasmResults.average).toFixed(2)}x`
-      // );
-    });
-  }, []);
+  //     console.log(`WASM 平均執行時間: ${wasmResults.average.toFixed(8)}ms`);
+  //     console.log(`TypeScript 平均執行時間: ${tsResults.average.toFixed(8)}ms`);
+  //     console.log(
+  //       `效能提升比例: ${(tsResults.average / wasmResults.average).toFixed(8)}x`
+  //     );
+  //   });
+  // }, []);
 
   useEffect(() => {
     // Create and subscribe to state changes
@@ -159,11 +140,43 @@ export default function Home() {
     };
   }, [currentLevelId]);
 
+  useEffect(() => {
+    // 使用範例：產生一個 50x50 的關卡
+    const { rooms, corridors } = generateBSPLevel(50, 50);
+    console.log("房間：", rooms);
+    console.log("走廊：", corridors);
+  }, []);
+
+  // useEffect(() => {
+  //   async function init() {
+  //     try {
+  //       // 等待產生 DemoLevel1 的地圖
+  //       const demoLevel1Snapshot = await generateMap();
+  //       const levels = {
+  //         DemoLevel1: demoLevel1Snapshot as LevelStateSnapshot,
+  //         DemoLevel2: DemoLevel2,
+  //       };
+
+  //       const levelState = new LevelState(
+  //         currentLevelId,
+  //         (newState) => {
+  //           setLevel(newState);
+  //         },
+  //         levels
+  //       );
+  //       setLevel(levelState.getState());
+  //     } catch (error) {
+  //       console.error("初始化地圖失敗:", error);
+  //     }
+  //   }
+  //   init();
+  // }, [currentLevelId]);
+
   if (!spriteSheetImage) {
-    return null;
+    return <div>Loading Image...</div>;
   }
   if (!level) {
-    return null;
+    return <div>Loading...</div>;
   }
 
   return <RenderLevel level={level} />;

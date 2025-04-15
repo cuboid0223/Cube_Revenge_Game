@@ -25,8 +25,6 @@ import { LevelAnimatedFrames } from "./LevelAnimatedFrames";
 import { Camera } from "./Camera";
 import { Clock } from "./Clock";
 import findSolutionPath, { createMap } from "@/utils/findSolutionPath";
-// import { createMap } from "@/utils/findSolutionPath";
-// import * as wasm_js from "../../public/pkg/";
 
 import {
   DeathCause,
@@ -42,6 +40,7 @@ import { LockPlacement } from "@/game-objects/LockPlacement";
 import { HeroPlacement } from "@/game-objects/HeroPlacement";
 import { HeroEditingPlacement } from "@/game-objects/HeroEditingPlacement";
 import { KeyPlacement } from "@/game-objects/KeyPlacement";
+import { encodeGameMap, encodePlacements } from "@/utils/encodeObject";
 
 type OnEmitType = (level: LevelStateSnapshot) => void;
 
@@ -74,6 +73,7 @@ export class LevelState {
   deathOutcome!: PlacementType | null;
   gameMap!: string[][];
   enableEditing: boolean;
+  static wasmModule: any = null;
 
   constructor(
     levelId: string,
@@ -101,12 +101,6 @@ export class LevelState {
       return placementFactory.createPlacement(config, this);
     });
     this.gameMap = createMap(levelData).gameMap;
-    this.solutionPath = findSolutionPath(
-      this.gameMap,
-      this.tilesWidth,
-      this.tilesHeight,
-      levelData.placements
-    );
 
     this.heroRef = this.placements.find(
       (p): p is HeroPlacement | HeroEditingPlacement =>
@@ -118,6 +112,8 @@ export class LevelState {
     this.animatedFrames = new LevelAnimatedFrames();
 
     this.startGameLoop();
+    this.solutionPath = [];
+    // this.solutionPath = await this.updateSolutionPath();
   }
 
   setEditingMode(enableEditing: boolean) {
@@ -230,16 +226,55 @@ export class LevelState {
     });
   }
 
-  async updateSolutionPath() {
-    this.gameMap = createMap(this.getState()).gameMap;
+  // 定義一個靜態的輔助方法，動態載入 wasm 模組
+  static async loadWasmModule() {
+    if (!LevelState.wasmModule) {
+      try {
+        // 注意檢查路徑是否正確（依照專案結構調整相對路徑）
+        LevelState.wasmModule = await import(
+          "../../public/wasm/findSolutionPath"
+        );
+      } catch (error) {
+        console.error("WASM 模組載入失敗:", error);
+        throw error;
+      }
+    }
+    return LevelState.wasmModule;
+  }
 
-    this.solutionPath = findSolutionPath(
-      this.gameMap,
-      this.tilesWidth,
-      this.tilesHeight,
-      this.placements
-    );
-    return this.solutionPath;
+  async updateSolutionPath() {
+    // 檢查必備資料是否存在
+    if (!this.gameMap || !this.placements) {
+      console.warn("缺少 gameMap 或 placements 的資料");
+      return;
+    }
+
+    // 先做必要的編碼 (參考你原本的 ts 版本)
+    const encodedMap = encodeGameMap(this.gameMap);
+    const encodedPlacements = encodePlacements(this.placements);
+
+    try {
+      // 載入 wasm 模組 (只會在首次呼叫時動態載入)
+      const wasm = await LevelState.loadWasmModule();
+
+      // 調用 wasm 版本的 findSolutionPathSimple
+      const solution = wasm.findSolutionPathSimple(
+        encodedMap,
+        this.tilesWidth,
+        this.tilesHeight,
+        encodedPlacements
+      );
+
+      console.log("WASM 找到解決方案:", solution);
+
+      // 根據需求，可以將 solution 更新到 LevelState 中，例如：
+      this.solutionPath = solution; // 假設你已有定義 solutionPath
+
+      return solution;
+    } catch (error) {
+      console.error("呼叫 WASM 版本 findSolutionPathSimple 失敗:", error);
+      // 若需要進一步處理錯誤可在這裡擴充
+    }
   }
 
   clearSolutionPath() {

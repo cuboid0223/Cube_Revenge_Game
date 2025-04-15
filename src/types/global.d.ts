@@ -63,4 +63,5 @@ export interface ExtendedPlacementConfig extends PlacementConfig {
   isRaised?: boolean;
   direction?: string;
   initialDirection?: string;
+  color?: string;
 }

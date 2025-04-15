@@ -112,7 +112,6 @@ export function createMap(level: LevelStateSnapshot): {
   */
   const { tilesWidth: width, tilesHeight: height, placements } = level;
   const gameMap = Array.from({ length: height }, () => Array(width).fill(""));
-  console.log(placements);
   placements.forEach(({ x, y, type, corner, color, direction, isRaised }) => {
     const adjustedX = x - 1;
     const adjustedY = y - 1;
@@ -330,8 +329,8 @@ export default function findSolutionPath(
   height: number,
   placements: PlacementConfig[]
 ): SolutionPathType {
-  console.log("開始路徑搜尋");
-  console.log(gameMap);
+  // console.log("開始路徑搜尋");
+  // console.log(gameMap);
   const startPosition = placements.find(
     (p) =>
       p.type === PLACEMENT_TYPE_HERO || p.type === PLACEMENT_TYPE_HERO_SPAWN

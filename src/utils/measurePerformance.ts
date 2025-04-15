@@ -1,3 +1,4 @@
+import { ExtendedPlacementConfig } from "@/types/global";
 import findSolutionPath from "./findSolutionPath";
 
 // 性能測量函數
@@ -21,10 +22,10 @@ function measurePerformance(fn: Function, iterations = 1) {
 
 // WASM 版本測試函數
 export function testWasm(
-  encodedMap,
-  width,
-  height,
-  encodedPlacements,
+  encodedMap: string,
+  width: number,
+  height: number,
+  encodedPlacements: string,
   iterations = 10
 ) {
   return measurePerformance(async () => {
@@ -36,10 +37,10 @@ export function testWasm(
 
 // TypeScript 版本測試函數
 export function testTypeScript(
-  gameMap,
-  width,
-  height,
-  placements,
+  gameMap: string[][],
+  width: number,
+  height: number,
+  placements: ExtendedPlacementConfig[],
   iterations = 10
 ) {
   return measurePerformance(() => {

@@ -2,9 +2,10 @@ import generateMap from "@/utils/generateMap";
 import DemoLevel1 from "./DemoLevel1";
 import DemoLevel2 from "./DemoLevel2";
 import DemoLevel5 from "./DemoLevel5";
+import { BugLevel3 } from "./BugLevel3";
 
 const levels = {
-  DemoLevel1: DemoLevel5, //DemoLevel1,
+  DemoLevel1: DemoLevel1, //DemoLevel1,
   DemoLevel2: DemoLevel2,
 };
 

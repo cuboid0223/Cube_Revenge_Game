@@ -1,7 +1,6 @@
 // 若使用 TypeScript，最上面可以加入：
 /// <reference lib="webworker" />
 
-
 import generateMap from "@/utils/generateMap";
 
 // 監聽主執行緒傳入的訊息
@@ -14,7 +13,7 @@ self.onmessage = (event) => {
     // 將結果回傳給主執行緒
     self.postMessage({ success: true, levelData });
   } catch (error) {
-    let message = 'Unknown error';
+    let message = "Unknown error";
     if (error instanceof Error) {
       message = error.message;
     }

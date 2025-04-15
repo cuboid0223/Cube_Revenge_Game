@@ -8,9 +8,11 @@ import {
   PLACEMENT_TYPE_HERO,
 } from "@/helpers/consts";
 import generateRooms from "./generateRooms";
+import { encodeGameMap, encodePlacements } from "./encodeObject";
+import DemoLevel1 from "@/levels/DemoLevel1";
 
-const MAX_ATTEMPTS = 10;
-const ROOM_GRID_SIZE = 2;
+const MAX_ATTEMPTS = 100;
+const ROOM_GRID_SIZE = 3;
 const ROOM_WIDTH = 10,
   ROOM_HEIGHT = 10;
 
@@ -22,55 +24,70 @@ type MapInfo = {
   maxAttempts?: number;
 };
 
-export default function generateMap({
+export default async function generateMap({
   roomGridSize = ROOM_GRID_SIZE,
   roomWidth = ROOM_WIDTH,
   roomHeight = ROOM_HEIGHT,
   levelTheme = LEVEL_THEMES.YELLOW,
   maxAttempts = MAX_ATTEMPTS,
 }: MapInfo = {}) {
-  // 設置最多嘗試次數，避免無限迴圈
+  const startOverall = performance.now();
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    // 1) 先 macro-level 生成 rooms
+    // 快速生成關卡核心數據
+    // 生成 ROOM_GRID_SIZE * ROOM_GRID_SIZE 個房間
+    // eg. ROOM_GRID_SIZE = 3 即是 9 個房間
+    // 每個房間 10 * 10
     const rooms = generateRooms(roomGridSize);
-
-    // 2) micro-level => 生成 tileMap
+    //  根據房間類型選擇對應模板
     const tileMap = buildTileMap(rooms, roomWidth, roomHeight, templateMap);
-    // console.log(tileMap);
-    // 3) 將 string[][] tileMap 轉換成 array of object
+    // 將所有房間的模板轉換成 levelData
     const levelData = tileMapToLevel(tileMap, levelTheme);
-
-    // 4) createMap => gameMap/placements
+    // 方便 findSolutionPathSimple 計算
     const { gameMap, placements } = createMap(levelData);
 
-    // 5) 找 hero
+    // 早期驗證：檢查必備 placement 是否存在
     const heroPos = findPositions(placements, PLACEMENT_TYPE_HERO)[0];
     const goalPos = findPositions(placements, PLACEMENT_TYPE_GOAL)[0];
     if (!heroPos || !goalPos) {
-      // 若連英雄都沒有 => 代表地圖沒放 "H"? 或衝突
-      console.log(gameMap);
-      console.log("no goalPos or hero");
-      continue; // 重新來一次
+      console.log("缺少 hero 或 goal，嘗試下一組生成");
+      continue;
     }
 
-    // 嘗試找解法
-    const solutionPath = findSolutionPath(
-      gameMap,
-      levelData.tilesWidth,
-      levelData.tilesHeight,
-      placements
-    );
+    // 呼叫 WASM 解題
+    const encodedMap = encodeGameMap(gameMap);
+    const encodedPlacements = encodePlacements(placements);
+    try {
+      const wasmModule = await import("../../public/wasm/findSolutionPath");
+      const t0 = performance.now();
+      const solutionPath: [number, number][] =
+        wasmModule.findSolutionPathSimple(
+          encodedMap,
+          levelData.tilesWidth,
+          levelData.tilesHeight,
+          encodedPlacements
+        );
+      const t1 = performance.now();
+      console.log(`WASM 解題耗時: ${(t1 - t0).toFixed(2)} ms`);
 
-    if (solutionPath && solutionPath.length > 0) {
-      console.log(
-        `在經過 ${
-          attempt + 1
-        } 次生成關卡後，成功找到 solutionPath: ${JSON.stringify(solutionPath)}`
-      );
-      return { ...levelData, solutionPath };
+      if (solutionPath && solutionPath.length > 0) {
+        console.log(
+          `在第 ${attempt + 1} 次嘗試後找到解法: ${JSON.stringify(
+            solutionPath
+          )}`
+        );
+        console.log(levelData);
+        return { ...levelData, solutionPath };
+      }
+    } catch (error) {
+      console.error("呼叫 WASM 解題失敗:", error);
+      continue;
+    }
+
+    // 超時檢查（例如總時間超過 5 秒則退出）
+    if (performance.now() - startOverall > 5000) {
+      throw new Error("生成關卡花費時間過長");
     }
   }
-
-  // 超過MAX_ATTEMPTS還沒找到 => 拋出錯誤或回傳null
-  throw new Error(`無法在 ${MAX_ATTEMPTS} 次嘗試內生成可通關地圖`);
+  return DemoLevel1;
+  // throw new Error(`無法在 ${maxAttempts} 次嘗試內生成可通關地圖`);
 }

@@ -18,7 +18,8 @@ import DemoLevel7 from "@/levels/DemoLevel7";
 import { encodeGameMap, encodePlacements } from "@/utils/encodeObject";
 import DemoLevel2 from "@/levels/DemoLevel2";
 import generateMap from "@/utils/generateMap";
-import { generateBSPLevel } from "@/utils/test";
+import { generateBSPLevel, generateLevelWithTemplates } from "@/utils/test";
+import { gm } from "@/utils/gm";
 
 soundsManager.init();
 
@@ -142,9 +143,8 @@ export default function Home() {
 
   useEffect(() => {
     // 使用範例：產生一個 50x50 的關卡
-    const { rooms, corridors } = generateBSPLevel(50, 50);
-    console.log("房間：", rooms);
-    console.log("走廊：", corridors);
+
+    console.log(gm());
   }, []);
 
   // useEffect(() => {

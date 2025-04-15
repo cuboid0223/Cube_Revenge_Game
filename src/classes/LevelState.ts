@@ -25,6 +25,9 @@ import { LevelAnimatedFrames } from "./LevelAnimatedFrames";
 import { Camera } from "./Camera";
 import { Clock } from "./Clock";
 import findSolutionPath, { createMap } from "@/utils/findSolutionPath";
+// import { createMap } from "@/utils/findSolutionPath";
+// import * as wasm_js from "../../public/pkg/";
+
 import {
   DeathCause,
   Direction,
@@ -88,7 +91,7 @@ export class LevelState {
     this.start();
   }
 
-  start() {
+  async start() {
     const levelData = this.levels![this.id];
     this.deathOutcome = null;
     this.theme = levelData.theme;
@@ -227,15 +230,15 @@ export class LevelState {
     });
   }
 
-  updateSolutionPath() {
+  async updateSolutionPath() {
     this.gameMap = createMap(this.getState()).gameMap;
+
     this.solutionPath = findSolutionPath(
       this.gameMap,
       this.tilesWidth,
       this.tilesHeight,
       this.placements
     );
-
     return this.solutionPath;
   }
 

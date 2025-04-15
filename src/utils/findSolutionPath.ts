@@ -311,6 +311,13 @@ export function combineCellState(cell: string): CompositeCellState {
     }
   });
 
+  types.forEach((t) => {
+    // 若 t 以 "SWITCH_DOOR:" 開頭，則拆分出升起資訊 "1" 或 "0"
+    if (t.startsWith(PLACEMENT_TYPE_SWITCH_DOOR + "_")) {
+      state.switchDoor = true;
+    }
+  });
+
   return state;
 }
 
@@ -324,6 +331,7 @@ export default function findSolutionPath(
   placements: PlacementConfig[]
 ): SolutionPathType {
   console.log("開始路徑搜尋");
+  console.log(gameMap);
   const startPosition = placements.find(
     (p) =>
       p.type === PLACEMENT_TYPE_HERO || p.type === PLACEMENT_TYPE_HERO_SPAWN
@@ -354,8 +362,9 @@ export default function findSolutionPath(
     const door = placements.find(
       (p) => p.type === PLACEMENT_TYPE_SWITCH_DOOR && `${p.x},${p.y}` === key
     );
+
     // 假設 isRaised === true 代表門是「關閉」（即阻擋），我們用 1 表示關閉
-    if (door && door.hasOwnProperty("isRaised") ? door.isRaised : false) {
+    if (door && door.hasOwnProperty("isRaised") && door.isRaised) {
       initDoorMask |= 1 << index;
     }
   });
@@ -579,11 +588,11 @@ export default function findSolutionPath(
 
 // 改進版啟發函數：用 Manhattan 距離估算，這裡可依需要改成 MST 等更精準估算
 function heuristicOptimized(
-  cx,
-  cy,
+  cx: number,
+  cy: number,
   flourMap: Map<string, number>,
   totalFlours: number,
-  goalPosition
+  goalPosition: PlacementConfig
 ) {
   // 找出所有未收集面粉的最小距離，再與目標距離取最小值
   let minDist = Math.abs(goalPosition.x - cx) + Math.abs(goalPosition.y - cy);

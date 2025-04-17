@@ -18,7 +18,7 @@ import DemoLevel7 from "@/levels/DemoLevel7";
 import { encodeGameMap, encodePlacements } from "@/utils/encodeObject";
 import DemoLevel2 from "@/levels/DemoLevel2";
 import generateMap from "@/utils/generateMap";
-import { generateBSPLevel, generateLevelWithTemplates } from "@/utils/test";
+import { generateLevelWithTemplates } from "@/utils/test";
 import { gm } from "@/utils/gm";
 
 soundsManager.init();
@@ -139,11 +139,13 @@ export default function Home() {
     return () => {
       levelState.destroy();
     };
+
+    
+
   }, [currentLevelId]);
 
   useEffect(() => {
     // 使用範例：產生一個 50x50 的關卡
-
     console.log(gm());
   }, []);
 

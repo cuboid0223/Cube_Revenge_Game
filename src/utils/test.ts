@@ -2,7 +2,7 @@
 // 型別與常數定義
 // --------------------
 
-import { templateMap } from "@/helpers/roomTemplatesMap";
+import { templateMap, TileMap } from "@/helpers/roomTemplatesMap";
 
 interface Rect {
   x: number;
@@ -17,6 +17,8 @@ interface Leaf {
   right?: Leaf;
   room?: Rect;
   corridors?: Rect[];
+  isStartRoom?: boolean;
+  isGoalRoom?: boolean;
   exits?: RoomExits; // 代表該房間四個方向是否開放
 }
 
@@ -27,22 +29,10 @@ export type RoomExits = {
   right: boolean;
 };
 
-export type TileMap = string[][];
-
 // BSP 與走廊相關常數
-const MIN_LEAF_SIZE = 15;
-const MIN_ROOM_SIZE = 6;
-const CORRIDOR_WIDTH = 1; // 可調整的走廊寬度
-
-// --------------------
-// 模板定義（templateMap）
-// --------------------
-
-// 以下 templateMap 為示意，可依照你實際的模板數據擴充
-
-// --------------------
-// BSP 與模板整合相關函式
-// --------------------
+const MIN_LEAF_SIZE = 15; // 15*15
+const MIN_ROOM_SIZE = 6; // 6*6
+const CORRIDOR_WIDTH = 1; // 走廊寬度
 
 // BSP 分割，遞迴切分 leaf
 function splitLeaf(leaf: Leaf): boolean {
@@ -129,25 +119,28 @@ function getRoomTemplateKey(exits: RoomExits): string {
   return key;
 }
 
-// 從 templateMap 選取符合出口的模板（若找不到，則使用全封閉模板）
-function selectTemplateForRoom(exits: RoomExits): string[][] {
-  const key = getRoomTemplateKey(exits);
-  const templates = templateMap[key] || templateMap[""];
-  const idx = Math.floor(Math.random() * templates.length);
+// 從 templateMap 選取符合出口的模板（若找不到，則使用預設模板）
+function selectTemplateForRoom(exits: RoomExits): TileMap {
+  const key = getRoomTemplateKey(exits); // 出口方向
+  const templates = templateMap[key] || templateMap[""]; // 根據出口方向選擇模板列表，沒有的話選擇預設模板
+  const idx = Math.floor(Math.random() * templates.length); // 隨機選擇
   return templates[idx];
 }
 
 // 將模板貼入房間區域（模板居中）
 function applyRoomTemplate(
-  overallTileMap: string[][],
+  overallTileMap: TileMap,
   roomRect: Rect,
-  roomTemplate: string[][]
+  roomTemplate: TileMap
 ): void {
   const templateWidth = roomTemplate[0].length;
   const templateHeight = roomTemplate.length;
   const offsetX = roomRect.x + Math.floor((roomRect.width - templateWidth) / 2);
   const offsetY =
     roomRect.y + Math.floor((roomRect.height - templateHeight) / 2);
+  console.log(`房間大小(Rect): ${roomRect.width}*${roomRect.height}`);
+  console.log(`模板大小(template): ${templateWidth}*${templateHeight}`);
+  console.log(`貼上模板到房間上的偏移量:[${offsetX},${offsetY}]`);
   for (let j = 0; j < templateHeight; j++) {
     for (let i = 0; i < templateWidth; i++) {
       overallTileMap[offsetY + j][offsetX + i] = roomTemplate[j][i];
@@ -155,7 +148,8 @@ function applyRoomTemplate(
   }
 }
 
-// 此處僅以隨機模擬出口資訊，實際上可根據走廊連接情形決定
+// 此處僅以隨機模擬出口資訊
+// TODO: 根據走廊連接情形決定
 function determineRoomExits(): RoomExits {
   return {
     up: Math.random() > 0.5,
@@ -229,10 +223,10 @@ function createCorridors(leaf: Leaf): void {
 export function generateLevelWithTemplates(
   mapWidth: number,
   mapHeight: number
-): string[][] {
+): TileMap {
   // 初始化整體 tile map，預設填充為牆壁 "1"
-  const overallTileMap: string[][] = Array.from({ length: mapHeight }, () =>
-    Array(mapWidth).fill("1")
+  const overallTileMap: TileMap = Array.from({ length: mapHeight }, () =>
+    Array(mapWidth).fill("0")
   );
 
   const root: Leaf = {
@@ -273,9 +267,67 @@ export function generateLevelWithTemplates(
   }
   fillCorridors(root);
 
+  // 新增步驟：指定唯一的起始與目標房間、調整模板中的 "h" 與 "g"
+  assignHeroAndGoalPoints(overallTileMap, leaves);
+
   return overallTileMap;
 }
 
-// --------------------
-// 執行產生並輸出結果
-// --------------------
+/**
+ * 在所有房間中選取唯一的起始房與目標房，
+ * 並在各自的房間內將 "h" 改成 "H"，"g" 改成 "G"，
+ * 其他房間內若有 "h" 或 "g"，則移除（改為 "0" 地板）
+ */
+function assignHeroAndGoalPoints(overallTileMap: TileMap, leaves: Leaf[]): void {
+  // 只選取沒有子節點並有 room 的葉節點
+  const roomLeaves = leaves.filter(leaf => !leaf.left && !leaf.right && leaf.room);
+  if (roomLeaves.length === 0) return;
+
+  // 隨機選一個房間作為起始房
+  const startIndex = Math.floor(Math.random() * roomLeaves.length);
+  let startLeaf = roomLeaves[startIndex];
+
+  // 如果至少有兩間房，隨機選另一間作為目標房
+  let goalLeaf = startLeaf;
+  if (roomLeaves.length > 1) {
+    let goalIndex = Math.floor(Math.random() * roomLeaves.length);
+    while (goalIndex === startIndex) {
+      goalIndex = Math.floor(Math.random() * roomLeaves.length);
+    }
+    goalLeaf = roomLeaves[goalIndex];
+  }
+
+  // 設定房間標記，用於後續判斷
+  startLeaf.isStartRoom = true;
+  goalLeaf.isGoalRoom = true;
+
+  // 對每個房間的區域進行掃描替換
+  for (const leaf of roomLeaves) {
+    const room = leaf.room!;
+    let heroReplaced = false;
+    let goalReplaced = false;
+    for (let y = room.y; y < room.y + room.height; y++) {
+      for (let x = room.x; x < room.x + room.width; x++) {
+        if (overallTileMap[y][x] === "h") {
+          // 僅在起始房且首次出現時設置 H，其它替換成 "0"
+          if (leaf === startLeaf && !heroReplaced) {
+            overallTileMap[y][x] = "H";
+            heroReplaced = true;
+          } else {
+            overallTileMap[y][x] = "0";
+          }
+        }
+        if (overallTileMap[y][x] === "g") {
+          // 僅在目標房且首次出現時設置 G，其它替換成 "0"
+          if (leaf === goalLeaf && !goalReplaced) {
+            overallTileMap[y][x] = "G";
+            goalReplaced = true;
+          } else {
+            overallTileMap[y][x] = "0";
+          }
+        }
+      }
+    }
+  }
+}
+

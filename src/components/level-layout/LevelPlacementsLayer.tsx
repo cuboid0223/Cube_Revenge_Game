@@ -67,6 +67,7 @@ export default function LevelPlacementsLayer({ level }: Props) {
     })
     .map((placement) => {
       // Wrap each Sprite in a positioned div
+      
       const [x, y] = placement.displayXY();
       const style: CSSProperties = {
         position: "absolute",

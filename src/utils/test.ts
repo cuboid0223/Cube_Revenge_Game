@@ -30,8 +30,8 @@ export type RoomExits = {
 };
 
 // BSP 與走廊相關常數
-const MIN_LEAF_SIZE = 15; // 15*15
-const MIN_ROOM_SIZE = 6; // 6*6
+const MIN_LEAF_SIZE = 15; // 15*15 or 3*5 ?
+const MIN_ROOM_SIZE = 6; // 6*6 or 3*2 ?
 const CORRIDOR_WIDTH = 1; // 走廊寬度
 
 // BSP 分割，遞迴切分 leaf
@@ -226,7 +226,7 @@ export function generateLevelWithTemplates(
 ): TileMap {
   // 初始化整體 tile map，預設填充為牆壁 "1"
   const overallTileMap: TileMap = Array.from({ length: mapHeight }, () =>
-    Array(mapWidth).fill("0")
+    Array(mapWidth).fill("1")
   );
 
   const root: Leaf = {

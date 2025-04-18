@@ -6,7 +6,7 @@ import { BugLevel3 } from "./BugLevel3";
 import { gm } from "@/utils/gm";
 
 const levels = {
-  DemoLevel1: gm(), //DemoLevel1,
+  DemoLevel1: gm()[0], //DemoLevel1,
   DemoLevel2: DemoLevel2,
 };
 

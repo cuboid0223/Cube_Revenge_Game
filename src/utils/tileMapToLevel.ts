@@ -30,7 +30,7 @@ import {
 } from "@/helpers/consts";
 
 import { Placement } from "@/helpers/types";
-import { ExtendedPlacementConfig } from "@/types/global";
+import { ExtendedPlacementConfig, LevelStateSnapshot } from "@/types/global";
 
 /**
  * 將 2D tileMap (例如 9×9) 轉成:
@@ -52,7 +52,7 @@ import { ExtendedPlacementConfig } from "@/types/global";
 export default function tileMapToLevel(
   tileMap: string[][],
   theme: string = "LEVEL_THEMES.YELLOW"
-): any {
+): LevelStateSnapshot {
   const height = tileMap.length;
   const width = tileMap[0]?.length ?? 0;
 

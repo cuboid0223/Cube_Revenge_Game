@@ -51,6 +51,12 @@ type EditModePlacementType = {
   initialDirection?: Direction;
   direction?: Direction;
 };
+type VisibleTileBounds = {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+};
 
 export class LevelState {
   levels?: Record<string, LevelStateSnapshot>;
@@ -65,6 +71,7 @@ export class LevelState {
   tilesWidth!: number;
   tilesHeight!: number;
   placements!: Placement[];
+  visiblePlacements!: Placement[];
   heroRef: HeroPlacement | HeroEditingPlacement | undefined;
   camera!: Camera;
   clock!: Clock;
@@ -74,6 +81,8 @@ export class LevelState {
   gameMap!: string[][];
   enableEditing: boolean;
   static wasmModule: any = null;
+  visibleTileBounds: VisibleTileBounds;
+  readonly RENDER_RADIUS = 10; // Configurable: Tiles to render around the hero (adjust for performance/view)
 
   constructor(
     levelId: string,
@@ -88,6 +97,13 @@ export class LevelState {
     this.editModePlacement = { type: PLACEMENT_TYPE_WALL };
     this.inventory = new Inventory();
     this.enableEditing = false;
+    this.visibleTileBounds = {
+      minX: 0,
+      maxX: 0,
+      minY: 0,
+      maxY: 0,
+  };
+
     this.start();
   }
 
@@ -100,6 +116,7 @@ export class LevelState {
     this.placements = levelData.placements.map((config: PlacementConfig) => {
       return placementFactory.createPlacement(config, this);
     });
+    this.visiblePlacements = [];
     this.gameMap = createMap(levelData).gameMap;
 
     this.heroRef = this.placements.find(
@@ -110,7 +127,12 @@ export class LevelState {
     this.camera = new Camera(this);
     this.clock = new Clock(60, this);
     this.animatedFrames = new LevelAnimatedFrames();
-
+    this.visibleTileBounds = {
+      minX: 0,
+      maxX: this.tilesWidth,
+      minY: 0, 
+      maxY: this.tilesHeight,
+  };
     this.startGameLoop();
     this.solutionPath = [];
     // this.solutionPath = await this.updateSolutionPath();
@@ -442,11 +464,46 @@ export class LevelState {
   }
 
   getState(): LevelStateSnapshot {
+   
+
+    if (this.heroRef) {
+        const heroX = this.heroRef.x;
+        const heroY = this.heroRef.y;
+
+        // Calculate tile bounds for filtering
+        // Use Math.floor/Math.ceil to ensure integer tile indices
+        const minVisibleX = Math.max(0, Math.floor(heroX - this.RENDER_RADIUS));
+        const maxVisibleX = Math.min(this.tilesWidth, Math.ceil(heroX + this.RENDER_RADIUS));
+        const minVisibleY = Math.max(0, Math.floor(heroY - this.RENDER_RADIUS));
+        const maxVisibleY = Math.min(this.tilesHeight, Math.ceil(heroY + this.RENDER_RADIUS)) ;
+
+        // Filter placements
+        this.visiblePlacements = this.placements.filter(p =>
+            p.x >= minVisibleX && p.x <= maxVisibleX &&
+            p.y >= minVisibleY && p.y <= maxVisibleY
+        );
+
+        // Store these bounds for background rendering
+        this.visibleTileBounds = {
+            minX: minVisibleX,
+            maxX: maxVisibleX,
+            minY: minVisibleY,
+            maxY: maxVisibleY,
+        };
+
+    } else {
+        // If no hero, maybe render a default area or everything (less ideal for large maps)
+        // For now, let's filter based on camera if no hero, or default to all
+        this.visiblePlacements = this.placements; // Or filter based on camera center
+         // visibleTileBounds remain full map size
+    }
     return {
       theme: this.theme,
       tilesWidth: this.tilesWidth,
       tilesHeight: this.tilesHeight,
-      placements: this.placements,
+      // placements: this.placements,
+      placements: this.visiblePlacements, // **Only visible placements**
+      visibleTileBounds: this.visibleTileBounds, // **Bounds for background rendering**
       solutionPath: this.solutionPath,
       deathOutcome: this.deathOutcome,
       isCompleted: this.isCompleted,

@@ -138,9 +138,9 @@ function applyRoomTemplate(
   const offsetX = roomRect.x + Math.floor((roomRect.width - templateWidth) / 2);
   const offsetY =
     roomRect.y + Math.floor((roomRect.height - templateHeight) / 2);
-  console.log(`房間大小(Rect): ${roomRect.width}*${roomRect.height}`);
-  console.log(`模板大小(template): ${templateWidth}*${templateHeight}`);
-  console.log(`貼上模板到房間上的偏移量:[${offsetX},${offsetY}]`);
+  // console.log(`房間大小(Rect): ${roomRect.width}*${roomRect.height}`);
+  // console.log(`模板大小(template): ${templateWidth}*${templateHeight}`);
+  // console.log(`貼上模板到房間上的偏移量:[${offsetX},${offsetY}]`);
   for (let j = 0; j < templateHeight; j++) {
     for (let i = 0; i < templateWidth; i++) {
       overallTileMap[offsetY + j][offsetX + i] = roomTemplate[j][i];

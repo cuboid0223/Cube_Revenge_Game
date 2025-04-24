@@ -22,6 +22,12 @@ export interface LevelStateSnapshot {
   tilesWidth: number;
   tilesHeight: number;
   placements: Placement[];
+  visibleTileBounds: { 
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+};
   solutionPath: [number, number][] | null;
   deathOutcome: PlacementType | null;
   isCompleted: boolean;

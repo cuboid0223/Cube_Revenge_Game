@@ -24,6 +24,7 @@ export default function RenderLevel({ level }: RenderLevelProps) {
   const adjustedCameraTranslate = `translate3d(${
     level.cameraTransformX / zoomFactor
   }px, ${level.cameraTransformY / zoomFactor}px, 0)`;
+  
   return (
     <div
       className={styles.fullScreenContainer}

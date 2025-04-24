@@ -51,7 +51,7 @@ import { ExtendedPlacementConfig, LevelStateSnapshot } from "@/types/global";
  */
 export default function tileMapToLevel(
   tileMap: string[][],
-  theme: string = "LEVEL_THEMES.YELLOW"
+  theme: string = "YELLOW"
 ): LevelStateSnapshot {
   const height = tileMap.length;
   const width = tileMap[0]?.length ?? 0;

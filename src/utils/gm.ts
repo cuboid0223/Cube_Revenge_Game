@@ -1,5 +1,5 @@
 import { LEVEL_THEMES } from "@/helpers/consts";
-import { generateLevelWithTemplates } from "./test";
+import { generateLevelWithTemplates } from "./generateLevelWithTemplates";
 import tileMapToLevel from "./tileMapToLevel";
 
 export const gm = (mapWidth:number = 20 ,mapHeight:number = 20 ) => {

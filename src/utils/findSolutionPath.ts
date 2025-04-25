@@ -1,3 +1,9 @@
+/*
+沒有用了，已經透過 AssemblyScript 編譯成 WASM 
+以後有 bug 可以從這裡檢查比較方便
+
+*/
+
 import {
   DIRECTION_DOWN,
   DIRECTION_LEFT,

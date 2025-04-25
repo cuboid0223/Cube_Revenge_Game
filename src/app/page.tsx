@@ -26,7 +26,7 @@ import DemoLevel7 from "@/levels/DemoLevel7";
 import { encodeGameMap, encodePlacements } from "@/utils/encodeObject";
 import DemoLevel2 from "@/levels/DemoLevel2";
 import generateMap from "@/utils/generateMap";
-import { generateLevelWithTemplates } from "@/utils/test";
+import { generateLevelWithTemplates } from "@/utils/generateLevelWithTemplates";
 import { gm } from "@/utils/gm";
 import { TileMap } from "@/helpers/roomTemplatesMap";
 import tileMapToLevel from "@/utils/tileMapToLevel";
@@ -34,6 +34,7 @@ import DemoLevel1 from "@/levels/DemoLevel1";
 import DefaultLevel from "@/levels/DefaultLevel";
 import { Placement } from "@/game-objects/Placement";
 import { placementFactory } from "@/classes/PlacementFactory";
+import generateLevelConfig from "@/utils/generateLevelConfig";
 
 soundsManager.init();
 
@@ -56,59 +57,69 @@ export default function Home() {
   const [level, setLevel] = useState<LevelState | null>(null);
   const currentLevelId = useRecoilValue(currentLevelIdAtom);
   const [playerPos, setPlayerPos] = useState({ x: 1, y: 1 });
-  // 新增：以 Map 儲存已生成的區塊，key 為 "chunkX,chunkY"，value 為該區塊的 TileMap（此處假設 tile map 為二維字串陣列）
-  const [visibleChunks, setVisibleChunks] = useState<Map<string, string[][]>>(
-    new Map()
-  );
   const [overallTileMap, setOverallTileMap] = useState<TileMap>();
 
-  // useEffect(() => {
-  //   // 使用範例：產生一個 50x50 的關卡
-  //   // console.log(gm());
-  //   const overallTileMap = generateLevelWithTemplates(50, 50);
-  //   setOverallTileMap(overallTileMap);
-  // }, []);
-
   useEffect(() => {
-    const generatedTileMap = generateLevelWithTemplates(50, 50); // Or your desired size
-    setOverallTileMap(generatedTileMap);
-    const levelConfig = tileMapToLevel(generatedTileMap);
-console.log(levelConfig)
-    // Create and subscribe to state changes
-    const levelState = new LevelState(
-      currentLevelId,
-      (newState) => {
-        setLevel(newState);
-      },
-      // levels
-      { "DemoLevel1": levelConfig }
-    );
-    if (!levelState.heroRef) return;
+    let levelState: LevelState | undefined;
 
-    //Get initial state
-    setLevel(levelState);
-    levelState.setEditingMode(false);
-    // console.log(levelState.placements);
+    async function initLevel() {
+      let generatedTileMap;
+      let generatedLevelConfig;
+      let solutionPath: [number, number][] = [];
 
-    const heroStartPos = { x: levelState.heroRef?.x, y: levelState.heroRef?.y };
-    // console.log(heroStartPos);
-    setPlayerPos(heroStartPos);
+      // 重複產生關卡，直到 solutionPath 長度超過 50
+      do {
+        // 1. 產生新的 map + config
+        const res = await generateLevelConfig(50, 50);
+        generatedTileMap = res.generatedTileMap;
+        generatedLevelConfig = res.generatedLevelConfig;
 
-    //Destroy method when this component unmounts for cleanup
+        // 2. 使用臨時的 LevelState 來試算路徑
+        const tempState = new LevelState(
+          currentLevelId,
+          () => {}, // 不需要更新 UI
+          { DemoLevel1: generatedLevelConfig }
+        );
+
+        solutionPath = await tempState.updateSolutionPath();
+        // 清理這個臨時物件
+        tempState.destroy();
+      } while (!solutionPath || solutionPath.length <= 50);
+
+      // 到這裡就有一組可解的 generatedLevelConfig
+      levelState = new LevelState(
+        currentLevelId,
+        (newState) => setLevel(newState),
+        { DemoLevel1: generatedLevelConfig }
+      );
+
+      // 最後真正 set state
+      setOverallTileMap(generatedTileMap);
+      setLevel(levelState);
+      levelState.solutionPath = solutionPath;
+      levelState.setEditingMode(false);
+
+      // 英雄起始位置
+      if (levelState.heroRef) {
+        setPlayerPos({
+          x: levelState.heroRef.x,
+          y: levelState.heroRef.y,
+        });
+      }
+    }
+
+    initLevel();
+    // 通關後清除
     return () => {
-      levelState.destroy();
+      levelState?.destroy();
     };
   }, [currentLevelId]);
 
-
-
-
-  
   if (!spriteSheetImage) {
-    return <div>Loading Image...</div>;
+    return <div>Loading assets...</div>;
   }
-  if (!level) {
-    return <div>Loading...</div>;
+  if (!level?.heroRef) {
+    return <div>Loading level...</div>;
   }
 
   return <RenderLevel level={level} />;

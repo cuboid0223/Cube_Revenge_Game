@@ -265,21 +265,17 @@ export class LevelState {
   }
 
   async updateSolutionPath() {
-    // 檢查必備資料是否存在
     if (!this.gameMap || !this.placements) {
       console.warn("缺少 gameMap 或 placements 的資料");
       return;
     }
 
-    // 先做必要的編碼 (參考你原本的 ts 版本)
     const encodedMap = encodeGameMap(this.gameMap);
     const encodedPlacements = encodePlacements(this.placements);
 
     try {
-      // 載入 wasm 模組 (只會在首次呼叫時動態載入)
       const wasm = await LevelState.loadWasmModule();
 
-      // 調用 wasm 版本的 findSolutionPathSimple
       const solution = wasm.findSolutionPathSimple(
         encodedMap,
         this.tilesWidth,

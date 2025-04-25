@@ -27,9 +27,9 @@ import {
   DIRECTION_RIGHT,
   DIRECTION_UP,
   DIRECTION_DOWN,
+  LEVEL_THEMES,
 } from "@/helpers/consts";
 
-import { Placement } from "@/helpers/types";
 import { ExtendedPlacementConfig, LevelStateSnapshot } from "@/types/global";
 
 /**
@@ -51,7 +51,7 @@ import { ExtendedPlacementConfig, LevelStateSnapshot } from "@/types/global";
  */
 export default function tileMapToLevel(
   tileMap: string[][],
-  theme: string = "YELLOW"
+  theme: string = LEVEL_THEMES.YELLOW
 ): LevelStateSnapshot {
   const height = tileMap.length;
   const width = tileMap[0]?.length ?? 0;

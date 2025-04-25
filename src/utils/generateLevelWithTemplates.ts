@@ -2,6 +2,7 @@
 // 型別與常數定義
 // --------------------
 
+import { PLACEMENT_TYPES_CODE } from "@/helpers/consts";
 import { templateMap, TileMap } from "@/helpers/roomTemplatesMap";
 
 interface Rect {
@@ -30,9 +31,12 @@ export type RoomExits = {
 };
 
 // BSP 與走廊相關常數
-const MIN_LEAF_SIZE = 15; // 15*15 or 3*5 ?
+const MIN_LEAF_SIZE = 10; // 15*15 or 3*5 ?
 const MIN_ROOM_SIZE = 6; // 6*6 or 3*2 ?
 const CORRIDOR_WIDTH = 1; // 走廊寬度
+
+
+
 
 // BSP 分割，遞迴切分 leaf
 function splitLeaf(leaf: Leaf): boolean {
@@ -226,7 +230,7 @@ export function generateLevelWithTemplates(
 ): TileMap {
   // 初始化整體 tile map，預設填充為牆壁 "1"
   const overallTileMap: TileMap = Array.from({ length: mapHeight }, () =>
-    Array(mapWidth).fill("1")
+    Array(mapWidth).fill(PLACEMENT_TYPES_CODE.WALL)
   );
 
   const root: Leaf = {
@@ -257,7 +261,7 @@ export function generateLevelWithTemplates(
       for (const corridor of leaf.corridors) {
         for (let j = corridor.y; j < corridor.y + corridor.height; j++) {
           for (let i = corridor.x; i < corridor.x + corridor.width; i++) {
-            overallTileMap[j][i] = "0";
+            overallTileMap[j][i] = PLACEMENT_TYPES_CODE.EMPTY;
           }
         }
       }

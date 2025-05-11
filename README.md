@@ -13,7 +13,11 @@ The hero must collect all the `FLOUR` on the map and reach the goal to clear the
    ![image](/public/path_3.png)
 
 3. **Random level generation is achieved through the Random Walker algorithm**.
-   ![image](/public/4.gif)
+   ![image](/public/random%20(1).gif)
+
+4. Dynamic rendering improves rendering performance.
+  ![image](/public/dynamic_render.gif)
+  
 
 ## Getting Started
 

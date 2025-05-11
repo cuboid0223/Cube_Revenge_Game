@@ -25,7 +25,7 @@ export class Camera {
     this.level = level;
     const [heroX, heroY] = (
       this.level.heroRef as HeroPlacement | HeroEditingPlacement
-    ).displayXY();
+    )?.displayXY();
     this.cameraX = heroX;
     this.cameraY = heroY;
     this.transformOffset = -5.5 * CELL_SIZE;

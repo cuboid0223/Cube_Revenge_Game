@@ -220,10 +220,6 @@ function createCorridors(leaf: Leaf): void {
   }
 }
 
-// --------------------
-// 主流程：產生整體關卡 tile map 並結合模板與走廊
-// --------------------
-
 export function generateLevelWithTemplates(
   mapWidth: number,
   mapHeight: number
@@ -301,11 +297,11 @@ function assignHeroAndGoalPoints(overallTileMap: TileMap, leaves: Leaf[]): void 
     goalLeaf = roomLeaves[goalIndex];
   }
 
-  // 設定房間標記，用於後續判斷
+  // 設定房間標記
   startLeaf.isStartRoom = true;
   goalLeaf.isGoalRoom = true;
 
-  // 對每個房間的區域進行掃描替換
+  // 對每個房間的區域進行替換
   for (const leaf of roomLeaves) {
     const room = leaf.room!;
     let heroReplaced = false;

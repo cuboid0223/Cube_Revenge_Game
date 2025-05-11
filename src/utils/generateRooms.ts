@@ -27,7 +27,7 @@ function createEmptyRooms(n: number): RoomsGrid {
  * 產生一個 NxN 的房間網格.
  * 如果 N=3  則會產生 3*3 = 9 個房間
  * 每個房間存有 {up,down,left,right} 布林，表示出口方向。
- * 從 (sr,sc) => (gr,gc) 隨機走上下左右 (撞牆→往下, 超過步數→connectToGoal)。
+ * 從 (sr,sc) => (gr,gc) 隨機走上下左右 (撞牆->往下, 超過步數->connectToGoal)。
  */
 export default function generateRooms(n: number): RoomsGrid {
   const rooms = createEmptyRooms(n);
@@ -61,17 +61,14 @@ export default function generateRooms(n: number): RoomsGrid {
   while (true) {
     steps++;
     if (steps > limit) {
-      // 超過 limit 則直接連通到 goal
       connectToGoalExits(r, c, gr, gc, rooms);
       break;
     }
 
     if (r === gr && c === gc) {
-      // 到達 goal
       break;
     }
 
-    // 擲骰 (6 面骰)
     const dice = Math.floor(Math.random() * 6) + 1;
     let nr = r,
       nc = c;
@@ -97,9 +94,7 @@ export default function generateRooms(n: number): RoomsGrid {
         break;
     }
 
-    // 邊界檢查
     if (nr < 0 || nr >= n || nc < 0 || nc >= n) {
-      // 撞到邊界則往下走
       nr = r + 1;
       nc = c;
     }
@@ -120,7 +115,6 @@ export default function generateRooms(n: number): RoomsGrid {
     }
     // 左右出口一開始預設就是 true
 
-    // 標記進入解題路徑
     rooms[nr][nc].inSolutionPath = true;
     r = nr;
     c = nc;

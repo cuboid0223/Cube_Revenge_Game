@@ -1,5 +1,10 @@
 import { TILES } from "./tiles";
 
+//  生成地圖的長寬
+export const  OVERALL_WIDTH = 50 
+export const  OVERALL_HEIGHT = 50
+
+
 export const CELL_SIZE = 16;
 export const Z_INDEX_LAYER_SIZE = 10;
 

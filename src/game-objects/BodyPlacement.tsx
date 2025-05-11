@@ -62,7 +62,7 @@ export abstract class BodyPlacement extends Placement {
     ) {
       // 新增  spriteFacingDirection 這個變數的用意是
       // 假設我們要讓角色踩到機關並倒退一格，這時角色的應該面向右邊而往左後退或是面向左邊而往右後退
-      // 所以我們將 spriteFacingDirection, movingPixelDirection 兩個看似作用相同的變數分開
+      // 所以將 spriteFacingDirection, movingPixelDirection 兩個看似作用相同的變數分開
       this.spriteFacingDirection = this.movingPixelDirection;
     }
   }

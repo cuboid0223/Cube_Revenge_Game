@@ -50,7 +50,6 @@ export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
             return;
           }
 
-          // 清除解法路徑並新增 placement
           level.clearSolutionPath();
           level.addPlacement({
             x: x,
@@ -58,13 +57,11 @@ export default function MapCell({ level, x, y, frameCoord }: MapCellType) {
             ...level.editModePlacement,
           });
 
-          // 新增完成後給予反饋
           toast({
             title: `新增 ${level.editModePlacement.type}`,
             description: `新增 ${level.editModePlacement.type} 至 [${x}, ${y}]`,
           });
         } else {
-          // 如果條件不符合，顯示錯誤
           if(isEditPage){
             toast({
               title: `新增 ${level.editModePlacement.type} 至 [${x}, ${y}] 失敗`,

@@ -1,7 +1,7 @@
 import { generateLevelWithTemplates } from "./generateLevelWithTemplates";
 import tileMapToLevel from "./tileMapToLevel";
 
-const generateLevelConfig = async (
+const generateLevel = async (
   overallWidth: number = 50,
   overallHeight: number = 50
 ) => {
@@ -38,4 +38,4 @@ const generateLevelConfig = async (
   return { generatedTileMap, generatedLevelConfig };
 };
 
-export default generateLevelConfig;
+export default generateLevel;

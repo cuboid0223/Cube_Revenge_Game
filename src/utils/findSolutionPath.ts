@@ -183,9 +183,8 @@ export function getHeroDirection(dx: number, dy: number) {
   return entryDirection;
 }
 
-//––––– 事前準備 –––––//
+
 // 為面粉建立一個 mapping：key = "x,y" ； value = index（從 0 開始）
-// 假設 placements 中面粉數量不多
 export function buildFlourMapping(placements: PlacementConfig[]) {
   const flourPositions = placements.filter(
     (p) => p.type === PLACEMENT_TYPE_FLOUR
@@ -354,21 +353,21 @@ export default function findSolutionPath(
     return [];
   }
 
-  // 事前準備：面粉 mapping 與 switch door mapping
+  // 面粉 mapping 與 switch door mapping
   const { flourMap, totalFlours } = buildFlourMapping(placements);
   const { doorMap, totalDoors } = buildSwitchDoorMapping(placements);
 
   // 初始面粉收集：使用 bit mask 表示（全 0 表示未收集）
   let initFlourMask = 0;
   // 初始 switchDoor 狀態：用 bit mask 表示，每個門的預設值從 door 物件中取得
-  // 若 door 物件有 isRaised 屬性就採用它，否則預設為 0 (開啟)
+  // 若 door 物件有 isRaised 屬性採用該屬性，否則預設為 0 (開啟)
   let initDoorMask = 0;
   doorMap.forEach((index, key) => {
     const door = placements.find(
       (p) => p.type === PLACEMENT_TYPE_SWITCH_DOOR && `${p.x},${p.y}` === key
     );
 
-    // 假設 isRaised === true 代表門是「關閉」（即阻擋），我們用 1 表示關閉
+    // 如果 isRaised === true 代表門是關閉，即阻擋，用 1 表示關閉
     if (door && door.hasOwnProperty("isRaised") && door.isRaised) {
       initDoorMask |= 1 << index;
     }
@@ -502,17 +501,17 @@ export default function findSolutionPath(
         if (!(newItemMask & 16)) continue;
       }
 
-      // 如火、水，僅當有相應道具時才能通過
+      // 如火、水，當有相應道具時才能通過
       if (compositeState.fire && !(newItemMask & 1)) continue;
 
       if (compositeState.water && !(newItemMask & 2)) continue;
 
-      // 處理 switch：踩到 switch 時，全部 switchDoor 狀態取反
+      // 踩到 switch 時，全部 switchDoor 狀態取反
       if (compositeState.switch) {
         newDoorMask = toggleSwitchDoorMask(newDoorMask, totalDoors);
       }
 
-      // 收集面粉：如果該位置在 flourMap 中，則將對應位元設為 1
+      // 收集面粉，如果該位置在 flourMap 中，則將對應位元設為 1
 
       if (compositeState.flour) {
         const flourKey = `${nx},${ny}`;
@@ -521,7 +520,7 @@ export default function findSolutionPath(
           newFlourMask |= 1 << index;
         }
       }
-      // 處理拾取道具：火焰、流水、冰、鑰匙等
+      // 處理拾取道具：火pickup、水pickup、冰、藍綠鑰匙等
       // 假設各拾取物件出現在某一位置時，就把對應的 bit 打開
       if (compositeState.firePickup) newItemMask |= 1;
 
@@ -559,8 +558,7 @@ export default function findSolutionPath(
         newItemMask = 0;
       }
 
-      // 生成新的 state key：用簡短的字串結合數值資訊
-
+      // 生成新的 state key：用字串結合數值
       const stateKey = `${nx},${ny},${newFlourMask},${newItemMask},${newDoorMask}`;
       if (visited.has(stateKey)) continue;
       visited.add(stateKey);
@@ -591,7 +589,7 @@ export default function findSolutionPath(
   return [];
 }
 
-// 改進版啟發函數：用 Manhattan 距離估算，這裡可依需要改成 MST 等更精準估算
+// 啟發函數：用 Manhattan 距離估算
 function heuristicOptimized(
   cx: number,
   cy: number,
@@ -599,11 +597,10 @@ function heuristicOptimized(
   totalFlours: number,
   goalPosition: PlacementConfig
 ) {
-  // 找出所有未收集面粉的最小距離，再與目標距離取最小值
+  // 如果面粉都收集完了：直接走向目標
   let minDist = Math.abs(goalPosition.x - cx) + Math.abs(goalPosition.y - cy);
   flourMap.forEach((index, key) => {
-    // 檢查這個面粉是否收集（在主邏輯中我們用 bit mask 表示，這裡僅作參考，實際上可改用參數傳入的收集狀態）
-    // 你也可以傳入當前收集的 mask 來篩選未收集面粉
+    //如果還有面粉要收集，優先考慮最近的面粉
     const [fx, fy] = key.split(",").map(Number);
     const d = Math.abs(fx - cx) + Math.abs(fy - cy);
     if (d < minDist) minDist = d;

@@ -48,9 +48,8 @@ export function handleIceSliding(
   const currentTile = gameMap[ny - 1][nx - 1];
   let compositeState = combineCellState(currentTile);
 
-  // 如果有hasIcePickup，則不滑動（僅返回起始位置）
+  // 如果有hasIcePickup，則不滑動
   if (hasIcePickup) {
-    // 處理冰角阻擋
     movingTrace = handleIceCornerBlocking(
       placements,
       nx,
@@ -69,7 +68,7 @@ export function handleIceSliding(
     };
   }
 
-  // 使用訪問集合來檢測迴圈
+  // 檢測迴圈用
   let visited = new Set<string>();
 
   while (true) {
@@ -123,7 +122,7 @@ export function handleIceSliding(
     let nextX = nx + dx;
     let nextY = ny + dy;
 
-    // 邊界檢查（現在放在冰角處理後）
+    // 邊界檢查
     if (nextX < 1 || nextX > width || nextY < 1 || nextY > height) break;
 
     // 檢查是否存在無窮迴圈
@@ -234,7 +233,7 @@ export function handleIceSliding(
   };
 }
 
-// 處理冰角邏輯，將其封裝為一個函數，避免重複程式碼
+// 處理冰角邏輯
 function handleIceCornerBlocking(
   placements: PlacementConfig[],
   nx: number,
